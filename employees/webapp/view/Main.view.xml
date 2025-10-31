@@ -1,0 +1,135 @@
+<mvc:View 
+    controllerName="com.logaligroup.employees.controller.Main"
+        xmlns="sap.m"
+        xmlns:f="sap.f"
+        xmlns:core="sap.ui.core"
+        xmlns:mvc="sap.ui.core.mvc"
+        xmlns:fb="sap.ui.comp.filterbar">
+
+    <f:DynamicPage id="idDynamicPage" >
+
+        <f:title>
+
+            <f:DynamicPageTitle id="idGenDynamicPageTitle" >
+
+                <f:heading>
+
+                    <Title  text="{i18n>appTitle}" />
+
+                </f:heading>
+
+            </f:DynamicPageTitle>
+
+        </f:title>
+
+        <f:header>
+
+            <f:DynamicPageHeader id="idGenDynamicPageHeader" >
+            
+                <fb:FilterBar
+                            search="onFilterSearchPress"
+                            showClearOnFB="true"
+                            clear="onClearPress">
+
+                    <fb:filterGroupItems>
+
+                        <fb:FilterGroupItem
+                                        groupName="filters"
+                                        name="employee"
+                                        label="{i18n>labelEmployee}"
+                                        visibleInFilterBar="true">
+
+                            <fb:control>
+
+                                <Input/>
+                            
+                            </fb:control>
+                        
+                        </fb:FilterGroupItem>
+
+                        <fb:FilterGroupItem groupName="filters"
+                                            name="country"
+                                            label="{i18n>labelCountry}"
+                                            visibleInFilterBar="true">
+                            <fb:control>
+
+                                <ComboBox
+                                      items="{countries>/Countries}">                                
+                                
+                                    <items>
+                                        <core:Item key="{countries>code}" 
+                                                text="{countries>country}"/>
+                                    </items>
+                                    
+                                </ComboBox>
+                            
+                            </fb:control>
+                        
+                        </fb:FilterGroupItem>
+
+                    
+                    </fb:filterGroupItems>
+
+
+                
+                
+                </fb:FilterBar>            
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <Table  id="table"
+                    items="{employees>/Employees}">
+
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Employees (45)"/>
+                        <ToolbarSpacer />
+                        <Button
+                                icon="sap-icon://download"
+                                press="onExportToExcel"/>
+                    </Toolbar>
+                </headerToolbar>
+
+                <columns>
+
+                    <Column>
+                        <Label text="{i18n>ID}"/>
+                    </Column>
+
+                    <Column>
+                        <Label text="{i18n>country}"/>
+                    </Column>
+
+                    <Column>
+                        <Label text="{i18n>city}"/>
+                    </Column>
+
+                    <Column>
+                        <Label text="{i18n>postalCode}"/>
+                    </Column>
+                
+                </columns>
+
+                <items>
+
+                    <ColumnListItem>
+
+                        <cells>
+
+                            <ObjectIdentifier title="{employees>EmployeeID}" 
+                                                text="{employees>LastName}, {employees>FirstName}"/>
+
+                            <Text text="{employees>Country}"/>
+                            <Text text="{employees>City}"/>
+                            <Text text="{employees>PostalCode}"/>
+                        
+                        </cells>
+                    
+                    </ColumnListItem>
+                
+                </items>
+            
+            </Table>            
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
