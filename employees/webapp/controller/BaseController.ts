@@ -22,6 +22,7 @@ export default class BaseController extends Controller {
 
     public setModel(model: Model, name?: string): View | undefined {
         return this.getView()?.setModel(model, name);
+        
     }
 
     public getResourceBundle(): ResourceBundle {
