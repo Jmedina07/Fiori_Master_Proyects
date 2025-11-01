@@ -1,10 +1,11 @@
 <mvc:View 
-    controllerName="com.logaligroup.employees.controller.Main"
+    controllerName="com.logaligroup.employees.controller.Master"
         xmlns="sap.m"
         xmlns:f="sap.f"
         xmlns:core="sap.ui.core"
         xmlns:mvc="sap.ui.core.mvc"
         xmlns:fb="sap.ui.comp.filterbar">
+    
 
     <f:DynamicPage id="idDynamicPage" >
 
@@ -92,19 +93,23 @@
 
                 <columns>
 
-                    <Column>
+                    <Column minScreenWidth="Small"
+                            demandPopin="true">
                         <Label text="{i18n>ID}"/>
                     </Column>
 
-                    <Column>
+                    <Column minScreenWidth="Small"
+                            demandPopin="true">
                         <Label text="{i18n>country}"/>
                     </Column>
 
-                    <Column>
+                    <Column minScreenWidth="Small"
+                            demandPopin="true">
                         <Label text="{i18n>city}"/>
                     </Column>
 
-                    <Column>
+                    <Column minScreenWidth="Small"
+                            demandPopin="false">
                         <Label text="{i18n>postalCode}"/>
                     </Column>
                 
@@ -112,7 +117,8 @@
 
                 <items>
 
-                    <ColumnListItem>
+                    <ColumnListItem type="Navigation"
+                                    press="onNavToDetails">
 
                         <cells>
 
