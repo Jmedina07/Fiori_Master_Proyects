@@ -1,0 +1,89 @@
+<mvc:View 
+    controllerName="com.logaligroup.invoices.controller.InvoicesList"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    core:require="{ MyFormmatter: 'com/logaligroup/invoices/model/formatter' }"
+    xmlns="sap.m">
+
+    <List 
+        id="List" 
+        headerText="{i18n>invoices}" 
+        class="sapUiResponsiveMargin"
+        items="{
+            path:'northwind>/Invoices',
+            filters:{
+                path:'ExtendedPrice',
+                operator:'BT',
+                value1: '0.00',
+                value2: '500.00'
+            },
+            sorter:{
+                path:'ShipperName',
+                group: true
+            }
+        }"
+        width="auto">
+        <headerToolbar>
+            <Toolbar >
+
+                <Title text="{i18n>invoices}"/>
+                <ToolbarSpacer />
+                <SearchField search="onSearchPress" width="50%" />
+                <ToolbarSeparator />
+
+                <MultiComboBox id="idcmbStatus"
+                    selectionFinish="onSelectedKeys"
+                    placeholder="Status Filter"
+                    width="30%"
+                    items="{
+                        path: 'status>/Status',
+                        sorter: { path: 'Id' }
+                    }">
+                    <items>
+                        <core:ListItem key="{status>Id}" text="{status>Description}"/>
+                    </items>
+                </MultiComboBox>
+
+            </Toolbar>
+            
+        </headerToolbar>
+
+        <items>
+            <ObjectListItem
+
+                title="{northwind>Quantity} x {northwind>ProductName}"
+                type="Navigation"
+                press=".onVanToDetail"
+                number="{
+                    parts: [
+                        'northwind>ExtendedPrice',
+                        'currency>/usd'
+                    ],
+                    type: 'sap.ui.model.type.Currency',
+                    formatOptions: {
+                        showMeasure: false 
+                    },
+                    formatter: 'MyFormmatter.decimalSeparator.bind($controller)'
+                    
+                }"
+                numberUnit="{currency>/usd}"
+                numberState="{=
+                    ( ${northwind>ExtendedPrice} >= 0.00 &amp;&amp; ${northwind>ExtendedPrice} &lt;= 50.00)? 'Error' : 
+                    ( ${northwind>ExtendedPrice} > 50.00 &amp;&amp; ${northwind>ExtendedPrice} &lt;= 300.00)? 'Warning' :
+                    ( ${northwind>ExtendedPrice} > 300.00 &amp;&amp; ${northwind>ExtendedPrice} &lt;= 700.00)? 'Success' : 'Information'
+                }">
+<!--
+                <firstStatus>
+                    <ObjectStatus
+                        text="{
+                            path:'invoices>Status',
+                            formatter: 'MyFormmatter.statusText.bind($controller)'
+                        }"/>
+                </firstStatus>
+-->
+
+            </ObjectListItem>
+        </items>
+    </List>
+
+</mvc:View>

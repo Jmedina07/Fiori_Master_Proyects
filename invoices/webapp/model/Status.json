@@ -1,0 +1,16 @@
+{
+    "Status": [
+        {
+            "Id": "A",
+            "Description":"New"
+        },
+        {
+            "Id": "B",
+            "Description":"In progress"
+        },
+        {
+            "Id": "C",
+            "Description":"Done"
+        }                
+    ]
+}

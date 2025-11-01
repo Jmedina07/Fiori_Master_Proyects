@@ -1,0 +1,23 @@
+<mvc:View controllerName="com.logaligroup.invoices.controller.App"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+
+    <Shell id="shell">
+
+        <App id="app">
+            
+        
+        </App>
+        
+    </Shell>
+
+<!--
+    <Button id="buton" text="{i18n>showHelloButtonText}" press=".onShowHello"></Button>
+    <Input value="{/recipient/name}" description="Hello {/recipient/name}"
+        width="60%" valueLiveUpdate="true"
+    ></Input>
+-->
+
+
+</mvc:View>

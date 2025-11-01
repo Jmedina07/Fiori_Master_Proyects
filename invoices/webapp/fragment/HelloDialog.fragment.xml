@@ -1,0 +1,29 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core" >
+    <Dialog id="helloDialog"
+        title="Hello {view/recipient/name}">
+        <content>
+        
+        </content>
+
+        <beginButton>
+            <Button 
+                type="Reject"
+                text="{i18n>cancel}"
+                tooltip="{i18n>cancel}"
+                press="onCloseDialog"
+                width="4rem"/>
+        </beginButton>
+
+        <endButton>
+            <Button 
+                type="Emphasized"
+                text="{i18n>ok}"
+                tooltip="{i18n>ok}"
+                width="4rem"/>        
+        </endButton>
+    </Dialog>
+
+
+</core:FragmentDefinition>
