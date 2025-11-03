@@ -43,8 +43,8 @@ server:
         excludePatterns:
           - /Component-preload.js
     #Se agrego por XLS
-    # - name: ui5-tooling-modules
-    #   afterMiddleware: compression          
+    - name: ui5-tooling-modules-middleware
+      afterMiddleware: compression          
 builder:
   customTasks:
     - name: ui5-tooling-transpile-task
@@ -54,5 +54,5 @@ builder:
         transformModulesToUI5:
           overridesToOverride: true
   #Se agrego por XLS
- #   - name: ui5-tooling-modules
- #     afterTask: replaceCopyright  
+    - name: ui5-tooling-modules-task
+      afterTask: replaceVersion  

@@ -11,7 +11,8 @@
   "dependencies": {
     "file-save": "^0.2.0",
     "file-saver": "^2.0.5",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "ui5-tooling-modules": "3.33.1"    
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.14.7",
@@ -27,8 +28,8 @@
     "eslint-plugin-fiori-custom": "2.6.7",
     "typescript": "^5.1.6",
     "ui5-task-zipper": "^3.4.x",
-    "ui5-tooling-modules": "^3.33.0",
-    "ui5-tooling-transpile": "^3.3.7"
+    "ui5-tooling-modules": "^3.33.1",
+    "ui5-tooling-transpile": "^3.3.7" 
   },
   "scripts": {
     "start": "fiori run --open \"test/flp.html#app-preview\"",

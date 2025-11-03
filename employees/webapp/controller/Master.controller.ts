@@ -7,7 +7,7 @@ import Filter from "sap/ui/model/Filter";
 import Table from "sap/m/Table";
 import ListBinding from "sap/ui/model/ListBinding";
 import FilterOperator from "sap/ui/model/FilterOperator";
-//import * as XLSX from "xlsx";
+import * as XLSX from "xlsx";
 import Binding from "sap/ui/model/Binding";
 import Context from "sap/ui/model/Context";
 import oSpreedsheet from "sap/ui/export/Spreadsheet"
@@ -84,47 +84,47 @@ export default class Main extends BaseController {
 
     }
 
-    // public onExportToExcel(): void {
+    public onExportToExcel(): void {
 
-    //     // 1. Obtener la referencia a la tabla
-    //     const oTable = this.byId("table") as Table;
+        // 1. Obtener la referencia a la tabla
+        const oTable = this.byId("table") as Table;
 
-    //     // 2. Obtener el binding de los items
-    //     // Esto es crucial porque nos da los datos YA FILTRADOS por el FilterBar
-    //     const oBinding = oTable.getBinding("items") as ListBinding;
-    //     const aContexts: Context[] = oBinding.getContexts();
+        // 2. Obtener el binding de los items
+        // Esto es crucial porque nos da los datos YA FILTRADOS por el FilterBar
+        const oBinding = oTable.getBinding("items") as ListBinding;
+        const aContexts: Context[] = oBinding.getContexts();
 
-    //     // 3. Obtener los objetos de datos puros de los contextos
-    //     const aTableData: any[] = aContexts.map((oContext: Context) => {
-    //         return oContext.getObject();
-    //     });
+        // 3. Obtener los objetos de datos puros de los contextos
+        const aTableData: any[] = aContexts.map((oContext: Context) => {
+            return oContext.getObject();
+        });
 
-    //     // 4. Transformar los datos al formato deseado para Excel
-    //     // Esto es importante porque tu ObjectIdentifier combina dos campos.
-    //     // Creamos un nuevo array de objetos con las cabeceras que queremos.
-    //     const aDataToExport = aTableData.map(oEmployee => {
-    //         return {
-    //             "ID Empleado": oEmployee.EmployeeID,
-    //             "Nombre Completo": `${oEmployee.LastName}, ${oEmployee.FirstName}`,
-    //             "País": oEmployee.Country,
-    //             "Ciudad": oEmployee.City,
-    //             "Código Postal": oEmployee.PostalCode
-    //         };
-    //     });
+        // 4. Transformar los datos al formato deseado para Excel
+        // Esto es importante porque tu ObjectIdentifier combina dos campos.
+        // Creamos un nuevo array de objetos con las cabeceras que queremos.
+        const aDataToExport = aTableData.map(oEmployee => {
+            return {
+                "ID Empleado": oEmployee.EmployeeID,
+                "Nombre Completo": `${oEmployee.LastName}, ${oEmployee.FirstName}`,
+                "País": oEmployee.Country,
+                "Ciudad": oEmployee.City,
+                "Código Postal": oEmployee.PostalCode
+            };
+        });
 
-    //     // 5. Crear la Hoja de Cálculo (WorkSheet)
-    //     // Usamos 'json_to_sheet' que toma un array de objetos
-    //     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(aDataToExport);
+        // 5. Crear la Hoja de Cálculo (WorkSheet)
+        // Usamos 'json_to_sheet' que toma un array de objetos
+        const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(aDataToExport);
 
-    //     // 6. Crear el Libro de Trabajo (WorkBook)
-    //     const wb: XLSX.WorkBook = XLSX.utils.book_new();
+        // 6. Crear el Libro de Trabajo (WorkBook)
+        const wb: XLSX.WorkBook = XLSX.utils.book_new();
 
-    //     // 7. Añadir la hoja al libro con un nombre (ej: "Empleados")
-    //     XLSX.utils.book_append_sheet(wb, ws, "Empleados");
+        // 7. Añadir la hoja al libro con un nombre (ej: "Empleados")
+        XLSX.utils.book_append_sheet(wb, ws, "Empleados");
 
-    //     // 8. Generar y descargar el archivo
-    //     XLSX.writeFile(wb, "ListaEmpleados.xlsx");
-    // }
+        // 8. Generar y descargar el archivo
+        XLSX.writeFile(wb, "ListaEmpleados.xlsx");
+    }
 
     // public onExportToExcel () : void {
     //     //  "sap/ui/export/Spreadsheet" is the library that has been used here

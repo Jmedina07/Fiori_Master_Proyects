@@ -48,13 +48,39 @@
                         
                         </fb:FilterGroupItem>
 
+                        <fb:FilterGroupItem groupName="filters1"
+                                            name="country1"
+                                            label="{i18n>labelCountry}"
+                                            visibleInFilterBar="true">
+                            <fb:control>
+                               
+                                               <MultiComboBox id="idcmbStatus"
+                    selectionFinish="onSelectedKeys"
+                    placeholder="Status Filter"
+                    width="50%"                    
+                    items="{
+                        path: 'countries>/Countries',
+                        sorter: { path: 'code' },
+ 
+                        length:500
+                    }">
+                    <items>
+                        <core:ListItem key="{countries>code}"   text="{countries>country}" additionalText="{countries>code}"/>
+                    </items>
+                </MultiComboBox>
+                            </fb:control>
+                        
+                        </fb:FilterGroupItem>
+
                         <fb:FilterGroupItem groupName="filters"
                                             name="country"
                                             label="{i18n>labelCountry}"
                                             visibleInFilterBar="true">
                             <fb:control>
 
-                                <ComboBox
+                               
+
+                                <ComboBox 
                                       items="{countries>/Countries}">                                
                                 
                                     <items>
@@ -63,11 +89,13 @@
                                     </items>
                                     
                                 </ComboBox>
+
                             
-                            </fb:control>
+                            </fb:control>                            
                         
                         </fb:FilterGroupItem>
 
+  
                     
                     </fb:filterGroupItems>
 
