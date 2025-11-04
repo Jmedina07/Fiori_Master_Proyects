@@ -30,8 +30,9 @@
                 <fb:FilterBar
                             search="onFilterSearchPress"
                             showClearOnFB="true"
-                            clear="onClearPress">
-
+                            clear="onClearPress"
+                            >
+                    
                     <fb:filterGroupItems>
 
                         <fb:FilterGroupItem
@@ -50,26 +51,52 @@
 
                         <fb:FilterGroupItem groupName="filters1"
                                             name="country1"
-                                            label="{i18n>labelCountry}"
+                                            label="Countries"
                                             visibleInFilterBar="true">
+
                             <fb:control>
+                                <Input
+                                    id="productInput"
+                                    type="Text"
+                                    placeholder="Enter Country ..."
+                                    showValueHelp="true"
+                                    valueHelpOnly="true"
+                                    valueHelpRequest=".onSelectDialogPress"
+                                    class="sapUiSmallMarginBottom"
+                                    >
+                                    <customData>
+                                        <core:CustomData key="multi" value="true" />
+                                        <core:CustomData key="resizable" value="true" />                                    
+                                    </customData>
+                                </Input> 
+
+
+
                                
-                                               <MultiComboBox id="idcmbStatus"
-                    selectionFinish="onSelectedKeys"
-                    placeholder="Status Filter"
-                    width="50%"                    
-                    items="{
-                        path: 'countries>/Countries',
-                        sorter: { path: 'code' },
- 
-                        length:500
-                    }">
-                    <items>
-                        <core:ListItem key="{countries>code}"   text="{countries>country}" additionalText="{countries>code}"/>
-                    </items>
-                </MultiComboBox>
+                                <!-- <MultiComboBox id="idcmbStatus"
+                                    selectionFinish="onSelectedKeys"
+                                    placeholder="Status Filter"
+                                    showSecondaryValues= "true"                                    
+                                    width="80%"                    
+                                    items="{
+                                        path: 'countries>/Countries',
+                                        sorter: { path: 'code' },
+                                        length:500,
+                                        templateShareable: false
+                                    }">
+                                    <items>
+                                        <core:Item text="text" ></core:Item>
+                                        <core:ListItem key="{countries>code}" 
+
+                                        icon="{countries>flag}" 
+                                        text="{countries>country}" 
+                                        additionalText="{countries>flag}"/>
+                                    </items>
+                                </MultiComboBox> -->
+
+  
                             </fb:control>
-                        
+      
                         </fb:FilterGroupItem>
 
                         <fb:FilterGroupItem groupName="filters"

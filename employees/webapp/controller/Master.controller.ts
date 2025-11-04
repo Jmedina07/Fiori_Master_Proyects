@@ -15,11 +15,21 @@ import Column from "sap/ui/table/Column";
 import Event from "sap/ui/base/Event";
 import ObjectListItem from "sap/m/ObjectListItem";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import Fragment from "sap/ui/core/Fragment";
+import View from "sap/ui/core/mvc/View";
+import Dialog from "sap/m/Dialog"
+import SelectDialog from "sap/m/SelectDialog";
+import Model from "sap/ui/model/Model";
+import Button from "sap/m/Button";
+import syncStyleClass from "sap/ui/core/syncStyleClass";
 
 /**
  * @namespace com.logaligroup.employees.controller
  */
+type SelectDialogPromise = Promise<SelectDialog>;
 export default class Main extends BaseController {
+
+    private _pDialog!: SelectDialogPromise;
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
@@ -70,16 +80,16 @@ export default class Main extends BaseController {
         combobox.setSelectedKey("");
         this.onFilterSearchPress(event);
     }
-    public onNavToDetails(event: Event): void{
+    public onNavToDetails(event: Event): void {
 
         let item = event.getSource() as ObjectListItem;
         let bindingContext = item.getBindingContext("employees") as Context;
         let id = bindingContext.getProperty("EmployeeID");
         const model = this.getModel("view") as JSONModel;
-        model.setProperty("/layout","TwoColumnsMidExpanded");
+        model.setProperty("/layout", "TwoColumnsMidExpanded");
         const router = this.getRouter();
-        router.navTo("RouteDetails",{
-            ID: parseInt(id) -1 //index
+        router.navTo("RouteDetails", {
+            ID: parseInt(id) - 1 //index
         });
 
     }
@@ -125,49 +135,158 @@ export default class Main extends BaseController {
         // 8. Generar y descargar el archivo
         XLSX.writeFile(wb, "ListaEmpleados.xlsx");
     }
+    //public async onValueHelpRequest1() : Promise<void> {
+    // public onValueHelpRequest1(event: Event): void {
+    //     // var oButton = event.getSource(),
+    // 	// 	oView = this.getView();
+    //     // const oModel = oView.getModel() as Model;
 
-    // public onExportToExcel () : void {
-    //     //  "sap/ui/export/Spreadsheet" is the library that has been used here
-    //     var oTable = this.byId("exportTable") as Table;
-    //     // get Rows of the Table
-    //     var oBinding = oTable.getBinding("rows") as Binding;
-    //     // get Columns of the Table and get the Header labels and Property values 
-    //     var aCols = oTable.getColumns().map(function (oColumn: Column) {
-    //         var sProperty = oColumn.getSortProperty();
-    //         if (!sProperty) {
-    //             var oTemplate = oColumn.getTemplate() as Template;
-    //             sProperty = oTemplate && oTemplate.getBindingPath("text");
-    //         }
-    //         return {
-    //             label: oColumn.getLabel().getText(),
-    //             property: sProperty,
-    //             type: "String"
-    //         };
-    //     });
-    //     var iLength = oBinding.getLength();
-    //     // getting Data of the Table
-    //     // use getContexts() for odata V2
-    //     // use requestContexts() for odata v4
-    //     var aContexts = await oBinding.getContexts(0, iLength);
-    //     var aData = aContexts.map(function (oContext) {
-    //         return oContext.getObject();
-    //     });
-    //     // settings for the Spreadsheet
-    //     var oSettings = {
-    //         workbook: {
-    //             columns: aCols,
-    //         },
-    //         dataSource: aData,
-    //         fileName: "Exported Data.xlsx",
-    //         worker: false
-    //     };
-    //     // getting new Spreadsheet object and binding the settings
-    //     var oSpreadsheet = new Spreadsheet(oSettings);
-    //     oSpreadsheet.build().then(function () {
-    //         MessageToast.show("Exported excel data successfully ...");
-    //     }).finally(function () {
-    //         oSpreadsheet.destroy();
-    //     })
+    //     const oButton = event.getSource() as Button;
+    //     const oView = this.getView() as View;
+    //     const oModel = oView.getModel() as Model;
+
+    //     let view = this.getView() as View;
+
+    //     if(!this._pDialog){
+    //         this._pDialog =  Fragment.load({
+    //             id: view.getId(),
+    //             name: "com.logaligroup.employees.fragment.Countries",
+    //             controller: this
+    //         }) as SelectDialog;
+    //     }
+    //     view.addDependent(this.dialog);
+    //     this.dialog.open();   
+
+
     // }
+    // configDialog(oButton: Button, oDialog: any) {
+    //     throw new Error("Method not implemented.");
+    // }
+
+    public onSelectDialogPress(oEvent: Event): void {
+
+        const oButton = oEvent.getSource() as Button;
+        const oView = this.getView() as View;
+        const oModel = oView.getModel() as Model;
+        if (!oView) {
+            console.error("View is not available.");
+            return;
+        }
+
+        // Si la Promise del diálogo no ha sido inicializada, la creamos cargando el Fragment.
+        if (!this._pDialog) {
+            this._pDialog = Fragment.load({
+                id: oView.getId(),
+                // **ATENCIÓN: Cambia esta ruta a la de tu fragmento real**
+                name: "com.logaligroup.employees.fragment.Countries",
+                controller: this
+            }).then((oDialog: any): SelectDialog => {
+                // Asumimos que el fragmento devuelve el SelectDialog.
+                const selectDialog = oDialog as SelectDialog;
+
+                // Aplicar el modelo de la vista al diálogo.
+                selectDialog.setModel(oModel);
+
+                // Opcional: añadir como dependiente para el manejo del ciclo de vida
+                oView.addDependent(selectDialog);
+
+                return selectDialog;
+            });
+            //this.configDialog(oButton, this._pDialog );
+        }
+
+        // Usamos la Promise para configurar y abrir el diálogo.
+        // El 'bind(this)' se mantiene para asegurar el contexto dentro de la función .then().
+        this._pDialog.then((oDialog: SelectDialog) => {
+            // 'this' aquí es automáticamente el controlador (MyController)
+            this._configDialog(oButton, oDialog);
+            oDialog.open();
+        }); // <-- Observa que eliminamos .bind(this)
+
+    }
+
+    private _configDialog(oButton: Button, oDialog: SelectDialog): void {
+        // Multi-select if required
+        const bMultiSelect = !!oButton.data("multi");
+        oDialog.setMultiSelect(bMultiSelect);
+
+        // Custom Confirm Button Text
+        const sCustomConfirmButtonText = oButton.data("confirmButtonText") as string;
+        oDialog.setConfirmButtonText(sCustomConfirmButtonText);
+        // if (sCustomConfirmButtonText) {
+        //     oDialog.setConfirmButtonText(sCustomConfirmButtonText);
+        // }
+
+        // Remember selections if required
+        const bRemember = !!oButton.data("remember");
+        oDialog.setRememberSelections(bRemember);
+
+        // Add Clear button if needed
+        const bShowClearButton = !!oButton.data("showClearButton");
+        oDialog.setShowClearButton(bShowClearButton);
+
+        // Set growing property (convertir a boolean)
+        const bGrowing = oButton.data("growing") === "true";
+        oDialog.setGrowing(bGrowing);
+
+        // Set growing threshold
+        var sGrowingThreshold = oButton.data("threshold");
+        if (sGrowingThreshold) {
+            oDialog.setGrowingThreshold(parseInt(sGrowingThreshold));
+        }
+        // const sGrowingThreshold = oButton.data("threshold") as string;
+        // if (sGrowingThreshold) {
+        //     const iThreshold = parseInt(sGrowingThreshold, 10);
+        //     if (!isNaN(iThreshold)) {
+        //         oDialog.setGrowingThreshold(iThreshold);
+        //     }
+        // }
+
+        // Set draggable property
+        const bDraggable = !!oButton.data("draggable");
+        oDialog.setDraggable(bDraggable);
+
+        // Set resizable property
+        const bResizable = !!oButton.data("resizable");
+        oDialog.setResizable(bResizable);
+
+        // Set style classes
+        const sResponsiveStyleClasses = "sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer";
+        const bResponsivePadding = !!oButton.data("responsivePadding");
+        oDialog.toggleStyleClass(sResponsiveStyleClasses, bResponsivePadding);
+
+        // Clear the old search filter (asegurando que getBinding("items") no sea null)
+        // const oBinding = oDialog.getBinding("items");
+        // if (oBinding) {
+        //     oBinding.filter([]);
+        // }
+
+        // clear the old search filter
+        const oBinding = oDialog.getBinding("items");
+
+        // 1. Verificar si el binding existe
+        if (oBinding) {
+            // 2. Aplicar aserción de tipo para que TypeScript reconozca la función filter
+            const oListBinding = oBinding as ListBinding;
+
+            // 3. Llamar a filter en el ListBinding
+            oListBinding.filter([]);
+        }
+
+        // Toggle compact style
+        //(sap.m as any).syncStyleClass("sapUiSizeCompact", this.getView(), oDialog);
+        // const oMLibrary = sap.ui.require("sap/ui/core");
+        // if (oMLibrary && oMLibrary.syncStyleClass) {
+        //     oMLibrary.syncStyleClass("sapUiSizeCompact", this.getView(), oDialog);
+        // } else {
+        //     // Esto debería ejecutarse solo en entornos legacy o si hay un error de carga
+        //     console.warn("syncStyleClass no pudo ser cargada directamente. Intentando con la sintaxis global...");
+        //     // Intentamos la sintaxis global (solo si estás seguro de que está disponible)
+        //     // (sap.m as any).syncStyleClass("sapUiSizeCompact", this.getView(), oDialog);
+        // }
+
+
+        syncStyleClass("sapUiSizeCompact", this.getView() as View, oDialog); //
+    }
 
 }
