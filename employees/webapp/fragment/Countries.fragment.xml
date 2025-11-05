@@ -5,9 +5,9 @@
 		id="mySelectDialog"
 		noDataText="No Products Found"
 		title="Select Product"
-		search=".onSearch"
-		confirm=".onDialogClose"
-		cancel=".onDialogClose"
+		search="._handleValueHelpSearch"
+		confirm=".onSelectDialogConfirm"
+		cancel=".onSelectDialogConfirm"
 		items="{
 			path: 'countries>/Countries',
 			length:500

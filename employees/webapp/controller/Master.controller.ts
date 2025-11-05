@@ -22,14 +22,31 @@ import SelectDialog from "sap/m/SelectDialog";
 import Model from "sap/ui/model/Model";
 import Button from "sap/m/Button";
 import syncStyleClass from "sap/ui/core/syncStyleClass";
+import StandardListItem from "sap/m/StandardListItem";
+import ValueHelpDialog from "sap/ui/comp/valuehelpdialog/ValueHelpDialog";
+import MultiInput from "sap/m/MultiInput";
+import TableSelectDialog from "sap/m/TableSelectDialog";
+import ListItemBase from "sap/m/ListItemBase"; // <--- Importación corregida
+import Token from "sap/m/Token";
+
+
 
 /**
  * @namespace com.logaligroup.employees.controller
  */
 type SelectDialogPromise = Promise<SelectDialog>;
+type ValueHelpDialogPromise = Promise<ValueHelpDialog>;
+interface SelectDialogConfirmParameters {
+    selectedItems: StandardListItem[];
+    // Puedes añadir otros parámetros si los usas:
+    // selectedContexts: sap.ui.model.Context[];
+    // confirmButtonPressed: boolean; 
+}
 export default class Main extends BaseController {
 
     private _pDialog!: SelectDialogPromise;
+    // Declaración de propiedad privada para la promesa del diálogo
+    private _pValueHelpDialog: Promise<TableSelectDialog> | undefined;
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
@@ -75,9 +92,9 @@ export default class Main extends BaseController {
     public onClearPress(event: FilterBar$ClearEvent): void {
         const array = event.getParameter("selectionSet") as Control[];
         const input = array[0] as Input;
-        const combobox = array[1] as ComboBox;
+        const MultiInput = array[1] as MultiInput;
         input.setValue("");
-        combobox.setSelectedKey("");
+        MultiInput.removeAllTokens();
         this.onFilterSearchPress(event);
     }
     public onNavToDetails(event: Event): void {
@@ -110,8 +127,6 @@ export default class Main extends BaseController {
         });
 
         // 4. Transformar los datos al formato deseado para Excel
-        // Esto es importante porque tu ObjectIdentifier combina dos campos.
-        // Creamos un nuevo array de objetos con las cabeceras que queremos.
         const aDataToExport = aTableData.map(oEmployee => {
             return {
                 "ID Empleado": oEmployee.EmployeeID,
@@ -135,33 +150,6 @@ export default class Main extends BaseController {
         // 8. Generar y descargar el archivo
         XLSX.writeFile(wb, "ListaEmpleados.xlsx");
     }
-    //public async onValueHelpRequest1() : Promise<void> {
-    // public onValueHelpRequest1(event: Event): void {
-    //     // var oButton = event.getSource(),
-    // 	// 	oView = this.getView();
-    //     // const oModel = oView.getModel() as Model;
-
-    //     const oButton = event.getSource() as Button;
-    //     const oView = this.getView() as View;
-    //     const oModel = oView.getModel() as Model;
-
-    //     let view = this.getView() as View;
-
-    //     if(!this._pDialog){
-    //         this._pDialog =  Fragment.load({
-    //             id: view.getId(),
-    //             name: "com.logaligroup.employees.fragment.Countries",
-    //             controller: this
-    //         }) as SelectDialog;
-    //     }
-    //     view.addDependent(this.dialog);
-    //     this.dialog.open();   
-
-
-    // }
-    // configDialog(oButton: Button, oDialog: any) {
-    //     throw new Error("Method not implemented.");
-    // }
 
     public onSelectDialogPress(oEvent: Event): void {
 
@@ -177,7 +165,6 @@ export default class Main extends BaseController {
         if (!this._pDialog) {
             this._pDialog = Fragment.load({
                 id: oView.getId(),
-                // **ATENCIÓN: Cambia esta ruta a la de tu fragmento real**
                 name: "com.logaligroup.employees.fragment.Countries",
                 controller: this
             }).then((oDialog: any): SelectDialog => {
@@ -213,9 +200,6 @@ export default class Main extends BaseController {
         // Custom Confirm Button Text
         const sCustomConfirmButtonText = oButton.data("confirmButtonText") as string;
         oDialog.setConfirmButtonText(sCustomConfirmButtonText);
-        // if (sCustomConfirmButtonText) {
-        //     oDialog.setConfirmButtonText(sCustomConfirmButtonText);
-        // }
 
         // Remember selections if required
         const bRemember = !!oButton.data("remember");
@@ -234,13 +218,6 @@ export default class Main extends BaseController {
         if (sGrowingThreshold) {
             oDialog.setGrowingThreshold(parseInt(sGrowingThreshold));
         }
-        // const sGrowingThreshold = oButton.data("threshold") as string;
-        // if (sGrowingThreshold) {
-        //     const iThreshold = parseInt(sGrowingThreshold, 10);
-        //     if (!isNaN(iThreshold)) {
-        //         oDialog.setGrowingThreshold(iThreshold);
-        //     }
-        // }
 
         // Set draggable property
         const bDraggable = !!oButton.data("draggable");
@@ -255,12 +232,6 @@ export default class Main extends BaseController {
         const bResponsivePadding = !!oButton.data("responsivePadding");
         oDialog.toggleStyleClass(sResponsiveStyleClasses, bResponsivePadding);
 
-        // Clear the old search filter (asegurando que getBinding("items") no sea null)
-        // const oBinding = oDialog.getBinding("items");
-        // if (oBinding) {
-        //     oBinding.filter([]);
-        // }
-
         // clear the old search filter
         const oBinding = oDialog.getBinding("items");
 
@@ -273,20 +244,46 @@ export default class Main extends BaseController {
             oListBinding.filter([]);
         }
 
-        // Toggle compact style
-        //(sap.m as any).syncStyleClass("sapUiSizeCompact", this.getView(), oDialog);
-        // const oMLibrary = sap.ui.require("sap/ui/core");
-        // if (oMLibrary && oMLibrary.syncStyleClass) {
-        //     oMLibrary.syncStyleClass("sapUiSizeCompact", this.getView(), oDialog);
-        // } else {
-        //     // Esto debería ejecutarse solo en entornos legacy o si hay un error de carga
-        //     console.warn("syncStyleClass no pudo ser cargada directamente. Intentando con la sintaxis global...");
-        //     // Intentamos la sintaxis global (solo si estás seguro de que está disponible)
-        //     // (sap.m as any).syncStyleClass("sapUiSizeCompact", this.getView(), oDialog);
-        // }
-
-
         syncStyleClass("sapUiSizeCompact", this.getView() as View, oDialog); //
+    }
+
+
+    public onSelectDialogConfirm(oEvent: Event): void {
+
+        const aSelectedItems = (oEvent.getParameter as (name: string) => any)("selectedItems") as ListItemBase[] | undefined;
+
+        // Obtenemos la referencia al control MultiInput usando su ID
+        const oMultiInput = this.byId("multiInput") as MultiInput;
+
+        if (aSelectedItems && aSelectedItems.length > 0) {
+            aSelectedItems.forEach((oItem: ListItemBase) => {
+                const sKey = (oItem as any).getTitle();
+                const sText = (oItem as any).getDescription();
+
+                oMultiInput.addToken(new Token({
+                    text: sText,
+                    key: sText
+                }));
+            });
+        }
+
+
+    }
+
+    public _handleValueHelpSearch(evt: Event): void {
+
+        const sValue = ((evt.getParameter as (name: string) => any)("value") as string) || "";
+
+        const oFilter = new Filter(
+            "country",
+            FilterOperator.Contains,
+            sValue
+        );
+
+        // El Source del evento de búsqueda es el TableSelectDialog (o el control de búsqueda dentro)
+        const oDialog = evt.getSource() as TableSelectDialog;
+        const oBinding = oDialog.getBinding("items") as ListBinding | undefined;
+        oBinding?.filter([oFilter]);
     }
 
 }
