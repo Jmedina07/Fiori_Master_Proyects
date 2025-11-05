@@ -1,0 +1,28 @@
+{
+    "Statuses": [
+        {
+            "StatusID": 1,
+            "Estatus": "active",
+            "Description_ES": "Activo/En Proceso",
+            "Icon": "sap-icon://status-in-process"
+        },
+        {
+            "StatusID": 2,
+            "Estatus": "inactive",
+            "Description_ES": "Inactivo/Entregado",
+            "Icon": "sap-icon://complete"
+        },
+        {
+            "StatusID": 3,
+            "Estatus": "pending",
+            "Description_ES": "Pendiente de Pago",
+            "Icon": "sap-icon://alert"
+        },
+        {
+            "StatusID": 4,
+            "Estatus": "cancelled",
+            "Description_ES": "Cancelado/Rechazado",
+            "Icon": "sap-icon://decline"
+        }
+    ]
+}

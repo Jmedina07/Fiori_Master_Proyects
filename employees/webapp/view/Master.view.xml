@@ -31,6 +31,7 @@
                             search="onFilterSearchPress"
                             showClearOnFB="true"
                             clear="onClearPress"
+                            filterContainerWidth="15rem"
                             >
                     
                     <fb:filterGroupItems>
@@ -52,11 +53,12 @@
 
                         <fb:FilterGroupItem groupName="filtercountry"
                                         name="country"
+                
                                         label="{i18n>labelCountry}"
                                         visibleInFilterBar="true">
                             <fb:control>
 
-                                <MultiInput width="80%"
+                                <MultiInput width="150%"
                                     id="multiInput"
                                     suggestionItems="{
                                         path: 'countries>/Countries',
@@ -84,11 +86,15 @@
         </f:header>
         <f:content>
             <Table  id="table"
-                    items="{employees>/Employees}">
+                    items="{employees>/Employees}"
+                    updateFinished="onTableUpdateFinished"
+                    growing="true" 
+                    growingThreshold="20"                    
+                    >
 
                 <headerToolbar>
                     <Toolbar>
-                        <Title text="Employees (45)"/>
+                        <Title id="myRows" text="Employees"/>
                         <ToolbarSpacer />
                         <Button
                                 icon="sap-icon://download"

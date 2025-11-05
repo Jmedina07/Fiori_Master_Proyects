@@ -28,6 +28,7 @@ import MultiInput from "sap/m/MultiInput";
 import TableSelectDialog from "sap/m/TableSelectDialog";
 import ListItemBase from "sap/m/ListItemBase"; // <--- Importación corregida
 import Token from "sap/m/Token";
+import Title from "sap/m/Title"; // Importa el tipo Title
 
 
 
@@ -44,10 +45,14 @@ interface SelectDialogConfirmParameters {
 }
 export default class Main extends BaseController {
 
+    public aFilters: any[] = [];
     private _pDialog!: SelectDialogPromise;
     // Declaración de propiedad privada para la promesa del diálogo
     private _pValueHelpDialog: Promise<TableSelectDialog> | undefined;
 
+    // Properties to hold the current filters from different controls
+    private aSearchFilters: Filter[] = [];
+    private aStatusFilters: Filter[] = [];
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
 
@@ -55,39 +60,82 @@ export default class Main extends BaseController {
 
     public onFilterSearchPress(event: FilterBar$SearchEvent): void {
         const array = event.getParameter("selectionSet") as Control[];
-        const input = array[0] as Input;            //getValue()
-        const combobox = array[1] as ComboBox;      ///getSelectedKey()
-        const sEmployee = input.getValue();
-        const sCountry = combobox.getSelectedKey();
-        let filters = [];
+        const oInput = array[0] as Input;            //getValue()
+        const oMultiInput = array[1] as MultiInput;      ///getSelectedKey()
 
+        // 1. Reset the internal search filters array
+        this.aSearchFilters = [];
+        this.aStatusFilters = [];
+        this.inputfilter(oInput);
+        this.countryFilter(oMultiInput);
+        this.applyAllFilters();
+    }
+
+    private inputfilter(input: Input): void {
+
+        const sEmployee = input.getValue();
         if (sEmployee) {
-            filters.push(
+            // Create a single OR filter for ProductName and ShipperName
+            const oSearchFilter =
                 new Filter({
                     filters: [
                         new Filter("EmployeeID", FilterOperator.EQ, sEmployee),
                         new Filter({
                             filters: [
-                                new Filter("FirstName", "Contains", sEmployee),
+                                new Filter("FistName", FilterOperator.Contains, sEmployee),
                                 new Filter("LastName", FilterOperator.Contains, sEmployee)
                             ],
                             and: false
                         })
+
                     ],
-                    and: false
-                })
-            );
+                    and: false // Use OR logic for the search query
+                });
+            this.aSearchFilters.push(oSearchFilter);
         }
 
-        if (sCountry) {
-            filters.push(new Filter("Country", "EQ", sCountry));
-        }
-
-        const table = this.byId("table") as Table;
-        const binding = table.getBinding("items") as ListBinding;
-        binding.filter(filters);
     }
 
+    private countryFilter(oMultiInput: MultiInput): void {
+
+        // 2. Obtener la lista de tokens
+        const aTokens = oMultiInput.getTokens() as Token[];
+
+        // 3. Obtener los valores (asumimos que el texto del token es el valor de filtrado)
+        const aSelectedKeys = aTokens.map((token: Token) => token.getKey());
+
+        if (aSelectedKeys.length > 0) {
+            // Create a filter for each selected status (all with OR logic)
+            const aStatusFilters = aSelectedKeys.map((item: string) =>
+                // Usamos "Status" o la propiedad OData que necesites filtrar
+                new Filter("Country", FilterOperator.EQ, item)
+            );
+            // Agrupar todos los filtros de estado con una lógica OR general
+            const oCombinedStatusFilter = new Filter({
+                filters: aStatusFilters,
+                and: false // Lógica OR: Coincide si el Status es igual a cualquiera de los tokens
+            });
+            this.aStatusFilters.push(oCombinedStatusFilter);
+        }
+
+    }
+
+    private applyAllFilters(): void {
+        // Combine all filter arrays into one (AND logic between the groups)
+        const aAllFilters = [
+            ...this.aSearchFilters,
+            ...this.aStatusFilters
+        ];
+
+        // const list = this.byId("List") as List;
+        // const binding = list.getBinding("items") as ListBinding;
+
+        // Apply the combined array of filters
+        // binding.filter(aAllFilters);
+        const table = this.byId("table") as Table;
+        const binding = table.getBinding("items") as ListBinding;
+        binding.filter(aAllFilters);
+    }
 
     public onClearPress(event: FilterBar$ClearEvent): void {
         const array = event.getParameter("selectionSet") as Control[];
@@ -262,7 +310,7 @@ export default class Main extends BaseController {
 
                 oMultiInput.addToken(new Token({
                     text: sText,
-                    key: sText
+                    key: sKey
                 }));
             });
         }
@@ -284,6 +332,24 @@ export default class Main extends BaseController {
         const oDialog = evt.getSource() as TableSelectDialog;
         const oBinding = oDialog.getBinding("items") as ListBinding | undefined;
         oBinding?.filter([oFilter]);
+    }
+
+    public onTableUpdateFinished(oEvent: Event): void {
+
+        const oTable = oEvent.getSource() as Table;
+        const oBinding = oTable.getBinding("items") as ListBinding; // Usa "rows" para sap.ui.table.Table
+
+        if (oBinding) {
+            const iTotalRowCount: number = oBinding.getLength();
+
+            // 1. Obtener la referencia al control Title por su ID
+            const oTitle = ( this.getView() as View).byId("myRows") as Title;
+
+            if (oTitle) {
+                // 2. Actualizar el texto del título con el formato deseado
+                oTitle.setText(`Employees (${iTotalRowCount})`);
+            }
+        }
     }
 
 }
