@@ -3,3 +3,22 @@
 .boldElement {
     font-weight: bold;
 }
+
+/* Estilo del color de fondo normal */
+.iconDownload {
+    background-color: #e0f2d2 !important; /* Verde claro para el fondo */
+    border-color: #e0f2d2 !important; /* Mismo color para el borde */
+    border-radius: 8px !important; /* Bordes redondeados */
+}
+
+/* Estilo al pasar el ratón (hover) - puedes ajustar si quieres un efecto diferente */
+.iconDownload:hover {
+    background-color: #d1ecc0 !important; /* Un tono ligeramente diferente para hover */
+    border-color: #d1ecc0 !important;
+}
+
+/* Estilo al hacer click (active) - puedes ajustar si quieres un efecto diferente */
+.iconDownload:active {
+    background-color: #c2e6af !important; /* Otro tono para active */
+    border-color: #c2e6af !important;
+}

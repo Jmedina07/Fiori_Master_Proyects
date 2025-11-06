@@ -51,11 +51,7 @@
         "settings": {
           "bundleName": "com.logaligroup.employees.i18n.i18n"
         }
-      },
-      "countries":{
-        "type":"sap.ui.model.json.JSONModel",
-        "uri":"model/Countries.json"
-      }   
+      }
     },
     "resources": {
       "css": [

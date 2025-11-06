@@ -10,6 +10,7 @@ export default class App extends BaseController {
     public onInit(): void {
         this.loadEmployees();
         this.loadCountries();
+        this.loadStatus();
         this.loadView();
     }
 
@@ -24,6 +25,12 @@ export default class App extends BaseController {
         model.loadData("../model/Countries.json");
         this.setModel(model, "countries");
     }
+
+    private loadStatus(): void {
+        const model = new JSONModel();  //Modelos
+        model.loadData("../model/Status.json");
+        this.setModel(model, "status");
+    }    
 
     private loadView(): void {
 

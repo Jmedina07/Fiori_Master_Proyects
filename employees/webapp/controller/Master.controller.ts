@@ -29,7 +29,7 @@ import TableSelectDialog from "sap/m/TableSelectDialog";
 import ListItemBase from "sap/m/ListItemBase"; // <--- Importación corregida
 import Token from "sap/m/Token";
 import Title from "sap/m/Title"; // Importa el tipo Title
-
+import MultiComboBox from "sap/m/MultiComboBox";
 
 
 /**
@@ -62,12 +62,14 @@ export default class Main extends BaseController {
         const array = event.getParameter("selectionSet") as Control[];
         const oInput = array[0] as Input;            //getValue()
         const oMultiInput = array[1] as MultiInput;      ///getSelectedKey()
+        const oMultiComboBox = array[2] as MultiComboBox;      ///getSelectedKey()
 
         // 1. Reset the internal search filters array
         this.aSearchFilters = [];
         this.aStatusFilters = [];
         this.inputfilter(oInput);
         this.countryFilter(oMultiInput);
+        this.statusFilter(oMultiComboBox);
         this.applyAllFilters();
     }
 
@@ -139,10 +141,12 @@ export default class Main extends BaseController {
 
     public onClearPress(event: FilterBar$ClearEvent): void {
         const array = event.getParameter("selectionSet") as Control[];
-        const input = array[0] as Input;
-        const MultiInput = array[1] as MultiInput;
-        input.setValue("");
-        MultiInput.removeAllTokens();
+        const oInput = array[0] as Input;
+        const oMultiInput = array[1] as MultiInput;
+        const oMultiComboBox = array[2] as MultiComboBox;
+        oInput.setValue("");
+        oMultiInput.removeAllTokens();
+        oMultiComboBox.removeAllSelectedItems();
         this.onFilterSearchPress(event);
     }
     public onNavToDetails(event: Event): void {
@@ -343,13 +347,49 @@ export default class Main extends BaseController {
             const iTotalRowCount: number = oBinding.getLength();
 
             // 1. Obtener la referencia al control Title por su ID
-            const oTitle = ( this.getView() as View).byId("myRows") as Title;
+            const oTitle = (this.getView() as View).byId("myRows") as Title;
 
             if (oTitle) {
                 // 2. Actualizar el texto del título con el formato deseado
                 oTitle.setText(`Employees (${iTotalRowCount})`);
             }
         }
+    }
+
+    public statusFilter(oMultiComboBox: MultiComboBox): void {
+
+
+        // Get the selected keys (an array of strings)
+        const aSelectedKeys = oMultiComboBox.getSelectedKeys();
+
+        // let aFilters: any[] = [];
+        // aSelectedKeys.forEach((item) => {
+        //     aFilters.push(new Filter("Status", FilterOperator.EQ, item));
+        // });
+        // this.onFilter(aFilters);
+
+        // 1. Obtener la lista de tokens
+        // const aTokens = oMultiInput.getTokens() as Token[];
+
+        // 2. Obtener los valores (asumimos que el texto del token es el valor de filtrado)
+        // const aSelectedKeys = aTokens.map((token: Token) => token.getKey());
+
+        if (aSelectedKeys.length > 0) {
+            // Create a filter for each selected status (all with OR logic)
+            const aStatusFilters = aSelectedKeys.map((item: string) =>
+                // Usamos "Status" o la propiedad OData que necesites filtrar
+                new Filter("StatusID", FilterOperator.EQ, item)
+            );
+            // Agrupar todos los filtros de estado con una lógica OR general
+            const oCombinedStatusFilter = new Filter({
+                filters: aStatusFilters,
+                and: false // Lógica OR: Coincide si el Status es igual a cualquiera de los tokens
+            });
+            this.aStatusFilters.push(oCombinedStatusFilter);
+        }
+
+
+
     }
 
 }
