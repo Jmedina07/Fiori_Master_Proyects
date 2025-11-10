@@ -1,0 +1,16 @@
+{
+    "Types":[
+        {
+            "key":0,
+            "text":"Correct"
+        },
+        {
+            "key":1,
+            "text":"Pending"
+        },
+        {
+            "key":2,
+            "text":"Error"
+        }
+    ]
+}

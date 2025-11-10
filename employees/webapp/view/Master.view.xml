@@ -111,7 +111,7 @@
         </f:header>
         <f:content>
             <Table  id="table"
-                    items="{employees>/Employees}"
+                    items="{northwind>/Employees}"
                     updateFinished="onTableUpdateFinished"
                     growing="true" 
                     growingThreshold="20"                    
@@ -163,20 +163,20 @@
 
                         <cells>
 
-                            <ObjectIdentifier title="{employees>EmployeeID}" 
-                                                text="{employees>LastName}, {employees>FirstName}"/>
+                            <ObjectIdentifier title="{northwind>EmployeeID}" 
+                                                text="{northwind>LastName}, {northwind>FirstName}"/>
 
-                            <Text text="{employees>Country}"/>
-                            <Text text="{employees>City}"/>
-                            <Text text="{employees>PostalCode}"/>
-                            <!-- <Text text="{employees>StatusID}"/> -->
-                            <ObjectStatus 
+                            <Text text="{northwind>Country}"/>
+                            <Text text="{northwind>City}"/>
+                            <Text text="{northwind>PostalCode}"/>
+                            <!-- <Text text="{northwind>StatusID}"/> -->
+                            <!-- <ObjectStatus 
                             text="{
-                                path: 'employees>StatusID',
+                                path: 'northwind>StatusID',
                                 formatter: 'MyFormmatter.statusText.bind($controller)' 
                                 
                                 }"
-                            />                            
+                            />                             -->
                         
                         </cells>
                     

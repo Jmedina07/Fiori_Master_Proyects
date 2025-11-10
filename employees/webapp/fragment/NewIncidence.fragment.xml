@@ -1,0 +1,62 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+
+	<Panel >
+
+        <headerToolbar>
+    
+            <Toolbar >
+                <Title text="Incidence ({form>Index})"/>
+                <ToolbarSpacer />
+                <Button
+                    icon="sap-icon://save"
+                    type="Emphasized"
+                    press="onSavePress"/>
+                <Button
+                    icon="sap-icon://delete"
+                    type="Reject"
+                    press="onDeletePress"/>                
+            </Toolbar>
+
+        </headerToolbar>
+
+        <content>
+
+            <HBox >
+
+                <VBox class="sapUiSmallMarginEnd" >
+                
+                    <Text text="{i18n>date}:"/>
+                    <DatePicker dateValue="{form>CreationDate}" />
+
+                </VBox>
+
+                <VBox class="sapUiSmallMarginEnd">
+                
+                    <Text text="{i18n>reason}:"/>
+                    <Input value="{form>Reason}" />
+
+                </VBox>
+
+                <VBox class="sapUiSmallMarginEnd">
+                
+                    <Text text="{i18n>type}"/>
+                    <Select items="{types>/Types}"
+                            forceSelection="false"
+                            selectedKey="{form>Type}"
+                            width="12rem">
+                        <core:Item key="{types>key}" text="{types>text}"></core:Item>
+                    </Select>
+
+                </VBox>
+
+            </HBox>
+
+
+
+        </content>
+    
+    </Panel>
+
+</core:FragmentDefinition>

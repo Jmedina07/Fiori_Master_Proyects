@@ -2,6 +2,7 @@
             controllerName="com.logaligroup.employees.controller.Details"
             xmlns="sap.m"
             xmlns:uxap="sap.uxap"
+            xmlns:core="sap.ui.core"
             xmlns:mvc="sap.ui.core.mvc">
 
 
@@ -11,11 +12,11 @@
                 <uxap:ObjectPageDynamicHeaderTitle>
 
                     <uxap:expandedHeading>
-                        <Title text="{employees>LastName}, {employees>FirstName} ({employees>EmployeeID})"/>
+                        <Title text="{northwind>LastName}, {northwind>FirstName} ({northwind>EmployeeID})"/>
                     </uxap:expandedHeading>
 
                     <uxap:snappedHeading>
-                        <Title text="{employees>LastName}, {employees>FirstName} ({employees>EmployeeID})"/>
+                        <Title text="{northwind>LastName}, {northwind>FirstName} ({northwind>EmployeeID})"/>
                     </uxap:snappedHeading>
 
                     <uxap:expandedContent>
@@ -27,21 +28,21 @@
                                 <HBox>
                                     <VBox>
                                         <Label text="{i18n>country}:" class="boldElement"/>
-                                        <Text text="{employees>Country}"/>
+                                        <Text text="{northwind>Country}"/>
                                     </VBox>
                                 </HBox>
 
                                 <HBox>
                                     <VBox>
                                         <Label text="{i18n>city}:" class="boldElement"/>
-                                        <Text text="{employees>City}"/>
+                                        <Text text="{northwind>City}"/>
                                     </VBox>
                                 </HBox>
 
                                 <HBox>
                                     <VBox>
                                         <Label text="{i18n>postalCode}:" class="boldElement"/>
-                                        <Text text="{employees>PostalCode}"/>
+                                        <Text text="{northwind>PostalCode}"/>
                                     </VBox>
                                 </HBox>
 
@@ -57,21 +58,21 @@
                                 <HBox>
                                     <VBox>
                                         <Label text="{i18n>country}:" class="boldElement"/>
-                                        <Text text="{employees>Country}"/>
+                                        <Text text="{northwind>Country}"/>
                                     </VBox>
                                 </HBox>
 
                                 <HBox>
                                     <VBox>
                                         <Label text="{i18n>city}:" class="boldElement"/>
-                                        <Text text="{employees>City}"/>
+                                        <Text text="{northwind>City}"/>
                                     </VBox>
                                 </HBox>
 
                                 <HBox>
                                     <VBox>
                                         <Label text="{i18n>postalCode}:" class="boldElement"/>
-                                        <Text text="{employees>PostalCode}"/>
+                                        <Text text="{northwind>PostalCode}"/>
                                     </VBox>
                                 </HBox>
 
@@ -79,6 +80,10 @@
                     </uxap:snappedContent>
 
                     <uxap:actions>
+                        <Button text="{i18n>create}"
+                                tooltip="{i18n>create}"
+                                press="onCreate"
+                                type="Emphasized"></Button>
                         <Button
                                 icon="sap-icon://decline"
                                 press="onClosePress"
@@ -90,8 +95,45 @@
 
 
             <uxap:sections>
+
+                <uxap:ObjectPageSection >
+
+                    <uxap:subSections>
+
+                        <uxap:ObjectPageSubSection title="{i18n>incidence}">
+
+                            <uxap:blocks >
+
+                                <Panel id="tableIncidence"></Panel>
+
+                            </uxap:blocks>
+
+                        </uxap:ObjectPageSubSection>
+
+                    </uxap:subSections>
+
+                </uxap:ObjectPageSection>
             
-            
+
+                    <uxap:ObjectPageSection>
+                    
+                        <uxap:subSections>
+
+                            <uxap:ObjectPageSubSection title="{i18n>orders}">
+
+                                <uxap:blocks>
+
+                                    <core:Fragment
+                                                    fragmentName="com.logaligroup.employees.fragment.Orders"/>
+                                
+                                </uxap:blocks>
+                            
+                            </uxap:ObjectPageSubSection>
+                        
+                        </uxap:subSections>
+                    
+                    </uxap:ObjectPageSection>
+
             </uxap:sections>
         
         

@@ -24,10 +24,15 @@ server:
             - /test-resources
           url: https://ui5.sap.com
         backend:
-          - path: /v2
+          - url: https://services.odata.org
+            authenticationType: NoAuthentication
             destination: Northwind
-          - path: /sap
+            path: /northwind
+          - url: http://erp13.sap4practice.com:9037
+            client: '001'
+            authenticationType: BasicAuthentication
             destination: ERP13
+            path: /sap
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
@@ -50,6 +55,24 @@ server:
     #Se agrego por XLS
     - name: ui5-tooling-modules-middleware
       afterMiddleware: compression
+    - name: sap-fe-mockserver
+      beforeMiddleware: csp
+      configuration:
+        mountPath: /
+        services:
+          - urlPath: /northwind/northwind.svc
+            metadataPath: ./webapp/localService/mainService/metadata.xml
+            mockdataPath: ./webapp/localService/mainService/data
+            generateMockData: true
+          - urlPath: /v2/northwind/northwind.svc
+            metadataPath: ./webapp/localService/mainService/metadata.xml
+            mockdataPath: ./webapp/localService/mainService/data
+            generateMockData: true
+          - urlPath: /sap/opu/odata/sap/YSAPUI5_SRV_01
+            metadataPath: ./webapp/localService/YSAPUI5_SRV_01/metadata.xml
+            mockdataPath: ./webapp/localService/YSAPUI5_SRV_01/data
+            generateMockData: true
+        annotations: []
 builder:
   customTasks:
     - name: ui5-tooling-transpile-task

@@ -14,6 +14,26 @@
       "id": "@sap/generator-fiori:basic",
       "version": "1.19.3",
       "toolsId": "c9b1d288-2e95-4325-87af-5dddaabadc0b"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/v2/northwind/northwind.svc/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "YSAPUI5_SRV_01": {
+        "uri": "/sap/opu/odata/sap/YSAPUI5_SRV_01/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/YSAPUI5_SRV_01/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
     }
   },
   "sap.ui": {
@@ -51,6 +71,16 @@
         "settings": {
           "bundleName": "com.logaligroup.employees.i18n.i18n"
         }
+      },
+      "northwind": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {}
+      },
+      "zinvoices": {
+        "dataSource": "YSAPUI5_SRV_01",
+        "preload": true,
+        "settings": {}
       }
     },
     "resources": {
@@ -82,14 +112,14 @@
         {
           "name": "RouteDetails",
           "pattern": "Employee({ID})",
-          "target":[
+          "target": [
             "TargetMaster",
             "TargetDetails"
           ]
         }
       ],
       "targets": {
-        "TargetContainer":{
+        "TargetContainer": {
           "name": "Container"
         },
         "TargetMaster": {
@@ -98,7 +128,7 @@
           "controlAggregation": "beginColumnPages",
           "name": "Master"
         },
-        "TargetDetails":{
+        "TargetDetails": {
           "parent": "TargetContainer",
           "controlId": "container-fcl",
           "controlAggregation": "midColumnPages",

@@ -152,13 +152,13 @@ export default class Main extends BaseController {
     public onNavToDetails(event: Event): void {
 
         let item = event.getSource() as ObjectListItem;
-        let bindingContext = item.getBindingContext("employees") as Context;
+        let bindingContext = item.getBindingContext("northwind") as Context;
         let id = bindingContext.getProperty("EmployeeID");
         const model = this.getModel("view") as JSONModel;
         model.setProperty("/layout", "TwoColumnsMidExpanded");
         const router = this.getRouter();
         router.navTo("RouteDetails", {
-            ID: parseInt(id) - 1 //index
+            ID: id
         });
 
     }
