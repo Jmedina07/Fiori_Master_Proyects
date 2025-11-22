@@ -80,7 +80,11 @@
       "zinvoices": {
         "dataSource": "YSAPUI5_SRV_01",
         "preload": true,
-        "settings": {}
+        "settings": {
+          "useBatch": false,
+          "defaultBindingMode": "TwoWay",
+          "defaultUpdateMethod": "PUT"
+        }
       }
     },
     "resources": {

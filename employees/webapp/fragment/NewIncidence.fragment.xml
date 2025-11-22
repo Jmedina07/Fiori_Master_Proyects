@@ -28,14 +28,16 @@
                 <VBox class="sapUiSmallMarginEnd" >
                 
                     <Text text="{i18n>date}:"/>
-                    <DatePicker dateValue="{form>CreationDate}" />
+                    <DatePicker dateValue="{form>CreationDate}" 
+                                change="updateIncidenceCreationDate"/>
 
                 </VBox>
 
                 <VBox class="sapUiSmallMarginEnd">
                 
                     <Text text="{i18n>reason}:"/>
-                    <Input value="{form>Reason}" />
+                    <Input value="{form>Reason}"
+                        liveChange="updateIncidenceReason" />
 
                 </VBox>
 
@@ -45,6 +47,7 @@
                     <Select items="{types>/Types}"
                             forceSelection="false"
                             selectedKey="{form>Type}"
+                            change="updateIncidenceType"
                             width="12rem">
                         <core:Item key="{types>key}" text="{types>text}"></core:Item>
                     </Select>
