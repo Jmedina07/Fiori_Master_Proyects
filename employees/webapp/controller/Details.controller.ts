@@ -98,24 +98,24 @@ export default class Details extends BaseController {
 
 
 
-    private async read () : Promise<void> {
+    private async read(): Promise<void> {
         const northwind = this.getView()?.getBindingContext("northwind") as Context;
         const utils = new Utils(this);
 
         const object = {
             path: '/IncidentsSet',
             filters: [
-                new Filter("SapId","EQ", utils.getEmail()),
-                new Filter("EmployeeId","EQ", northwind.getProperty("EmployeeID"))
+                new Filter("SapId", "EQ", utils.getEmail()),
+                new Filter("EmployeeId", "EQ", northwind.getProperty("EmployeeID"))
             ]
         };
 
         const results = await utils.read(new JSONModel(object));
-        console.log(results);
+        //console.log(results);
         this.showIncidents(results);
     }
 
-    private showIncidents (results : ODataListBinding | void) : void {
+    private showIncidents(results: ODataListBinding | void): void {
         const panel = this.byId("tableIncidence") as Panel;
         panel.removeAllContent();
         const object = results as any;
@@ -123,12 +123,13 @@ export default class Details extends BaseController {
         form.setData(object.results);
 
 
-        object.results.forEach( async (incidence : object, index : number) => {
-            const newIncidence = await <Promise<Panel>> this.loadFragment({name: "com.logaligroup.employees.fragment.NewIncidence"});
-            newIncidence.bindElement("form>/"+index);
+        object.results.forEach(async (incidence: object, index: number) => {
+            const newIncidence = await <Promise<Panel>>this.loadFragment({ name: "com.logaligroup.employees.fragment.NewIncidence" });
+            newIncidence.bindElement("form>/" + index);
             panel.addContent(newIncidence);
         });
     }
+
 
     public onSavePress(event: Button$PressEvent): void {
 
@@ -142,32 +143,32 @@ export default class Details extends BaseController {
         let employeeId = (northwind.getProperty("EmployeeID") as number).toString();
 
         if (typeof bindingContext?.getProperty("IncidenceId") === 'undefined') {
-            console.log("Create");
+            //console.log("Create");
             const object = {
                 path: "/IncidentsSet",
                 data: {
-                    SapId:                  sapId,
-                    EmployeeId:             employeeId,
-                    CreationDate:           bindingContext?.getProperty("CreationDate"),
-                    Type:                   bindingContext?.getProperty("Type"),
-                    Reason:                 bindingContext?.getProperty("Reason")
+                    SapId: sapId,
+                    EmployeeId: employeeId,
+                    CreationDate: bindingContext?.getProperty("CreationDate"),
+                    Type: bindingContext?.getProperty("Type"),
+                    Reason: bindingContext?.getProperty("Reason")
                 }
             }
 
-            utils.crud('create',new JSONModel(object));
+            utils.crud('create', new JSONModel(object));
         } else {
-            console.log("Update");
+            //console.log("Update");
             let incidenceId = bindingContext.getProperty("IncidenceId");
 
             const object = {
                 path: `/IncidentsSet(IncidenceId='${incidenceId}',SapId='${sapId}',EmployeeId='${employeeId}')`,
                 data: {
-                    CreationDate:           bindingContext?.getProperty("CreationDate"),
-                    CreationDateX:          bindingContext?.getProperty("CreationDateX"),
-                    Type:                   bindingContext?.getProperty("Type"),
-                    TypeX:                  bindingContext?.getProperty("TypeX"),
-                    Reason:                 bindingContext?.getProperty("Reason"),
-                    ReasonX:                bindingContext?.getProperty("ReasonX")
+                    CreationDate: bindingContext?.getProperty("CreationDate"),
+                    CreationDateX: bindingContext?.getProperty("CreationDateX"),
+                    Type: bindingContext?.getProperty("Type"),
+                    TypeX: bindingContext?.getProperty("TypeX"),
+                    Reason: bindingContext?.getProperty("Reason"),
+                    ReasonX: bindingContext?.getProperty("ReasonX")
                 }
             }
 
@@ -199,4 +200,24 @@ export default class Details extends BaseController {
         object.TypeX = true;
 
     }
+    public onDeletePress(event: Button$PressEvent): void {
+
+        const button = event.getSource() as Button;
+        const bindingContext = button.getBindingContext("form");
+        const northwind = this.getView()?.getBindingContext("northwind") as Context;
+
+        const utils = new Utils(this);
+
+        let sapId = utils.getEmail();
+        let employeeId = (northwind.getProperty("EmployeeID") as number).toString();
+        let incidenceId = bindingContext?.getProperty("IncidenceId");
+
+        if (typeof bindingContext?.getProperty("IncidenceId") !== 'undefined') {
+            
+            const object = {
+                path: `/IncidentsSet(IncidenceId='${incidenceId}',SapId='${sapId}',EmployeeId='${employeeId}')`
+            }
+            utils.crud('delete', new JSONModel(object));
+        }
+    }    
 }

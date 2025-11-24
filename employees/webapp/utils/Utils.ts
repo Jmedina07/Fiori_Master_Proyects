@@ -12,22 +12,22 @@ import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
  */
 
 export default class Utils {
-    
-    private controller : Controller;
-    private model : ODataModel;
-    private resourceBundle : ResourceBundle;
 
-    constructor (controller : Controller) {
+    private controller: Controller;
+    private model: ODataModel;
+    private resourceBundle: ResourceBundle;
+
+    constructor(controller: Controller) {
         this.controller = controller;
         this.model = (this.controller.getOwnerComponent() as UIComponent).getModel("zinvoices") as ODataModel;
         this.resourceBundle = ((this.controller.getOwnerComponent() as UIComponent).getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
     }
 
-    public getEmail () : string {
+    public getEmail(): string {
         return "test@logaligroup.com";
     }
 
-    public async read (object? : JSONModel) : Promise<void | ODataListBinding>  {
+    public async read(object?: JSONModel): Promise<void | ODataListBinding> {
         const model = this.model;
         const path = object?.getProperty("/path");
         const filters = object?.getProperty("/filters");
@@ -36,7 +36,7 @@ export default class Utils {
         return new Promise((resolve, reject) => {
             model.read(path, {
                 filters: filters,
-                success: (data : ODataListBinding) =>{
+                success: (data: ODataListBinding) => {
                     resolve(data);
                 },
                 error: () => {
@@ -48,32 +48,33 @@ export default class Utils {
     }
 
     // action = create, read, update, delete
-    public async crud (action : string, object? : JSONModel) : Promise<void> {
+    public async crud(action: string, object?: JSONModel): Promise<void> {
+        console.log(action);
         const resourceBundle = this.resourceBundle;
 
         MessageBox.confirm(resourceBundle.getText("question") || 'no text defined', {
             actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
             emphasizedAction: MessageBox.Action.OK,
-            onClose : async (response : string) => {
+            onClose: async (response: string) => {
                 if (MessageBox.Action.OK == response) {
                     switch (action) {
-                        case 'create': await this.create(object);
-                        case 'update': await this.update(object);
-                        case 'delete': break;
+                        case 'create': await this.create(object); break;
+                        case 'update': await this.update(object); break;
+                        case 'delete': await this.delete(object); break;
                     }
                 }
             }
         });
     }
 
-    private async create (object? : JSONModel) : Promise<void> {
+    private async create(object?: JSONModel): Promise<void> {
 
         const model = this.model;
         const path = object?.getProperty("/path");
         const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
 
-        console.log(body);
+        //console.log(body);
 
         model.create(path, body, {
             success: () => {
@@ -85,8 +86,8 @@ export default class Utils {
         });
     }
 
-    private async update (object? : JSONModel) : Promise<void> {
-        
+    private async update(object?: JSONModel): Promise<void> {
+
         const model = this.model;
         const path = object?.getProperty("/path");
         const body = object?.getProperty("/data");
@@ -102,4 +103,25 @@ export default class Utils {
         });
 
     }
+
+    private async delete(object?: JSONModel): Promise<void> {
+
+        const model = this.model;
+        const path = object?.getProperty("/path");
+        const body = object?.getProperty("/data");
+        const resourceBundle = this.resourceBundle;
+
+        console.log("Remove Utils");
+
+        model.remove(path, {
+            success: () => {
+                MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+            },
+            error: () => {
+                MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+            }
+        });
+
+    }
+
 }
