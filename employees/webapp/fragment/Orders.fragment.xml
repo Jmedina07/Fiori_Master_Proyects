@@ -22,7 +22,8 @@
         </columns>
 
         <items>
-            <ColumnListItem >
+            <ColumnListItem type="Navigation"
+                            press="onNavOrderDetails" >
             
                 <cells>
                         <Text text="{northwind>OrderID}"/>

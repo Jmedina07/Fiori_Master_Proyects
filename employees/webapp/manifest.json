@@ -120,6 +120,15 @@
             "TargetMaster",
             "TargetDetails"
           ]
+        },
+        {
+          "name": "RouteOrderDetails",
+          "pattern": "Employee(ID={key})/Order(ID={key2})",
+          "target":[
+            "TargetMaster",
+            "TargetDetails",
+            "TargetOrderDetails"
+          ]
         }
       ],
       "targets": {
@@ -137,7 +146,14 @@
           "controlId": "container-fcl",
           "controlAggregation": "midColumnPages",
           "name": "Details"
+        },
+        "TargetOrderDetails": {
+          "parent": "TargetContainer",
+          "controlId": "container-fcl",
+          "controlAggregation": "endColumnPages",
+          "name":"OrderDetails"
         }
+
       }
     },
     "rootView": {

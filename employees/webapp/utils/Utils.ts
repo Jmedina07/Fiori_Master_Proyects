@@ -29,10 +29,13 @@ export default class Utils {
 
     public async read(object?: JSONModel): Promise<void | ODataListBinding> {
         const model = this.model;
-        const path = object?.getProperty("/path");
+        let path = object?.getProperty("/path");
         const filters = object?.getProperty("/filters");
         const resourceBundle = this.resourceBundle;
 
+        if( path && typeof path === 'string' ){
+            path = path.split('(')[0];
+        }
         return new Promise((resolve, reject) => {
             model.read(path, {
                 filters: filters,
@@ -48,26 +51,28 @@ export default class Utils {
     }
 
     // action = create, read, update, delete
-    public async crud(action: string, object?: JSONModel): Promise<void> {
+    public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
         console.log(action);
         const resourceBundle = this.resourceBundle;
 
-        MessageBox.confirm(resourceBundle.getText("question") || 'no text defined', {
-            actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
-            emphasizedAction: MessageBox.Action.OK,
-            onClose: async (response: string) => {
-                if (MessageBox.Action.OK == response) {
-                    switch (action) {
-                        case 'create': await this.create(object); break;
-                        case 'update': await this.update(object); break;
-                        case 'delete': await this.delete(object); break;
+        return new Promise((resolve, reject) => {
+            MessageBox.confirm(resourceBundle.getText("question") || 'no text defined', {
+                actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                emphasizedAction: MessageBox.Action.OK,
+                onClose: async (response: string) => {
+                    if (MessageBox.Action.OK == response) {
+                        switch (action) {
+                            case 'create': resolve(await this.create(object)); break;
+                            case 'update': resolve(await this.update(object)); break;
+                            case 'delete': resolve(await this.delete(object)); break;
+                        }
                     }
                 }
-            }
+            });
         });
     }
 
-    private async create(object?: JSONModel): Promise<void> {
+    private async create(object?: JSONModel): Promise<void | ODataListBinding> {
 
         const model = this.model;
         const path = object?.getProperty("/path");
@@ -75,51 +80,61 @@ export default class Utils {
         const resourceBundle = this.resourceBundle;
 
         //console.log(body);
-
-        model.create(path, body, {
-            success: () => {
-                MessageBox.success(resourceBundle.getText("success") || 'no text defined');
-            },
-            error: () => {
-                MessageBox.error(resourceBundle.getText("error") || 'no text defined');
-            }
+        return new Promise((resolve, reject) => {
+            model.create(path, body, {
+                success: async () => {
+                    MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                    resolve(await this.read(object));
+                },
+                error: () => {
+                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    reject();
+                }
+            });
         });
     }
 
-    private async update(object?: JSONModel): Promise<void> {
+    private async update(object?: JSONModel): Promise<void | ODataListBinding> {
 
         const model = this.model;
         const path = object?.getProperty("/path");
         const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
-
-        model.update(path, body, {
-            success: () => {
-                MessageBox.success(resourceBundle.getText("success") || 'no text defined');
-            },
-            error: () => {
-                MessageBox.error(resourceBundle.getText("error") || 'no text defined');
-            }
+        return new Promise((resolve, reject) => {
+            model.update(path, body, {
+                success: async () => {
+                    MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                    resolve(await this.read(object));
+                },
+                error: () => {
+                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    reject();
+                }
+            });
         });
 
     }
 
-    private async delete(object?: JSONModel): Promise<void> {
+    private async delete(object?: JSONModel): Promise<void | ODataListBinding> {
 
-        const model = this.model;
+        //const model = this.model;
         const path = object?.getProperty("/path");
-        const body = object?.getProperty("/data");
+        //const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
 
         console.log("Remove Utils");
 
-        model.remove(path, {
-            success: () => {
-                MessageBox.success(resourceBundle.getText("success") || 'no text defined');
-            },
-            error: () => {
-                MessageBox.error(resourceBundle.getText("error") || 'no text defined');
-            }
+        return new Promise((resolve, reject) => {
+            this.model.remove(path, {
+                success: async () => {
+                    MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                    resolve(await this.read(object));
+                },
+                error: () => {
+                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    reject();
+                }
+            });
         });
 
     }

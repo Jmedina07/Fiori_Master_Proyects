@@ -1,0 +1,143 @@
+<mvc:View 
+    controllerName="com.logaligroup.employees.controller.OrderDetails"
+            xmlns="sap.m"
+            xmlns:uxap="sap.uxap"
+            xmlns:mvc="sap.ui.core.mvc">
+
+            <uxap:ObjectPageLayout>
+
+                    <uxap:headerTitle>
+
+                        <uxap:ObjectPageDynamicHeaderTitle>
+
+                            <uxap:expandedHeading>
+                                <Title text="{i18n>customerId}: {northwind>CustomerID}"/>
+                            </uxap:expandedHeading>
+
+                            <uxap:snappedHeading>
+                                <Title text="{i18n>customerId}: {northwind>CustomerID}"/>
+                            </uxap:snappedHeading>
+
+                            <uxap:expandedContent>
+                                <Text text="{i18n>orderID}: {northwind>OrderID}"/>
+                            </uxap:expandedContent>
+
+                            <uxap:snappedContent>
+                                <Text text="{i18n>orderID}: {northwind>OrderID}"/>
+                            </uxap:snappedContent>
+                        
+                        </uxap:ObjectPageDynamicHeaderTitle>
+
+                    </uxap:headerTitle>
+
+                    <uxap:headerContent>
+
+                        <FlexBox justifyContent="SpaceBetween">
+
+                            <HBox>
+                                <VBox>
+                                    <Label text="{i18n>orderDate}:" class="boldElement"/>
+                                    <Text text="{
+                                        path: 'northwind>OrderDate',
+                                        type: 'sap.ui.model.type.Date'
+                                    }"/>
+                                </VBox>
+                            </HBox>
+
+                            <HBox>
+                                <VBox>
+                                    <Label text="{i18n>shipName}:" class="boldElement"/>
+                                    <Text text="{northwind>ShipName}"/>
+                                </VBox>
+                            </HBox>
+
+
+                            <HBox>
+                                <VBox>
+                                    <Label text="{i18n>shipAddress}:" class="boldElement"/>
+                                    <Text text="{northwind>ShipAddress}"/>
+                                </VBox>
+                            </HBox>
+
+                            <HBox>
+                                <VBox>
+                                    <Label text="{i18n>freight}:" class="boldElement"/>
+                                    <Text text="{northwind>Freight}"/>
+                                </VBox>
+                            </HBox>
+
+
+                        </FlexBox>
+
+                    </uxap:headerContent>
+
+                    <uxap:sections>
+
+                        <uxap:ObjectPageSection title="{i18n>signature}">
+                        
+                            <uxap:subSections>
+
+                                <uxap:ObjectPageSubSection>
+                                
+                                    <uxap:blocks>
+
+                                        <FlexBox width="100%"
+                                                alignItems="Center"
+                                                justifyContent="Center"
+                                                direction="Column">
+
+                                            <items>
+
+                                                <HBox width="400px"
+                                                        height="120px">
+                                                
+                                                </HBox>
+
+                                                <HBox class="sapUiSmallMarginTop">
+
+                                                    <Button
+                                                            class="sapUiSmallMarginEnd"
+                                                            text="{i18n>save}"
+                                                            tooltip="{i18n>save}"
+                                                            type="Accept"
+                                                            press="onSavePress"
+                                                            width="4rem"/>
+
+                                                    <Button
+                                                            class="sapUiSmallMarginEnd"
+                                                            text="{i18n>clear}"
+                                                            tooltip="{i18n>clear}"
+                                                            type="Reject"
+                                                            press="onClearPress"
+                                                            width="4rem"/>
+
+                                                    <Button
+                                                            class="sapUiSmallMarginEnd"
+                                                            text="{i18n>refresh}"
+                                                            tooltip="{i18n>refresh}"
+                                                            type="Accept"
+                                                            press="onRefreshPress"
+                                                            width="4rem"/>
+                                                
+                                                </HBox>
+                                            
+                                            
+                                            </items>
+
+                                        
+                                        </FlexBox>
+                                    
+                                    </uxap:blocks>
+                                
+                                </uxap:ObjectPageSubSection>
+                            
+                            </uxap:subSections>
+                        
+                        </uxap:ObjectPageSection>
+
+                    </uxap:sections>
+
+            </uxap:ObjectPageLayout>
+
+
+</mvc:View>
