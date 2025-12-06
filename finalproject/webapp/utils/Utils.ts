@@ -44,7 +44,7 @@ export default class Utils {
                 },
                 error: () => {
                     reject();
-                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    MessageBox.error(resourceBundle.getText("error") || 'no text defined Test');
                 }
             });
         });
