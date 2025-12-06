@@ -1,0 +1,61 @@
+<mvc:View controllerName="com.logaligroup.finalproject.controller.Master"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:card="sap.f.cards"
+	xmlns:w="sap.ui.integration.widgets"
+	displayBlock="true"
+	height="100%">
+
+	<!-- <ScrollContainer
+		height="100%"
+		width="100%"
+		vertical="true"> -->
+		<!-- <HBox alignItems="Center"> -->
+            <Panel headerText="{i18n>titlepanel1}" width="auto" class="sapUiResponsiveMargin">
+				<layoutData>
+					<FlexItemData baseSize="100%" />
+				</layoutData>
+				<f:GridContainer id="grid1" borderReached=".onBorderReached">
+					
+					<GenericTile header="" subheader="" press="oncreateEmployee"
+						headerImage="sap-icon://add-employee">
+						<layoutData>
+							<f:GridContainerItemLayoutData minRows="1" columns="2" />
+						</layoutData>
+						<TileContent footer="{i18n>buton1}">
+						</TileContent>					
+					</GenericTile>
+
+					<GenericTile header="" subheader="" press="onviewEmployee"
+						headerImage="sap-icon://employee-lookup">
+						<layoutData>
+							<f:GridContainerItemLayoutData minRows="2" columns="2" />
+						</layoutData>
+						<TileContent footer="{i18n>buton2}">
+						</TileContent>					
+					</GenericTile>
+                </f:GridContainer>      
+
+
+            </Panel>
+
+        <!-- </HBox>
+		<HBox alignItems="Center"> -->
+            <Panel headerText="{i18n>titlepanel2}" width="auto" class="sapUiResponsiveMargin" >
+
+				<f:GridContainer id="grid2" borderReached=".onBorderReached">
+					
+					<GenericTile header="" subheader="" press="onOrder"
+						headerImage="sap-icon://signature">
+						<layoutData>
+							<f:GridContainerItemLayoutData minRows="1" columns="2" />
+						</layoutData>
+						<TileContent footer="{i18n>buton3}">
+						</TileContent>					
+					</GenericTile>
+                </f:GridContainer>   
+			</Panel>		
+		<!-- </HBox> -->
+    <!-- </ScrollContainer> -->
+</mvc:View>

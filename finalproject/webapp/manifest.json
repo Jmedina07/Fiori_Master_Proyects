@@ -1,0 +1,185 @@
+{
+  "_version": "1.73.1",
+  "sap.app": {
+    "id": "com.logaligroup.finalproject",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.19.6",
+      "toolsId": "9cca3540-d221-4215-8d9e-468fd41cd9d6"
+    },
+   "dataSources": {
+      "mainService": {
+        "uri": "/v2/northwind/northwind.svc/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "YSAPUI5_SRV_01": {
+        "uri": "/sap/opu/odata/sap/YSAPUI5_SRV_01/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/YSAPUI5_SRV_01/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZEMPLOYEES_SRV": {
+        "uri": "/sap/opu/odata/sap/ZEMPLOYEES_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/ZEMPLOYEES_SRV/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }      
+    }    
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.136.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.f": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "com.logaligroup.finalproject.i18n.i18n"
+        }
+      },
+      "northwind": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {}
+      },
+      "zinvoices": {
+        "dataSource": "YSAPUI5_SRV_01",
+        "preload": true,
+        "settings": {
+          "useBatch": false,
+          "defaultBindingMode": "TwoWay",
+          "defaultUpdateMethod": "PUT"
+        }
+      },
+      "zinvoices2": {
+        "dataSource": "ZEMPLOYEES_SRV",
+        "preload": true,
+        "settings": {
+          "useBatch": false,
+          "defaultBindingMode": "TwoWay",
+          "defaultUpdateMethod": "PUT"
+        }
+      }      
+
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "com.logaligroup.finalproject.view",
+        "async": true
+      },
+      "routes": [
+        {
+          "name": "RouteMaster",
+          "pattern": ":?query:",
+          "target": [
+            "TargetMaster"
+          ]
+        },
+        {
+          "name": "RouteNewEmployee",
+          "pattern": "Employee({ID})",
+          "target": [
+            "TargetMaster",
+            "TargetNewEmployee"
+          ]
+        } ,        
+        {
+          "name": "RouteEmployees",
+          "pattern": "Employee({ID})",
+          "target": [
+            "TargetMaster",
+            "TargetEmployees"
+          ]
+        }        
+      ],
+      "targets": {
+       
+        "TargetContainer": {
+          "name": "Container"
+        },        
+        "TargetMaster": {
+          "parent": "TargetContainer",
+          "controlId": "container-fcl",
+          "controlAggregation": "beginColumnPages",
+          "name": "Master"
+        },
+        "TargetNewEmployee": {
+          "parent": "TargetContainer",
+          "controlId": "container-fcl",
+          "controlAggregation": "endColumnPages",          
+          "name": "NewEmployee"
+        } ,         
+        "TargetEmployees": {
+          "parent": "TargetContainer",
+          "controlId": "container-fcl",
+          "controlAggregation": "endColumnPages",
+          "name": "Employees"
+        }              
+      }
+    },
+    "rootView": {
+      "viewName": "com.logaligroup.finalproject.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  }
+}

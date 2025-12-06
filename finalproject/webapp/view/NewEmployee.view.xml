@@ -1,0 +1,268 @@
+<mvc:View controllerName="com.logaligroup.finalproject.controller.NewEmployee"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.f"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:layout="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+	height="100%">
+	<NavContainer id="navContainer">
+		<pages>
+			<f:DynamicPage
+				id="dynamicPage"
+				toggleHeaderOnTitleClick="{/titleClickable}"
+				stickySubheaderProvider="ShoppingCartWizard"
+				class="sapUiNoContentPadding"
+				showFooter="true">
+				<!-- DynamicPage Title -->
+				<f:title>
+					<f:DynamicPageTitle>
+						<f:heading>
+							<Title text="{i18n>wizardheader}" textAlign="Center"/>
+						</f:heading>
+					</f:DynamicPageTitle>
+				</f:title>
+				<!-- DynamicPage Header -->
+				<f:content>
+					<Wizard id="ShoppingCartWizard"
+					        class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
+					        complete="completedHandler"
+					        height="auto"
+					        enableBranching="true">
+						<WizardStep
+							id="ContentsStep"
+							nextStep="steptwo"
+							title="{i18n>wizardname1}"
+							validated="true">
+                            <HBox
+                                    alignItems="Center"
+                                    justifyContent="Center"
+                                    width="100%">
+                                <SegmentedButton
+                                    width="320px"
+                                    selectionChange="setProductTypeFromSegmented">
+                                    <items>
+                                        <SegmentedButtonItem icon="sap-icon://iphone" text="{i18n>tipoempleado1}"/>
+                                        <SegmentedButtonItem icon="sap-icon://sys-monitor" text="{i18n>tipoempleado2}"/>
+                                        <SegmentedButtonItem icon="sap-icon://database" text="{i18n>tipoempleado3}"/>
+                                    </items>
+                                </SegmentedButton>
+                            </HBox>
+
+						</WizardStep>
+						<WizardStep
+							id="steptwo"
+							title="{i18n>wizardname2}"
+							subsequentSteps="stepthree"
+                            activate="checkformComplete"
+							complete="formComplete"
+							icon="sap-icon://money-bills">
+							<!-- <Text class="sapUiSmallMarginBottom"
+							      text="We accept all major credit cards. No extra cost will be charged when paying with a credit card. Bank transfer and Cash on delivery are only possible for inland deliveries. A service charge of 2.99 EUR will be charged for these types of deliveries. Be aware, that for Bank transfers, the shipping will start on the day after the payment is received."/> -->
+								<form:SimpleForm
+										editable="true"
+										layout="ResponsiveGridLayout">
+                                    <MessageStrip
+                                        text="{i18n>messageform1}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiMediumMarginBottom">
+                                    </MessageStrip>       
+
+									<Label text="Name" required="true"/>
+									<Input valueStateText="Enter 6 symbols or more"
+											valueState="{/formComplete/name}" id="ProductName" liveChange="checkformComplete"
+											placeholder="Enter name with length greater than 6" value="{/formComplete/name}" />
+                                            
+									<Label text="Apellido" required="true"/>
+									<Input valueStateText="Enter digits"
+											valueState="{/formComplete/apellido}" id="apellido"
+											liveChange="checkformComplete" type="Number" placeholder="Enter digits"
+											value="{/formComplete/apellido}"/>
+									<Label text="Manufacturer"/>
+									<Select selectedKey="{/formComplete/manufacture}">
+										<core:Item key="Apple" text="Apple"/>
+										<core:Item key="Microsoft" text="Microsoft"/>
+										<core:Item key="Google" text="Google"/>
+										<core:Item key="Sony" text="Sony"/>
+										<core:Item key="Samsung" text="Samsung"/>
+										<core:Item key="Logitech" text="Logitech"/>
+									</Select>
+									<Label text="Description"/>
+									<TextArea value="{/formComplete/desc}" rows="8" liveChange="checkformComplete"/>
+								</form:SimpleForm>
+
+						</WizardStep>
+						<WizardStep
+							id="stepthree"
+							title="Credit card info"
+							
+							activate="checkCreditCardStep"
+							icon="sap-icon://credit-card">
+							<MessageStrip text="Enter at least 3 symbols for credit card name."/>
+							<form:SimpleForm
+								editable="true"
+								layout="ColumnLayout">
+								<Label text="Name on card" required="true"/>
+								<Input value="{/CreditCard/Name}" liveChange="checkCreditCardStep"
+								       valueLiveUpdate="true"/>
+								<Label text="Card number"/>
+								<Input value="{/CardNumber}"/>
+								<Label text="Security code"/>
+								<Input value="{/CreditCard/SecurityCode}"/>
+								<Label text="Expiration date"/>
+								<DatePicker value="{/CreditCard/Expire}"/>
+							</form:SimpleForm>
+						</WizardStep>
+					</Wizard>
+				</f:content>
+				<!-- DynamicPage Footer -->
+				<f:footer>
+					<OverflowToolbar>
+						<ToolbarSpacer/>
+						<Button type="Accept" text="Accept"/>
+						<Button type="Reject" text="Reject"/>
+					</OverflowToolbar>
+				</f:footer>
+			</f:DynamicPage>
+			<Page id="wizardBranchingReviewPage" showHeader="false">
+				<content>
+					<form:SimpleForm
+						title="1. List of products"
+						editable="false"
+						layout="ResponsiveGridLayout">
+						<List items="{/ProductCollection}">
+							<StandardListItem
+								title="{Name}"
+								type="Active"
+								description="{Description}"
+								icon="{ProductPicUrl}"
+								info="{Price} {CurrencyCode}"
+								iconDensityAware="false"
+								iconInset="false"/>
+						</List>
+						<ObjectHeader
+							title="Total"
+							number="{/ProductsTotalPrice}"
+							numberUnit="EUR">
+							<attributes>
+								<ObjectAttribute
+									press="handleNavBackToList"
+									active="true"
+									text="Edit"/>
+							</attributes>
+						</ObjectHeader>
+					</form:SimpleForm>
+					<form:SimpleForm
+						title="2. Payment type"
+						editable="false"
+						layout="ResponsiveGridLayout">
+						<form:content>
+							<Label text="Chosen payment type"/>
+							<Text text="{/selectedPayment}"/>
+							<Link press="handleNavBackToPaymentType" text="Edit"/>
+						</form:content>
+					</form:SimpleForm>
+
+					<form:SimpleForm
+						visible="{= ${/selectedPayment}==='Credit Card' ? true : false}"
+						title="3. Credit Card payment"
+						editable="false"
+						layout="ResponsiveGridLayout">
+						<form:content>
+							<Label text="Name on card"/>
+							<Text text="{/CreditCard/Name}"/>
+							<Label text="Card number"/>
+							<Text text="{/CardNumber}"/>
+							<Label text="Security code"/>
+							<Text text="{/CreditCard/SecurityCode}"/>
+							<Label text="Expiration date"/>
+							<Text text="{/CreditCard/Expire}"/>
+							<Link press="handleNavBackToCreditCard" text="Edit"/>
+						</form:content>
+					</form:SimpleForm>
+
+					<form:SimpleForm
+						visible="{= ${/selectedPayment}==='Bank Transfer' ? true : false}"
+						title="3. Bank Transfer"
+						editable="false"
+						layout="ResponsiveGridLayout">
+						<form:content>
+							<layout:Grid
+								defaultSpan="L6 M6 S10"
+								hSpacing="2">
+								<Label text="Beneficiary Name" design="Bold"/>
+								<Label text="Singapore Hardware e-Commerce LTD"/>
+								<Label text="Beneficiary Bank" design="Bold"/>
+								<Label text="CITY BANK, SINGAPORE BRANCH"/>
+								<Label text="Beneficiary Account Number" design="Bold"/>
+								<Label text="06110702027218"/>
+								<Label text="Bank Phone Number" design="Bold"/>
+								<Label text="+65-6224-2622"/>
+								<Label text="Bank Email Address" design="Bold"/>
+								<Label text="customerservice@citybank.com"/>
+							</layout:Grid>
+						</form:content>
+					</form:SimpleForm>
+
+					<form:SimpleForm
+						visible="{= ${/selectedPayment}==='Cash on Delivery' ? true : false}"
+						title="3. Cash on delivery"
+						editable="false"
+						layout="ResponsiveGridLayout">
+						<form:content>
+							<Label text="First Name"/>
+							<Text text="{/CashOnDelivery/FirstName}"/>
+							<Label text="Last Name"/>
+							<Text text="{/CashOnDelivery/LastName}"/>
+							<Label text="Phone number"/>
+							<Text text="{/CashOnDelivery/Phone Number}"/>
+							<Label text="Email address"/>
+							<Text text="{/CashOnDelivery/Email}"/>
+							<Link press="handleNavBackToCashOnDelivery" text="Edit"/>
+						</form:content>
+					</form:SimpleForm>
+
+					<form:SimpleForm
+						title="4. Billing Address"
+						editable="false"
+						layout="ResponsiveGridLayout">
+						<form:content>
+							<Label text="Address"/>
+							<Text text="{/BillingAddress/Address}"/>
+							<Label text="City"/>
+							<Text text="{/BillingAddress/City}"/>
+							<Label text="Zip Code"/>
+							<Text text="{/BillingAddress/ZipCode}"/>
+							<Label text="Country"/>
+							<Text text="{/BillingAddress/Country}"/>
+							<Label text="Note"/>
+							<Text text="{/BillingAddress/Note}"/>
+							<Link press="handleNavBackToBillingAddress" text="Edit"/>
+						</form:content>
+					</form:SimpleForm>
+
+					<form:SimpleForm
+						title="5. Delivery type"
+						editable="false"
+						layout="ResponsiveGridLayout">
+						<form:content>
+							<Label text="Chosen delivery type"/>
+							<Text text="{/selectedDeliveryMethod}"/>
+							<Link press="handleNavBackToDeliveryType" text="Edit"/>
+						</form:content>
+					</form:SimpleForm>
+				</content>
+				<footer>
+					<Bar>
+						<contentRight>
+							<Button text="Submit" press="handleWizardSubmit"/>
+							<Button text="Cancel" press="handleWizardCancel"/>
+						</contentRight>
+					</Bar>
+				</footer>
+			</Page>
+		</pages>
+	</NavContainer>
+
+</mvc:View>

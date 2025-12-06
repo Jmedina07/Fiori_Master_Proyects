@@ -1,0 +1,101 @@
+<mvc:View
+            controllerName="com.logaligroup.finalproject.controller.Employees"
+        xmlns="sap.m"
+        xmlns:f="sap.f"
+        xmlns:core="sap.ui.core"
+        xmlns:mvc="sap.ui.core.mvc"
+        xmlns:fb="sap.ui.comp.filterbar">
+
+    <f:DynamicPage>
+
+        <f:title>
+
+            <f:DynamicPageTitle>
+
+                <f:heading>
+
+                    <Title text="{i18n>appTitle}"/>
+                
+                </f:heading>
+            
+            </f:DynamicPageTitle>
+        
+        </f:title>
+
+        <f:header>
+
+            <f:DynamicPageHeader>
+
+            
+            </f:DynamicPageHeader>
+        
+        </f:header>
+
+        <f:content>
+
+            <Table  id="table"
+                    items="{zinvoices2>/Users}">
+
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Employees (45)"/>
+                        <ToolbarSpacer />
+                        <Button
+                                icon="sap-icon://download"
+                                press="onExportToExcel"/>
+                    </Toolbar>
+                </headerToolbar>
+
+                <columns>
+
+                    <Column>
+                        <Label text="{i18n>ID}"/>
+                    </Column>
+
+                    <Column>
+                        <Label text="{i18n>type}"/>
+                    </Column>
+
+                    <Column>
+                        <Label text="{i18n>dni}"/>
+                    </Column>
+
+                    <Column>
+                        <Label text="{i18n>date}"/>
+                    </Column>
+                
+                </columns>
+
+                <items>
+
+                    <ColumnListItem>
+
+                        <cells>
+
+                            <ObjectIdentifier title="{zinvoices2>EmployeeId}" 
+                                                text="{zinvoices2>LastName}, {zinvoices2>FirstName}"/>
+
+                            <Text text="{zinvoices2>Type}"/>
+                            <Text text="{zinvoices2>Dni}"/>
+                            <Text 
+                                text="{
+                                        path: 'zinvoices2>CreationDate',
+                                        type: 'sap.ui.model.type.Date'
+                                    }"
+                            />
+                        
+                        </cells>
+                    
+                    </ColumnListItem>
+                
+                </items>
+            
+            </Table>
+        
+
+        </f:content>
+    
+    </f:DynamicPage>
+
+
+</mvc:View>

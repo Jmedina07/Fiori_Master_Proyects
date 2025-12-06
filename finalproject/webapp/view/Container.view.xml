@@ -1,0 +1,11 @@
+<mvc:View 
+    controllerName="com.logaligroup.finalproject.controller.Master"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:mvc="sap.ui.core.mvc">
+    
+    <f:FlexibleColumnLayout id="container-fcl"
+        layout="{view>/layout}">
+    </f:FlexibleColumnLayout>
+
+</mvc:View>
