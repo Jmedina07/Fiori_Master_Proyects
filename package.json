@@ -13,6 +13,7 @@
     "rimraf": "^5.0.5"
   },
   "dependencies": {
-    "@sap-ux/ui5-middleware-fe-mockserver": "^2.3.19"
+    "@sap-ux/ui5-middleware-fe-mockserver": "^2.3.19",
+    "ui5-tooling-modules": "^3.34.0"
   }
 }

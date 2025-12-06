@@ -3,7 +3,12 @@
 .boldElement {
     font-weight: bold;
 }
-
+.signature {
+    border: 1px solid black;
+    background: white;
+    width: 300px;
+    height: 150px;
+}
 /* Estilo del color de fondo normal */
 .iconDownload {
     background-color: #e0f2d2 !important; /* Verde claro para el fondo */

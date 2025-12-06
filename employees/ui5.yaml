@@ -14,8 +14,11 @@ framework:
 type: application
 server:
   customMiddleware:
-    - name: fiori-tools-proxy
+      #Se agrego por XLS
+    - name: ui5-tooling-modules-middleware
       afterMiddleware: compression
+    - name: fiori-tools-proxy
+      afterMiddleware: ui5-tooling-modules-middleware
       configuration:
         ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
         ui5:

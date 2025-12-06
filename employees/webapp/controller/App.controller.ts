@@ -1,6 +1,7 @@
 import BaseController from "./BaseController";
 import JSONModel from "sap/ui/model/json/JSONModel";
 
+
 /**
  * @namespace com.logaligroup.employees.controller
  */

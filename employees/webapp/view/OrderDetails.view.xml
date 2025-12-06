@@ -2,6 +2,7 @@
     controllerName="com.logaligroup.employees.controller.OrderDetails"
             xmlns="sap.m"
             xmlns:uxap="sap.uxap"
+            xmlns:sg="com.logaligroup.employees.control"            
             xmlns:mvc="sap.ui.core.mvc">
 
             <uxap:ObjectPageLayout>
@@ -89,8 +90,10 @@
                                             <items>
 
                                                 <HBox width="400px"
-                                                        height="120px">
-                                                
+                                                        height="150px">
+                                                    <sg:Signature
+                                                        id="signature"
+                                                    />                                                
                                                 </HBox>
 
                                                 <HBox class="sapUiSmallMarginTop">
@@ -115,7 +118,7 @@
                                                             class="sapUiSmallMarginEnd"
                                                             text="{i18n>refresh}"
                                                             tooltip="{i18n>refresh}"
-                                                            type="Accept"
+                                                            type="Transparent"
                                                             press="onRefreshPress"
                                                             width="4rem"/>
                                                 
