@@ -24,7 +24,7 @@
 				</f:title>
 				<!-- DynamicPage Header -->
 				<f:content>
-					<Wizard id="ShoppingCartWizard"
+					<Wizard id="employeeWizard"
 					        class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
 					        complete="completedHandler"
 					        height="auto"
@@ -39,12 +39,14 @@
                                     justifyContent="Center"
                                     width="100%">
                                 <SegmentedButton
-                                    width="320px"
-                                    selectionChange="setProductTypeFromSegmented">
+                                    width="320px" id="butonselect" 
+                                    selectionChange="onButtonSelect1"
+									selectedKey="{/selectedOption}"
+									>
                                     <items>
-                                        <SegmentedButtonItem icon="sap-icon://iphone" text="{i18n>tipoempleado1}"/>
-                                        <SegmentedButtonItem icon="sap-icon://sys-monitor" text="{i18n>tipoempleado2}"/>
-                                        <SegmentedButtonItem icon="sap-icon://database" text="{i18n>tipoempleado3}"/>
+                                        <SegmentedButtonItem icon="sap-icon://iphone" text="{i18n>tipoempleado1}" key="1" width="100px"/>
+                                        <SegmentedButtonItem icon="sap-icon://sys-monitor" text="{i18n>tipoempleado2}" key="2" width="150px"/>
+                                        <SegmentedButtonItem icon="sap-icon://database" text="{i18n>tipoempleado3}" key="3" width="100px"/>
                                     </items>
                                 </SegmentedButton>
                             </HBox>
@@ -54,42 +56,53 @@
 							id="steptwo"
 							title="{i18n>wizardname2}"
 							subsequentSteps="stepthree"
-                            activate="checkformComplete"
-							complete="formComplete"
+                            activate="checksteptwo"
+							complete="steptwoComplete"
 							icon="sap-icon://money-bills">
 							<!-- <Text class="sapUiSmallMarginBottom"
 							      text="We accept all major credit cards. No extra cost will be charged when paying with a credit card. Bank transfer and Cash on delivery are only possible for inland deliveries. A service charge of 2.99 EUR will be charged for these types of deliveries. Be aware, that for Bank transfers, the shipping will start on the day after the payment is received."/> -->
 								<form:SimpleForm
 										editable="true"
 										layout="ResponsiveGridLayout">
-                                    <MessageStrip
-                                        text="{i18n>messageform1}"
-                                        type="Information"
-                                        showIcon="true"
-                                        class="sapUiMediumMarginBottom">
-                                    </MessageStrip>       
 
-									<Label text="Name" required="true"/>
-									<Input valueStateText="Enter 6 symbols or more"
-											valueState="{/formComplete/name}" id="ProductName" liveChange="checkformComplete"
-											placeholder="Enter name with length greater than 6" value="{/formComplete/name}" />
+									<MessageStrip
+										text="{i18n>messageform1}"
+										type="Information"
+										showIcon="true" 
+										class="sapUiMediumMarginBottom">
+									</MessageStrip>      
+
+									<Label text="{i18n>lblname}" required="true"/>
+									<Input  valueState="{/steptwo/name}" id="Name" liveChange="checksteptwo"
+											placeholder="{i18n>placename}" value="{/steptwo/name}" />
                                             
-									<Label text="Apellido" required="true"/>
+									<Label text="{i18n>lblapellido}" required="true"/>
 									<Input valueStateText="Enter digits"
-											valueState="{/formComplete/apellido}" id="apellido"
-											liveChange="checkformComplete" type="Number" placeholder="Enter digits"
-											value="{/formComplete/apellido}"/>
-									<Label text="Manufacturer"/>
-									<Select selectedKey="{/formComplete/manufacture}">
-										<core:Item key="Apple" text="Apple"/>
-										<core:Item key="Microsoft" text="Microsoft"/>
-										<core:Item key="Google" text="Google"/>
-										<core:Item key="Sony" text="Sony"/>
-										<core:Item key="Samsung" text="Samsung"/>
-										<core:Item key="Logitech" text="Logitech"/>
-									</Select>
-									<Label text="Description"/>
-									<TextArea value="{/formComplete/desc}" rows="8" liveChange="checkformComplete"/>
+											valueState="{/steptwo/apellido}" id="Apellido"
+											liveChange="checksteptwo" placeholder="{i18n>placeapellido}"
+											value="{/steptwo/apellido}"/>
+
+									<Label text="{i18n>lbldni}" required="true"/>
+									<Input valueStateText="Enter digits"
+											valueState="{/steptwo/dni}" id="Dni" type="Number"
+											liveChange="checksteptwo" placeholder="{i18n>placedni}"
+											value="{/steptwo/dni}"/>
+
+									<Label text="{i18n>lblcfi}" required="true"/>
+									<Input valueStateText="Enter digits"
+											valueState="{/steptwo/cfi}" id="cfi" type="Number"
+											liveChange="checksteptwo" placeholder="{i18n>placecfi}"
+											value="{/steptwo/cfi}"/>
+
+									<Label text="{i18n>lblsalario}" required="true"/>
+									<Slider enableTickmarks="true" class="sapUiMediumMarginBottom" min="12000" max="80000" value="24000" id="salario" />
+
+									<Label text="{i18n>lblprecio}" required="true"/>
+									<Slider enableTickmarks="true" class="sapUiMediumMarginBottom" min="100" max="2000" value="400" id="precio" />
+
+									<Label text="{i18n>lbldate}"/>
+									<DatePicker value="{/steptwo/date}" id="date" valueFormat="yyyy-MM-dd" displayFormat="long" liveChange="checksteptwo"/>
+
 								</form:SimpleForm>
 
 						</WizardStep>
