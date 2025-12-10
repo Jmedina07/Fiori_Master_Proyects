@@ -138,7 +138,6 @@
           "name": "detalleProducto1",
           "target": [
             "TargetContainer",
-            "TargetMaster",
             "TargetDetail1"
           ] 
         },
@@ -147,10 +146,25 @@
           "name": "detalleProducto2",
           "target": [
             "TargetContainer",
-            "TargetMaster",
             "TargetDetail2"
           ] 
-        }    
+        } ,
+        {
+          "pattern": "",
+          "name": "master",
+          "target": ["Container", "Master"]
+        },
+        {
+          "pattern": "employees",
+          "name": "employees",
+          "target": ["Container", "Employees"]
+        },
+        {
+          "pattern": "newEmployee",
+          "name": "newEmployee",
+          "target": ["Container", "NewEmployee"]
+        }
+
       ],
       "targets": {
         "TargetContainer": {
@@ -173,7 +187,23 @@
           "controlId": "container-fcl",
           "controlAggregation": "endColumnPages",
           "name": "Employees"
-        }
+        },
+        "Container": {
+          "viewId": "Container",
+          "name": "Container"
+        },
+        "Master": {
+          "viewId": "Master",
+          "name": "Master"
+        },
+        "Employees": {
+          "viewId": "Employees",
+          "name": "Employees"
+        },
+        "NewEmployee": {
+          "viewId": "NewEmployee",
+          "name": "NewEmployee"
+        }        
       }
     },
     "rootView": {

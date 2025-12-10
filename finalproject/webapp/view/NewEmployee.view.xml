@@ -20,6 +20,14 @@
 						<f:heading>
 							<Title text="{i18n>wizardheader}" textAlign="Center"/>
 						</f:heading>
+						<f:navigationActions>
+							<Button
+								text="Regresar"
+								icon="sap-icon://nav-back"
+								type="Transparent"
+								press=".onClosePress"
+							/>
+						</f:navigationActions> 
 					</f:DynamicPageTitle>
 				</f:title>
 				<!-- DynamicPage Header -->
@@ -32,6 +40,7 @@
 						<WizardStep
 							id="ContentsStep"
 							nextStep="steptwo"
+							activate="checkstepone"
 							title="{i18n>wizardname1}"
 							validated="true">
                             <HBox
@@ -108,23 +117,14 @@
 						</WizardStep>
 						<WizardStep
 							id="stepthree"
-							title="Credit card info"
-							
-							activate="checkCreditCardStep"
+							title="{i18n>wizardname3}"
 							icon="sap-icon://credit-card">
-							<MessageStrip text="Enter at least 3 symbols for credit card name."/>
+							<MessageStrip text="{i18n>messageform2}"/>
 							<form:SimpleForm
 								editable="true"
 								layout="ColumnLayout">
-								<Label text="Name on card" required="true"/>
-								<Input value="{/CreditCard/Name}" liveChange="checkCreditCardStep"
-								       valueLiveUpdate="true"/>
-								<Label text="Card number"/>
-								<Input value="{/CardNumber}"/>
-								<Label text="Security code"/>
-								<Input value="{/CreditCard/SecurityCode}"/>
-								<Label text="Expiration date"/>
-								<DatePicker value="{/CreditCard/Expire}"/>
+								<Label text="{i18n>lblnote}" required="false"/>
+								<TextArea rows="8" value="{/stepthree/Note}"/>						
 							</form:SimpleForm>
 						</WizardStep>
 					</Wizard>
@@ -133,8 +133,8 @@
 				<f:footer>
 					<OverflowToolbar>
 						<ToolbarSpacer/>
-						<Button type="Accept" text="Accept"/>
-						<Button type="Reject" text="Reject"/>
+						<Button type="Accept" text="{i18n>buton4}" id="savebuton"/>
+						<Button type="Reject" text="{i18n>buton5}"/>
 					</OverflowToolbar>
 				</f:footer>
 			</f:DynamicPage>

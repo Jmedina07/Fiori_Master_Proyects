@@ -5,7 +5,7 @@ import JSONModel from "sap/ui/model/json/JSONModel";
 import Wizard from "sap/m/Wizard";
 import WizardStep from "sap/m/WizardStep";
 import NavContainer from "sap/m/NavContainer";
-import Page from "sap/m/Page";
+import Page, { Page$NavButtonPressEvent } from "sap/m/Page";
 import EventBus from "sap/ui/core/EventBus";
 import DynamicPage from "sap/f/DynamicPage";
 import { ValueState } from "sap/ui/core/library";
@@ -14,6 +14,7 @@ import Input from "sap/m/Input";
 import SegmentedButton, { SegmentedButton$SelectionChangeEvent } from "sap/m/SegmentedButton";
 import SegmentedButtonItem from "sap/m/SegmentedButtonItem";
 import Slider from "sap/m/Slider";
+import Button from "sap/m/Button";
 
 /**
  * @namespace com.logaligroup.finalproject.controller
@@ -57,28 +58,42 @@ export default class NewEmployee extends BaseController {
     public onInit(): void {
         console.log("Entro a New Employes");
         const router = this.getRouter();
-        router.getRoute("RouteNewEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
+        router.getRoute("newEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
 
     }
     private loadIncidences(): void {
 
-        this._wizard = this.byId("employeeWizard") as Wizard;
+        const oWizard = this.byId("employeeWizard") as Wizard;
         this._oNavContainer = this.byId("navContainer") as NavContainer;
         this._oDynamicPage = this.getPage();
 
         this.model = new JSONModel();
 
         // Usamos attachRequestCompleted para manejar la carga asíncrona de datos
-        this.model.attachRequestCompleted(null, () => {
+        this.model.attachRequestCompleted({}, () => {
             const oData = this.model.getData() as ModelData;
 
             this.model.setProperty("/steptwo", {});
         }, this);
 
         // Cargar datos (asume que los paths son correctos en un proyecto real)
-        this.model.loadData(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"));
-        this.getView()?.setModel(this.model);
+        // this.model.loadData(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"));
+        // this.getView()?.setModel(this.model);
+        // Realiza una verificación de tipo para asegurar que es un Wizard (buena práctica de TS)
+        if (oWizard instanceof Wizard) {
+            this._wizard = oWizard;
+        } else {
+            // Manejo de error si el ID es incorrecto o el control no es un Wizard
+            console.error("Control con ID 'wizard' no encontrado o no es un sap.m.Wizard.");
+            // O lanza un error: throw new Error("Wizard no encontrado.");
+        }
+        const buton = this.byId("savebuton") as Button;
+        buton.setVisible(false);
 
+    }
+    public completedHandler(): void {
+//        this._oNavContainer = this.byId("wizardBranchingReviewPage") as Page;
+        this._oNavContainer.to( this.byId("wizardBranchingReviewPage") as Page );
     }
     public getPage(): DynamicPage {
         return this.byId("dynamicPage") as DynamicPage;
@@ -129,17 +144,10 @@ export default class NewEmployee extends BaseController {
 
 
     }
-
+    public checkstepone(): void {
+        //this.frontcustomizing();
+    }
     public checksteptwo(): void {
-
-        //const oInput = this.byId("myInputId") as SegmentedButton;
-
-        // const oNameBinding = ( this.model.bindProperty("/steptwo") as PropertyBinding );
-        // const sCurrentName = oNameBinding.getValue().bindProperty as StepTwoData;
-
-        // //console.log("Binding", name);
-        // console.log( "Name;", sCurrentName);
-        // 1. Obtener la instancia del control de entrada
 
         const oNameInput = this.byId("Name") as Input;
         const oApellidoInput = this.byId("Apellido") as Input;
@@ -154,5 +162,12 @@ export default class NewEmployee extends BaseController {
         } else {
             this._wizard.invalidateStep(steptwo);
         }
+    }
+
+    public onClosePress(): void {
+
+        const router = this.getRouter();
+        router.navTo("master");
+
     }
 }

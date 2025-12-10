@@ -7,6 +7,7 @@ import Utils from "../utils/Utils";
 import Context from "sap/ui/model/odata/v2/Context";
 import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
 import Filter from "sap/ui/model/Filter";
+import UIComponent from "sap/ui/core/UIComponent";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -88,6 +89,19 @@ export default class Employees extends BaseController {
             newIncidence.bindElement("form>/" + index);
             panel.addContent(newIncidence);
         });
+    }
+    
+    public onClosePress(): void {
+
+
+        // const router = this.getRouter();
+        // router.navTo("RouteMaster");
+        // const model = this.getModel("view") as JSONModel;
+        // model.setProperty("/layout", "OneColumn"); 
+        const router = this.getRouter();
+        router.navTo("master");
+        //UIComponent.getRouterFor(this).navTo("RouteMaster");
+
     }
 
 }

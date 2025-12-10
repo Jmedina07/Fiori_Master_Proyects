@@ -6,7 +6,7 @@
         xmlns:mvc="sap.ui.core.mvc"
         xmlns:fb="sap.ui.comp.filterbar">
 
-    <f:DynamicPage>
+    <f:DynamicPage >
 
         <f:title>
 
@@ -17,7 +17,14 @@
                     <Title text="{i18n>appTitle}"/>
                 
                 </f:heading>
-            
+                <f:navigationActions>
+                    <Button
+                        text="Regresar"
+                        icon="sap-icon://nav-back"
+                        type="Transparent"
+                        press=".onClosePress"
+                    />
+                </f:navigationActions>            
             </f:DynamicPageTitle>
         
         </f:title>
@@ -26,7 +33,6 @@
 
             <f:DynamicPageHeader>
 
-            
             </f:DynamicPageHeader>
         
         </f:header>
