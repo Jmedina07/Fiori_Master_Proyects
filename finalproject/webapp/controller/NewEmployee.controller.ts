@@ -13,6 +13,7 @@ import PropertyBinding from "sap/ui/model/PropertyBinding";
 import Input from "sap/m/Input";
 import SegmentedButton, { SegmentedButton$SelectionChangeEvent } from "sap/m/SegmentedButton";
 import SegmentedButtonItem from "sap/m/SegmentedButtonItem";
+import Slider from "sap/m/Slider";
 
 /**
  * @namespace com.logaligroup.finalproject.controller
@@ -82,13 +83,39 @@ export default class NewEmployee extends BaseController {
     public getPage(): DynamicPage {
         return this.byId("dynamicPage") as DynamicPage;
     }
+    private frontcustomizing(): void {
+
+        const option = this.onButtonSelect();
+        const ocifInput = this.byId("Cif") as Input;
+        const odniInput = this.byId("Dni") as Input;
+        const osalarioSlider = this.byId("Salario") as Slider;
+        const oprecioSlider = this.byId("Precio") as Slider;
+        if (option == 2) {
+
+            ocifInput.setVisible(true);
+            odniInput.setVisible(false);
+            oprecioSlider.setVisible(true);
+            osalarioSlider.setVisible(false);
+        }
+        else {
+            ocifInput.setVisible(false);
+            odniInput.setVisible(true);
+            oprecioSlider.setVisible(false);
+            osalarioSlider.setVisible(true);
+        }
+
+    }
     private onBindElement(event: Route$PatternMatchedEvent): void {
 
         this.loadIncidences();
-
-
+        this.frontcustomizing();
 
     }
+    public onSegmentedButtonChange(oEvent: SegmentedButton$SelectionChangeEvent): void {
+
+        this.frontcustomizing();
+    }
+
     public onButtonSelect(): number {
 
         // 1. Obtener el ítem (SegmentedButtonItem) que fue seleccionado.
@@ -96,9 +123,9 @@ export default class NewEmployee extends BaseController {
         const segmentedButton = this.byId("butonselect") as SegmentedButton;
 
         // Utilizamos getSelectedKey() para obtener la clave (key) del item seleccionado
-        const selectedKey: number = Number( segmentedButton.getSelectedKey().toString() );
+        const selectedKey: number = Number(segmentedButton.getSelectedKey().toString());
 
-        return selectedKey ;
+        return selectedKey;
 
 
     }
@@ -113,11 +140,7 @@ export default class NewEmployee extends BaseController {
         // //console.log("Binding", name);
         // console.log( "Name;", sCurrentName);
         // 1. Obtener la instancia del control de entrada
-        const option = this.onButtonSelect();
-        if( option == 1)
-        {
-            
-        }
+
         const oNameInput = this.byId("Name") as Input;
         const oApellidoInput = this.byId("Apellido") as Input;
 

@@ -15,7 +15,7 @@
       "version": "1.19.6",
       "toolsId": "9cca3540-d221-4215-8d9e-468fd41cd9d6"
     },
-   "dataSources": {
+    "dataSources": {
       "mainService": {
         "uri": "/v2/northwind/northwind.svc/",
         "type": "OData",
@@ -42,8 +42,8 @@
           "localUri": "localService/ZEMPLOYEES_SRV/metadata.xml",
           "odataVersion": "2.0"
         }
-      }      
-    }    
+      }
+    }
   },
   "sap.ui": {
     "technology": "UI5",
@@ -104,8 +104,7 @@
           "defaultBindingMode": "TwoWay",
           "defaultUpdateMethod": "PUT"
         }
-      }      
-
+      }
     },
     "resources": {
       "css": [
@@ -128,51 +127,53 @@
       "routes": [
         {
           "name": "RouteMaster",
-          "pattern": ":?query:",
+          "pattern": "",
           "target": [
+            "TargetContainer",
             "TargetMaster"
           ]
         },
         {
-          "name": "RouteNewEmployee",
-          "pattern": "Employee({ID})",
+          "pattern": "detail1", 
+          "name": "detalleProducto1",
           "target": [
+            "TargetContainer",
             "TargetMaster",
-            "TargetNewEmployee"
-          ]
-        } ,        
+            "TargetDetail1"
+          ] 
+        },
         {
-          "name": "RouteEmployees",
-          "pattern": "Employee({ID})",
+          "pattern": "detail2",
+          "name": "detalleProducto2",
           "target": [
+            "TargetContainer",
             "TargetMaster",
-            "TargetEmployees"
-          ]
-        }        
+            "TargetDetail2"
+          ] 
+        }    
       ],
       "targets": {
-       
         "TargetContainer": {
           "name": "Container"
-        },        
+        },
         "TargetMaster": {
           "parent": "TargetContainer",
           "controlId": "container-fcl",
           "controlAggregation": "beginColumnPages",
           "name": "Master"
         },
-        "TargetNewEmployee": {
+        "TargetDetail1": {
           "parent": "TargetContainer",
           "controlId": "container-fcl",
-          "controlAggregation": "endColumnPages",          
+          "controlAggregation": "endColumnPages",
           "name": "NewEmployee"
-        } ,         
-        "TargetEmployees": {
+        },
+        "TargetDetail2": {
           "parent": "TargetContainer",
           "controlId": "container-fcl",
           "controlAggregation": "endColumnPages",
           "name": "Employees"
-        }              
+        }
       }
     },
     "rootView": {

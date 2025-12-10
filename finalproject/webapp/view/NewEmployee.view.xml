@@ -40,7 +40,7 @@
                                     width="100%">
                                 <SegmentedButton
                                     width="320px" id="butonselect" 
-                                    selectionChange="onButtonSelect1"
+                                    selectionChange="onSegmentedButtonChange"
 									selectedKey="{/selectedOption}"
 									>
                                     <items>
@@ -88,17 +88,17 @@
 											liveChange="checksteptwo" placeholder="{i18n>placedni}"
 											value="{/steptwo/dni}"/>
 
-									<Label text="{i18n>lblcfi}" required="true"/>
+									<Label text="{i18n>lblcif}" required="true"/>
 									<Input valueStateText="Enter digits"
-											valueState="{/steptwo/cfi}" id="cfi" type="Number"
-											liveChange="checksteptwo" placeholder="{i18n>placecfi}"
-											value="{/steptwo/cfi}"/>
+											valueState="{/steptwo/cif}" id="Cif" type="Number"
+											liveChange="checksteptwo" placeholder="{i18n>placecif}"
+											value="{/steptwo/cif}"/>
 
 									<Label text="{i18n>lblsalario}" required="true"/>
-									<Slider enableTickmarks="true" class="sapUiMediumMarginBottom" min="12000" max="80000" value="24000" id="salario" />
+									<Slider enableTickmarks="true" class="sapUiMediumMarginBottom" min="12000" max="80000" value="24000" id="Salario" />
 
 									<Label text="{i18n>lblprecio}" required="true"/>
-									<Slider enableTickmarks="true" class="sapUiMediumMarginBottom" min="100" max="2000" value="400" id="precio" />
+									<Slider enableTickmarks="true" class="sapUiMediumMarginBottom" min="100" max="2000" value="400" id="Precio" />
 
 									<Label text="{i18n>lbldate}"/>
 									<DatePicker value="{/steptwo/date}" id="date" valueFormat="yyyy-MM-dd" displayFormat="long" liveChange="checksteptwo"/>

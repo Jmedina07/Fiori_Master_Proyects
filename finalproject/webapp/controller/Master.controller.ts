@@ -16,7 +16,7 @@ export default class Master extends BaseController {
         model.setProperty("/layout", "EndColumnFullScreen");
         const router = this.getRouter();
         console.log("Sale new Employee");      
-        router.navTo("RouteNewEmployee",{ ID: 0 });
+        router.navTo("detalleProducto1");
     }
 
     public onviewEmployee(event: Event): void{
@@ -25,9 +25,10 @@ export default class Master extends BaseController {
         model.setProperty("/layout", "EndColumnFullScreen");
         const router = this.getRouter();
         console.log("Sale master");      
-        router.navTo("RouteEmployees",{
-            ID: parseInt("1") - 1            //index
-        });
+        router.navTo("detalleProducto2");
+        // router.navTo("RouteEmployees",{
+        //     ID: parseInt("1") - 1            //index
+        // });
     }
 
 }
