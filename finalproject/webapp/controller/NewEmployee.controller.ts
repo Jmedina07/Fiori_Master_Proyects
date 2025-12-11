@@ -1,20 +1,20 @@
 import BaseController from "./BaseController";
 import { Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
-import View from "sap/ui/core/mvc/View";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import Wizard from "sap/m/Wizard";
 import WizardStep from "sap/m/WizardStep";
 import NavContainer from "sap/m/NavContainer";
 import Page, { Page$NavButtonPressEvent } from "sap/m/Page";
-import EventBus from "sap/ui/core/EventBus";
 import DynamicPage from "sap/f/DynamicPage";
-import { ValueState } from "sap/ui/core/library";
-import PropertyBinding from "sap/ui/model/PropertyBinding";
 import Input from "sap/m/Input";
 import SegmentedButton, { SegmentedButton$SelectionChangeEvent } from "sap/m/SegmentedButton";
-import SegmentedButtonItem from "sap/m/SegmentedButtonItem";
 import Slider from "sap/m/Slider";
 import Button from "sap/m/Button";
+import ResourceModel from "sap/ui/model/resource/ResourceModel";
+import ResourceBundle from "sap/base/i18n/ResourceBundle";
+import Label from "sap/m/Label";
+import Text from "sap/m/Text";
+import MessageBox, { Action, Icon } from "sap/m/MessageBox";
 
 /**
  * @namespace com.logaligroup.finalproject.controller
@@ -31,16 +31,9 @@ interface StepTwoData {
 interface ModelData {
     // Estas son las rutas de binding usadas en el XML
     titleClickable: boolean;
-    // ProductCollection: any[]; // Usaremos 'any' ya que no se define su estructura aquí
-    // ProductsTotalPrice: number;
-    // selectedPayment: string;
-    // selectedDeliveryMethod: string;
     steptwo: StepTwoData;
-    // CreditCard: CreditCardData;
-    // CashOnDelivery: CashOnDeliveryData;
-    // BillingAddress: BillingAddressData;
-    // CardNumber?: string;
 }
+type MessageBoxFunction = "confirm" | "warning";
 
 export default class NewEmployee extends BaseController {
 
@@ -49,10 +42,6 @@ export default class NewEmployee extends BaseController {
     private _oDynamicPage!: DynamicPage;
     private model!: JSONModel;
 
-    // Almacenamos los pasos para una referencia fácil
-    private _ContentsStep!: WizardStep;
-    private _steptwo!: WizardStep;
-    private _stepthree!: WizardStep;
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
@@ -72,13 +61,17 @@ export default class NewEmployee extends BaseController {
         // Usamos attachRequestCompleted para manejar la carga asíncrona de datos
         this.model.attachRequestCompleted({}, () => {
             const oData = this.model.getData() as ModelData;
+            oData.steptwo = {};
+            this.model.setData(oData, true);
+            //this.model.setProperty("/steptwo", "Step Two");
+            //  this.model.setProperty("/steptwo", {});
 
-            this.model.setProperty("/steptwo", {});
-        }, this);
-
+        });
+        // }, this);
+        //this.model.updateBindings();
         // Cargar datos (asume que los paths son correctos en un proyecto real)
-        // this.model.loadData(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"));
-        // this.getView()?.setModel(this.model);
+        this.model.loadData(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"));
+        this.getView()?.setModel(this.model);
         // Realiza una verificación de tipo para asegurar que es un Wizard (buena práctica de TS)
         if (oWizard instanceof Wizard) {
             this._wizard = oWizard;
@@ -92,8 +85,8 @@ export default class NewEmployee extends BaseController {
 
     }
     public completedHandler(): void {
-//        this._oNavContainer = this.byId("wizardBranchingReviewPage") as Page;
-        this._oNavContainer.to( this.byId("wizardBranchingReviewPage") as Page );
+
+        this._oNavContainer.to(this.byId("wizardReviewPage") as Page);
     }
     public getPage(): DynamicPage {
         return this.byId("dynamicPage") as DynamicPage;
@@ -105,18 +98,33 @@ export default class NewEmployee extends BaseController {
         const odniInput = this.byId("Dni") as Input;
         const osalarioSlider = this.byId("Salario") as Slider;
         const oprecioSlider = this.byId("Precio") as Slider;
-        if (option == 2) {
+        const lbldni = this.byId("lbldni") as Label;
+        const lblcif = this.byId("lblcif") as Label;
+        const txtdni = this.byId("txtdni") as Text;
+        const txtcif = this.byId("txtcif") as Text;
+        const resourceBundle = (this.getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
+        const option2 = resourceBundle.getText("tipoempleado2")
+
+        if (option == option2) {
 
             ocifInput.setVisible(true);
             odniInput.setVisible(false);
             oprecioSlider.setVisible(true);
             osalarioSlider.setVisible(false);
+            lbldni.setVisible(false);
+            txtdni.setVisible(false);
+            lblcif.setVisible(true);
+            txtcif.setVisible(true);
         }
         else {
             ocifInput.setVisible(false);
             odniInput.setVisible(true);
             oprecioSlider.setVisible(false);
             osalarioSlider.setVisible(true);
+            lbldni.setVisible(true);
+            txtdni.setVisible(true);
+            lblcif.setVisible(false);
+            txtcif.setVisible(false);
         }
 
     }
@@ -131,22 +139,20 @@ export default class NewEmployee extends BaseController {
         this.frontcustomizing();
     }
 
-    public onButtonSelect(): number {
+    public onButtonSelect(): string {
 
         // 1. Obtener el ítem (SegmentedButtonItem) que fue seleccionado.
         // Se usa 'getParameter("item")' para obtener el control que cambió.
         const segmentedButton = this.byId("butonselect") as SegmentedButton;
 
         // Utilizamos getSelectedKey() para obtener la clave (key) del item seleccionado
-        const selectedKey: number = Number(segmentedButton.getSelectedKey().toString());
+        const selectedKey = segmentedButton.getSelectedKey().toString();
 
         return selectedKey;
 
 
     }
-    public checkstepone(): void {
-        //this.frontcustomizing();
-    }
+
     public checksteptwo(): void {
 
         const oNameInput = this.byId("Name") as Input;
@@ -169,5 +175,68 @@ export default class NewEmployee extends BaseController {
         const router = this.getRouter();
         router.navTo("master");
 
+    }
+
+    public handleWizardCancel(): void {
+        this.handleMessageBoxOpen("Are you sure you want to cancel your purchase?", "warning");
+    }
+
+    public handleWizardSave(): void {
+        this.handleMessageBoxOpen("Are you sure you want to submit your report?", "confirm");
+    }
+
+    private handleMessageBoxOpen(sMessage: string, sMessageBoxType: MessageBoxFunction): void {
+
+        // Configuración de las acciones (YES/NO) y el manejador de cierre
+        const oActionConfig = {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            // oAction será tipado como una string literal de las acciones (ej: "YES")
+            onClose: (oAction: string) => {
+                // La comparación directa con "YES" (string) es la más segura y compatible
+                if (oAction === MessageBox.Action.YES) { // SAPUI5 define Action.YES como la string "YES"
+                    // Descartar el progreso y volver al inicio
+                    const firstStep = this._wizard.getSteps()[0];
+                    this._wizard.discardProgress(firstStep, false);
+                    this.handleNavBackToList();
+                }
+            }
+        };
+
+        // Usamos el switch para llamar al método correcto
+        switch (sMessageBoxType) {
+            case "confirm":
+                MessageBox.confirm(sMessage, oActionConfig);
+                break;
+            case "warning":
+                MessageBox.warning(sMessage, oActionConfig);
+                break;
+            default:
+                // Esto no debería suceder gracias al tipado de MessageBoxFunction
+                MessageBox.show(sMessage, oActionConfig);
+                break;
+        }
+    }
+
+    public handleNavBackToList(): void {
+        this.navBackToStep(this.byId("ContentsStep") as WizardStep);
+    }
+    // private _navBackToStep(step: WizardStep): void {
+    //     const fnAfterNavigate = () => {
+    //         this._wizard.goToStep(step, false);
+    //         this._oNavContainer.detachAfterNavigate(fnAfterNavigate);
+    //     }.bind: any(this);
+
+    //     this._oNavContainer.attachAfterNavigate(fnAfterNavigate);
+    //     this._oNavContainer.to(this._oDynamicPage);
+    // }
+
+    private navBackToStep(step: WizardStep): void {
+        const fnAfterNavigate = () => {
+            this._wizard.goToStep(step, false);
+            this._oNavContainer.detachAfterNavigate(fnAfterNavigate);
+        };
+
+        this._oNavContainer.attachAfterNavigate(fnAfterNavigate);
+        this._oNavContainer.to(this._oDynamicPage);
     }
 }

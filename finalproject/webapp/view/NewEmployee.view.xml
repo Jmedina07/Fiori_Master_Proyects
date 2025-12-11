@@ -53,9 +53,9 @@
 									selectedKey="{/selectedOption}"
 									>
                                     <items>
-                                        <SegmentedButtonItem icon="sap-icon://iphone" text="{i18n>tipoempleado1}" key="1" width="100px"/>
-                                        <SegmentedButtonItem icon="sap-icon://sys-monitor" text="{i18n>tipoempleado2}" key="2" width="150px"/>
-                                        <SegmentedButtonItem icon="sap-icon://database" text="{i18n>tipoempleado3}" key="3" width="100px"/>
+                                        <SegmentedButtonItem icon="sap-icon://iphone" text="{i18n>tipoempleado1}" key="{i18n>tipoempleado1}" width="100px" />
+                                        <SegmentedButtonItem icon="sap-icon://sys-monitor" text="{i18n>tipoempleado2}" key="{i18n>tipoempleado2}" width="150px"/>
+                                        <SegmentedButtonItem icon="sap-icon://database" text="{i18n>tipoempleado3}" key="{i18n>tipoempleado3}" width="100px"/>
                                     </items>
                                 </SegmentedButton>
                             </HBox>
@@ -82,24 +82,24 @@
 									</MessageStrip>      
 
 									<Label text="{i18n>lblname}" required="true"/>
-									<Input  valueState="{/steptwo/name}" id="Name" liveChange="checksteptwo"
+									<Input  id="Name" liveChange="checksteptwo"
 											placeholder="{i18n>placename}" value="{/steptwo/name}" />
                                             
 									<Label text="{i18n>lblapellido}" required="true"/>
 									<Input valueStateText="Enter digits"
-											valueState="{/steptwo/apellido}" id="Apellido"
+											id="Apellido"
 											liveChange="checksteptwo" placeholder="{i18n>placeapellido}"
 											value="{/steptwo/apellido}"/>
 
 									<Label text="{i18n>lbldni}" required="true"/>
 									<Input valueStateText="Enter digits"
-											valueState="{/steptwo/dni}" id="Dni" type="Number"
+											id="Dni" type="Number"
 											liveChange="checksteptwo" placeholder="{i18n>placedni}"
 											value="{/steptwo/dni}"/>
 
 									<Label text="{i18n>lblcif}" required="true"/>
 									<Input valueStateText="Enter digits"
-											valueState="{/steptwo/cif}" id="Cif" type="Number"
+											id="Cif" type="Number"
 											liveChange="checksteptwo" placeholder="{i18n>placecif}"
 											value="{/steptwo/cif}"/>
 
@@ -138,57 +138,33 @@
 					</OverflowToolbar>
 				</f:footer>
 			</f:DynamicPage>
-			<Page id="wizardBranchingReviewPage" showHeader="false">
+			<Page id="wizardReviewPage" showHeader="false">
 				<content>
 					<form:SimpleForm
-						title="1. List of products"
-						editable="false"
-						layout="ResponsiveGridLayout">
-						<List items="{/ProductCollection}">
-							<StandardListItem
-								title="{Name}"
-								type="Active"
-								description="{Description}"
-								icon="{ProductPicUrl}"
-								info="{Price} {CurrencyCode}"
-								iconDensityAware="false"
-								iconInset="false"/>
-						</List>
-						<ObjectHeader
-							title="Total"
-							number="{/ProductsTotalPrice}"
-							numberUnit="EUR">
-							<attributes>
-								<ObjectAttribute
-									press="handleNavBackToList"
-									active="true"
-									text="Edit"/>
-							</attributes>
-						</ObjectHeader>
-					</form:SimpleForm>
-					<form:SimpleForm
-						title="2. Payment type"
+						title="1. {i18n>wizardname1}"
 						editable="false"
 						layout="ResponsiveGridLayout">
 						<form:content>
-							<Label text="Chosen payment type"/>
-							<Text text="{/selectedPayment}"/>
+							<Label text="Tipo"/>
+							<Text text="{/selectedOption}"/>
 							<Link press="handleNavBackToPaymentType" text="Edit"/>
 						</form:content>
 					</form:SimpleForm>
 
 					<form:SimpleForm
-						visible="{= ${/selectedPayment}==='Credit Card' ? true : false}"
-						title="3. Credit Card payment"
+						title="2. {i18n>wizardname2}"
 						editable="false"
 						layout="ResponsiveGridLayout">
 						<form:content>
-							<Label text="Name on card"/>
-							<Text text="{/CreditCard/Name}"/>
-							<Label text="Card number"/>
-							<Text text="{/CardNumber}"/>
-							<Label text="Security code"/>
-							<Text text="{/CreditCard/SecurityCode}"/>
+							<Label text="{i18n>lblname}"/>
+							<Text text="{/steptwo/name}"/>
+							<Label text="{i18n>lblapellido}"/>
+							<Text text="{/steptwo/apellido}"/>
+							<Label text="{i18n>lbldni}" id="lbldni"/>
+							<Text text="{/steptwo/dni}" id="txtdni"/>
+							<Label text="{i18n>lblcif}" id="lblcif"/>
+							<Text text="{/steptwo/cif}" id="txtcif"/>
+
 							<Label text="Expiration date"/>
 							<Text text="{/CreditCard/Expire}"/>
 							<Link press="handleNavBackToCreditCard" text="Edit"/>
@@ -269,8 +245,8 @@
 				<footer>
 					<Bar>
 						<contentRight>
-							<Button text="Submit" press="handleWizardSubmit"/>
-							<Button text="Cancel" press="handleWizardCancel"/>
+							<Button text="{i18n>buton4}" press="handleWizardSave"/>
+							<Button text="{i18n>buton5}" press="handleWizardCancel"/>
 						</contentRight>
 					</Bar>
 				</footer>
