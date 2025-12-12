@@ -15,7 +15,7 @@ import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import Label from "sap/m/Label";
 import Text from "sap/m/Text";
 import MessageBox, { Action, Icon } from "sap/m/MessageBox";
-
+import ValueState from "sap/ui/core/ValueStateSupport";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -34,7 +34,17 @@ interface ModelData {
     steptwo: StepTwoData;
 }
 type MessageBoxFunction = "confirm" | "warning";
-
+// Define una interfaz para el historial (history)
+interface History {
+    prevPaymentSelect: string | null;
+    prevDiffDeliverySelect: boolean | null;
+}
+// Variable de historial fuera de la clase para mantener el estado
+// El uso de 'var history' en el código original sugiere un estado global/estático.
+const history: History = {
+    prevPaymentSelect: null,
+    prevDiffDeliverySelect: null
+};
 export default class NewEmployee extends BaseController {
 
     private _wizard!: Wizard;
@@ -50,6 +60,35 @@ export default class NewEmployee extends BaseController {
         router.getRoute("newEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
 
     }
+    // Define la estructura inicial/vacía de tu modelo
+    private initialModelData: any = {
+        selectedOption: "", // Para el SegmentedButton
+        steptwo: {
+            name: "",
+            apellido: "",
+            dni: null,
+            cif: null,
+            date: null
+            // Salario y Precio son Sliders, que se manejan mejor por ID o se inicializan aquí si están en el modelo
+        },
+        stepthree: {
+            Note: "" // Para el TextArea
+        },
+        // Aquí deberías incluir cualquier otra propiedad que uses en el Wizard
+        // como /CreditCard, /CashOnDelivery, /BillingAddress, etc. si las usas.
+
+        // Propiedades de ejemplo para el modelo
+        selectedPayment: "",
+        BillingAddress: {
+            Address: "",
+            City: "",
+            ZipCode: "",
+            Country: "",
+            Note: ""
+        },
+        selectedDeliveryMethod: "",
+        titleClickable: false // Propiedad de DynamicPage
+    };
     private loadIncidences(): void {
 
         const oWizard = this.byId("employeeWizard") as Wizard;
@@ -82,6 +121,47 @@ export default class NewEmployee extends BaseController {
         }
         const buton = this.byId("savebuton") as Button;
         buton.setVisible(false);
+
+    }
+    /**
+         * Reinicia el Wizard al primer paso y limpia los datos.
+         */
+    private _resetWizard(): void {
+
+        const oWizard = this.byId("employeeWizard") as Wizard;
+        //const oModel = this.getView().getModel() as JSONModel;
+
+        const oModel = this.model = new JSONModel();
+
+        // 1. Reiniciar el modelo de datos a su estado inicial
+        // (Esto limpiará todos los campos de entrada, botones de segmento, etc. que estén enlazados al modelo)
+        oModel.setData(this.initialModelData);
+
+        // Opcionalmente, puedes inicializar los Sliders a sus valores por defecto si no están enlazados al modelo
+        // const oSalarioSlider = this.byId("Salario") as Slider;
+        // oSalarioSlider.setValue(24000); 
+        // const oPrecioSlider = this.byId("Precio") as Slider;
+        // oPrecioSlider.setValue(400);
+
+        // 2. Volver al primer paso del Wizard
+        const oFirstStep = this.byId("ContentsStep") as WizardStep;
+        if (oWizard && oFirstStep) {
+            // Ir al primer paso
+            oWizard.discardProgress(oFirstStep, false);
+
+            // Opcional: Reiniciar la navegación al primer Page
+            const oNavContainer = this.byId("navContainer") as NavContainer;
+            const oDynamicPage = this.byId("dynamicPage") as DynamicPage;
+            if (oNavContainer && oDynamicPage) {
+                oNavContainer.to(oDynamicPage.getId());
+            }
+
+            // Opcional: Mostrar un mensaje
+            //MessageToast.show("Formulario y Wizard reiniciados.");
+        } else {
+            // Manejo de error si no se encuentra el Wizard o el primer paso
+            console.error("No se encontró el Wizard o el primer paso.");
+        }
 
     }
     public completedHandler(): void {
@@ -135,9 +215,49 @@ export default class NewEmployee extends BaseController {
 
     }
     public onSegmentedButtonChange(oEvent: SegmentedButton$SelectionChangeEvent): void {
+        this.setDiscardableProperty({
+            message: "Are you sure you want to change the payment type ? This will discard your progress.",
+            discardStepId: "ContentsStep",
+            modelPath: "/selectedOption",
+            historyPath: "prevPaymentSelect"
+        });
 
-        this.frontcustomizing();
     }
+
+    /**
+         * Función genérica para manejar cambios en el modelo que podrían requerir
+         * descartar el progreso del wizard si ya se ha avanzado.
+         * @param params Parámetros que contienen el mensaje, el ID del paso a descartar, el path del modelo y el path del historial.
+         */
+    private setDiscardableProperty(params: {
+        message: string;
+        discardStepId: string;
+        modelPath: string;
+        historyPath: keyof History;
+    }): void {
+        const discardStep = this.byId(params.discardStepId) as WizardStep;
+
+        if (this._wizard.getProgressStep() !== discardStep) {
+            MessageBox.warning(params.message, {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                onClose: (oAction: string) => {
+                    if (oAction === MessageBox.Action.YES) {
+                        this._wizard.discardProgress(discardStep, false);
+                        // Asegurar el tipado correcto para el historial
+                        history[params.historyPath] = this.model.getProperty(params.modelPath) as any;
+                        this.frontcustomizing();
+                    } else {
+                        // Restablecer el valor anterior
+                        this.model.setProperty(params.modelPath, history[params.historyPath]);
+                    }
+                }
+            });
+        } else {
+            // El usuario aún está en el paso, actualizar el historial sin MessageBox
+            history[params.historyPath] = this.model.getProperty(params.modelPath) as any;
+        }
+    }
+
 
     public onButtonSelect(): string {
 
@@ -197,7 +317,8 @@ export default class NewEmployee extends BaseController {
                     // Descartar el progreso y volver al inicio
                     const firstStep = this._wizard.getSteps()[0];
                     this._wizard.discardProgress(firstStep, false);
-                    this.handleNavBackToList();
+                    this._resetWizard();
+                    this.handleNavBackToFirst();
                 }
             }
         };
@@ -217,8 +338,14 @@ export default class NewEmployee extends BaseController {
         }
     }
 
-    public handleNavBackToList(): void {
+    public handleNavBackToFirst(): void {
         this.navBackToStep(this.byId("ContentsStep") as WizardStep);
+    }
+    public handleNavBackToTwo(): void {
+        this.navBackToStep(this.byId("steptwo") as WizardStep);
+    }
+    public handleNavBackToThree(): void {
+        this.navBackToStep(this.byId("stepthree") as WizardStep);
     }
     // private _navBackToStep(step: WizardStep): void {
     //     const fnAfterNavigate = () => {
@@ -233,10 +360,44 @@ export default class NewEmployee extends BaseController {
     private navBackToStep(step: WizardStep): void {
         const fnAfterNavigate = () => {
             this._wizard.goToStep(step, false);
+
             this._oNavContainer.detachAfterNavigate(fnAfterNavigate);
         };
 
         this._oNavContainer.attachAfterNavigate(fnAfterNavigate);
         this._oNavContainer.to(this._oDynamicPage);
+    }
+
+
+    private saveEmployee(): void {
+
+
+        const signature = this.byId("signature") as Signature;
+        const bindingContext = this.getView()?.getBindingContext("northwind") as Context;
+        const resourceBundle = this.getResourceBundle();
+        //const utils = new Utils(this);
+
+
+        if (!signature.isFill()) {
+            MessageBox.error(resourceBundle.getText("fillSignature") || '');
+        } else {
+            const sSignature = signature.getSignature();
+            //data:image/png;base64,
+            const sMediaContent = sSignature.replace("data:image/png;base64,", "");
+            const body = {
+                path: '/Users',
+                data: {
+                    OrderId: bindingContext.getProperty("OrderID").toString(),
+                    SapId: "",
+                    EmployeeId: bindingContext.getProperty("EmployeeID").toString(),
+                    MimeType: 'image/png',
+                    MediaContent: sMediaContent
+                }
+            };
+
+            await utils.crud('create', new JSONModel(body));
+        }
+
+
     }
 }
