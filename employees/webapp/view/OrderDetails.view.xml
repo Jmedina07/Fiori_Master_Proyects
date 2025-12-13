@@ -2,8 +2,9 @@
     controllerName="com.logaligroup.employees.controller.OrderDetails"
             xmlns="sap.m"
             xmlns:uxap="sap.uxap"
-            xmlns:sg="com.logaligroup.employees.control"            
-            xmlns:mvc="sap.ui.core.mvc">
+            xmlns:mvc="sap.ui.core.mvc"
+            xmlns:upload="sap.m.upload"
+            xmlns:sg="com.logaligroup.employees.control">
 
             <uxap:ObjectPageLayout>
 
@@ -89,11 +90,12 @@
 
                                             <items>
 
-                                                <HBox width="400px"
+                                                <HBox width="300px"
                                                         height="150px">
+
                                                     <sg:Signature
-                                                        id="signature"
-                                                    />                                                
+                                                                    id="signature"/>
+                                                
                                                 </HBox>
 
                                                 <HBox class="sapUiSmallMarginTop">
@@ -118,7 +120,7 @@
                                                             class="sapUiSmallMarginEnd"
                                                             text="{i18n>refresh}"
                                                             tooltip="{i18n>refresh}"
-                                                            type="Transparent"
+                                                            type="Accept"
                                                             press="onRefreshPress"
                                                             width="4rem"/>
                                                 
@@ -129,6 +131,29 @@
 
                                         
                                         </FlexBox>
+                                    
+                                    </uxap:blocks>
+                                
+                                </uxap:ObjectPageSubSection>
+                            
+                            </uxap:subSections>
+                        
+                        </uxap:ObjectPageSection>
+
+                        <uxap:ObjectPageSection title="{i18n>attachments}">
+                        
+                            <uxap:subSections>
+                            
+                                <uxap:ObjectPageSubSection>
+
+                                    <uxap:blocks>
+                                    
+                                        <upload:UploadSet 
+                                                        id="upload"
+                                                        uploadUrl="/sap/opu/odata/sap/YSAPUI5_SRV_01/FilesSet/"
+                                                        beforeUploadStarts="onBeforeUpload"
+                                                        uploadCompleted="onUploadCompleted"
+                                                        afterItemRemoved="onAfterRemoved"/>
                                     
                                     </uxap:blocks>
                                 
