@@ -40,15 +40,11 @@
         <f:content>
 
             <Table  id="table"
-                    items="{zinvoices2>/Users}">
+                    items="{resultsModel>/}">
 
                 <headerToolbar>
                     <Toolbar>
-                        <Title text="Employees (45)"/>
-                        <ToolbarSpacer />
-                        <Button
-                                icon="sap-icon://download"
-                                press="onExportToExcel"/>
+                        <Title text="Employees"/>
                     </Toolbar>
                 </headerToolbar>
 
@@ -78,14 +74,14 @@
 
                         <cells>
 
-                            <ObjectIdentifier title="{zinvoices2>EmployeeId}" 
-                                                text="{zinvoices2>LastName}, {zinvoices2>FirstName}"/>
+                            <ObjectIdentifier title="{resultsModel>EmployeeId}" 
+                                                text="{resultsModel>LastName}, {resultsModel>FirstName}"/>
 
-                            <Text text="{zinvoices2>Type}"/>
-                            <Text text="{zinvoices2>Dni}"/>
+                            <Text text="{resultsModel>Type}"/>
+                            <Text text="{resultsModel>Dni}"/>
                             <Text 
                                 text="{
-                                        path: 'zinvoices2>CreationDate',
+                                        path: 'resultsModel>CreationDate',
                                         type: 'sap.ui.model.type.Date'
                                     }"
                             />

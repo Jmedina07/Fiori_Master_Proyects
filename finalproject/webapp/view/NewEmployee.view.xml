@@ -246,7 +246,7 @@
 				<footer>
 					<Bar>
 						<contentRight>
-							<Button text="{i18n>buton4}" press="handleWizardSave" id="Save"/>
+							<Button text="{i18n>buton4}" press="saveEmployee" id="Save"/>
 							<Button text="{i18n>buton5}" press="handleWizardCancel"/>
 						</contentRight>
 					</Bar>

@@ -24,7 +24,7 @@ export default class Utils {
     }
 
     public getEmail(): string {
-        return "test@logaligroup.com";
+        return "joel@logaligroup.com";
     }
 
     public async read(object?: JSONModel): Promise<void | ODataListBinding> {
@@ -33,7 +33,7 @@ export default class Utils {
         const filters = object?.getProperty("/filters");
         const resourceBundle = this.resourceBundle;
 
-        if( path && typeof path === 'string' ){
+        if (path && typeof path === 'string') {
             path = path.split('(')[0];
         }
         return new Promise((resolve, reject) => {
@@ -51,7 +51,47 @@ export default class Utils {
     }
 
     // action = create, read, update, delete
-    // public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
-    // }
+    public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
+        console.log(action);
+        const resourceBundle = this.resourceBundle;
+
+        return new Promise((resolve, reject) => {
+            MessageBox.confirm(resourceBundle.getText("question") || 'no text defined', {
+                actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                emphasizedAction: MessageBox.Action.OK,
+                onClose: async (response: string) => {
+                    if (MessageBox.Action.OK == response) {
+                        switch (action) {
+                            case 'create': resolve(await this.create(object)); break;
+                            // case 'update': resolve(await this.update(object)); break;
+                            // case 'delete': resolve(await this.delete(object)); break;
+                        }
+                    }
+                }
+            });
+        });
+    }
+
+    private async create(object?: JSONModel): Promise<void | ODataListBinding> {
+
+        const model = this.model;
+        const path = object?.getProperty("/path");
+        const body = object?.getProperty("/data");
+        const resourceBundle = this.resourceBundle;
+        console.log(object);
+        //console.log(body);
+        return new Promise((resolve, reject) => {
+            model.create(path, body, {
+                success: async () => {
+                    MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                    resolve(await this.read(object));
+                },
+                error: () => {
+                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    reject();
+                }
+            });
+        });
+    }
 
 }

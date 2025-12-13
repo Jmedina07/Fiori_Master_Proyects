@@ -16,6 +16,7 @@ import Label from "sap/m/Label";
 import Text from "sap/m/Text";
 import MessageBox, { Action, Icon } from "sap/m/MessageBox";
 import ValueState from "sap/ui/core/ValueStateSupport";
+import Utils from "../utils/Utils";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -369,34 +370,38 @@ export default class NewEmployee extends BaseController {
     }
 
 
-    private saveEmployee(): void {
+    //private saveEmployee(): void {
+
+    public async saveEmployee () : Promise<void> {
+        // const signature = this.byId("signature") as Signature;
+        // const bindingContext = this.getView()?.getBindingContext("northwind") as Context;
+        // const resourceBundle = this.getResourceBundle();
+        const utils = new Utils(this);
 
 
-        const signature = this.byId("signature") as Signature;
-        const bindingContext = this.getView()?.getBindingContext("northwind") as Context;
-        const resourceBundle = this.getResourceBundle();
-        //const utils = new Utils(this);
-
-
-        if (!signature.isFill()) {
-            MessageBox.error(resourceBundle.getText("fillSignature") || '');
-        } else {
-            const sSignature = signature.getSignature();
+        // if (!signature.isFill()) {
+        //     MessageBox.error(resourceBundle.getText("fillSignature") || '');
+        // } else {
+            //const sSignature = signature.getSignature();
             //data:image/png;base64,
-            const sMediaContent = sSignature.replace("data:image/png;base64,", "");
+            //const sMediaContent = sSignature.replace("data:image/png;base64,", "");
+            const types: string = "1";
             const body = {
                 path: '/Users',
                 data: {
-                    OrderId: bindingContext.getProperty("OrderID").toString(),
-                    SapId: "",
-                    EmployeeId: bindingContext.getProperty("EmployeeID").toString(),
-                    MimeType: 'image/png',
-                    MediaContent: sMediaContent
+                    SapId: utils.getEmail(),
+                    EmployeeId: "0002",
+                    //EmployeeId: bindingContext.getProperty("EmployeeID").toString(),
+                    Type: "1",
+                    FirstName: "Joel",
+                    LastName:"Medina Juarez",
+                    Dni: "123456"
+                    //CreationDate: ("").toString
                 }
             };
 
             await utils.crud('create', new JSONModel(body));
-        }
+        // }
 
 
     }
