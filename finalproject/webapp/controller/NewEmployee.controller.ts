@@ -17,10 +17,17 @@ import Text from "sap/m/Text";
 import MessageBox, { Action, Icon } from "sap/m/MessageBox";
 import ValueState from "sap/ui/core/ValueStateSupport";
 import Utils from "../utils/Utils";
+import DatePicker from "sap/m/DatePicker";
+import TextArea from "sap/m/TextArea";
+import Filter from "sap/ui/model/Filter";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
-
+// Define el tipo de dato que esperas
+interface IReadResult {
+    results: any[];
+    __count?: number; // Propiedad opcional
+}
 // Definimos interfaces para la estructura del modelo de datos esperada
 interface StepTwoData {
     name?: string;
@@ -56,7 +63,7 @@ export default class NewEmployee extends BaseController {
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
-        console.log("Entro a New Employes");
+
         const router = this.getRouter();
         router.getRoute("newEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
 
@@ -217,7 +224,7 @@ export default class NewEmployee extends BaseController {
     }
     public onSegmentedButtonChange(oEvent: SegmentedButton$SelectionChangeEvent): void {
         this.setDiscardableProperty({
-            message: "Are you sure you want to change the payment type ? This will discard your progress.",
+            message: "Are you sure you want to change the Employee type ? This will discard your progress.",
             discardStepId: "ContentsStep",
             modelPath: "/selectedOption",
             historyPath: "prevPaymentSelect"
@@ -348,15 +355,6 @@ export default class NewEmployee extends BaseController {
     public handleNavBackToThree(): void {
         this.navBackToStep(this.byId("stepthree") as WizardStep);
     }
-    // private _navBackToStep(step: WizardStep): void {
-    //     const fnAfterNavigate = () => {
-    //         this._wizard.goToStep(step, false);
-    //         this._oNavContainer.detachAfterNavigate(fnAfterNavigate);
-    //     }.bind: any(this);
-
-    //     this._oNavContainer.attachAfterNavigate(fnAfterNavigate);
-    //     this._oNavContainer.to(this._oDynamicPage);
-    // }
 
     private navBackToStep(step: WizardStep): void {
         const fnAfterNavigate = () => {
@@ -370,39 +368,70 @@ export default class NewEmployee extends BaseController {
     }
 
 
-    //private saveEmployee(): void {
-
-    public async saveEmployee () : Promise<void> {
-        // const signature = this.byId("signature") as Signature;
-        // const bindingContext = this.getView()?.getBindingContext("northwind") as Context;
-        // const resourceBundle = this.getResourceBundle();
+    public async saveEmployee(): Promise<void> {
         const utils = new Utils(this);
+        const resourceBundle = (this.getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
+        const name = (this.byId("Name") as Input).getValue().toString();
+        const apellido = (this.byId("Apellido") as Input).getValue().toString();
+        let dni = "", amount = "";
 
-
-        // if (!signature.isFill()) {
-        //     MessageBox.error(resourceBundle.getText("fillSignature") || '');
-        // } else {
-            //const sSignature = signature.getSignature();
-            //data:image/png;base64,
-            //const sMediaContent = sSignature.replace("data:image/png;base64,", "");
-            const types: string = "1";
-            const body = {
-                path: '/Users',
-                data: {
-                    SapId: utils.getEmail(),
-                    EmployeeId: "0002",
-                    //EmployeeId: bindingContext.getProperty("EmployeeID").toString(),
-                    Type: "1",
-                    FirstName: "Joel",
-                    LastName:"Medina Juarez",
-                    Dni: "123456"
-                    //CreationDate: ("").toString
-                }
-            };
-
-            await utils.crud('create', new JSONModel(body));
+        var selectedKey = this.model.getProperty("/selectedOption").toString();
+        const option1 = resourceBundle.getText("tipoempleado1");
+        const option2 = resourceBundle.getText("tipoempleado2");
+        const option3 = resourceBundle.getText("tipoempleado3");
+        const type = ((selectedKey === option1) ? 1 : (selectedKey === option2) ? 2 : 3).toString();
+        //const dni1 = ( ( selectedKey === option2) ? (this.byId("Cif") as Input ).getValue() : (this.byId("Dni") as Input ).getValue()  ).toString();
+        if (selectedKey === option2) {
+            dni = (this.byId("Cif") as Input).getValue().toString();
+            amount = (this.byId("Precio") as Slider).getValue().toString();
+        } else {
+            dni = (this.byId("Dni") as Input).getValue().toString();
+            amount = (this.byId("Salario") as Slider).getValue().toString()
+        }
+        const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
+        //const note = this.model.getProperty("/stepthree/Note");
+        const comments = (this.byId("Note") as TextArea).getValue().toString();
+        //const employeeId = this.getId();
+        const employee = {
+            path: '/Users',
+            data: {
+                SapId: utils.getEmail(),
+                EmployeeId: (await this.getId()).toString(),
+                Type: type,
+                FirstName: name,
+                LastName: apellido,
+                Dni: dni,
+                CreationDate: date,
+                Comments: comments
+            }
+        };
+        console.log(employee);
+        await utils.crud('create', new JSONModel(employee));
         // }
 
 
+    }
+
+    private async getId(): Promise<string> {
+
+        const utils = new Utils(this);
+
+        const object = {
+            path: '/Users',
+            filters: [
+                new Filter("SapId", "EQ", utils.getEmail())
+            ]
+        };
+
+        // Forzamos el tipo de retorno usando 'as IReadResult'
+        const results = await utils.read(new JSONModel(object)) as unknown as IReadResult;
+        
+        let iCantidadRegistros: number = results.results ? results.results.length : 0;
+        iCantidadRegistros++;
+
+        let id = iCantidadRegistros.toString();
+        const employeeId: string = id.padStart(4, '0');
+
+        return employeeId;
     }
 }
