@@ -32,15 +32,27 @@ export default class Employees extends BaseController {
 
         const utils = new Utils(this);
 
-        const object = {
+        const filter = {
             path: '/Users',
             filters: [
                 new Filter("SapId", "EQ", utils.getEmail())
             ]
         };
 
-        const results = await utils.read(new JSONModel(object));
-        this.showResults(results);
+        const employees = await utils.read(new JSONModel(filter));
+        //console.log(employees);
+        this.showResults(employees);
+
+        const salary = {
+            path: '/Salaries',
+            filters: [
+                new Filter("SapId", "EQ", utils.getEmail()),
+                new Filter("EmployeeId", "EQ", "0006")
+            ]
+        };
+
+        //const Salaries = await utils.read(new JSONModel(salary));  
+        //console.log(Salaries);      
     }
 
     public showResults(data: void | ODataListBinding): void {

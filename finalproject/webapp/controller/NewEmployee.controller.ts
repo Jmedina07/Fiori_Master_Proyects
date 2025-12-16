@@ -63,7 +63,7 @@ export default class NewEmployee extends BaseController {
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
-
+        
         const router = this.getRouter();
         router.getRoute("newEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
 
@@ -391,24 +391,35 @@ export default class NewEmployee extends BaseController {
         const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
         //const note = this.model.getProperty("/stepthree/Note");
         const comments = (this.byId("Note") as TextArea).getValue().toString();
-        //const employeeId = this.getId();
+        const employeeId = (await this.getId()).toString();
+        const sapId = utils.getEmail()
         const employee = {
             path: '/Users',
             data: {
-                SapId: utils.getEmail(),
-                EmployeeId: (await this.getId()).toString(),
+                SapId: sapId,
+                EmployeeId: employeeId,
                 Type: type,
                 FirstName: name,
                 LastName: apellido,
                 Dni: dni,
-                CreationDate: date,
-                Comments: comments
+                CreationDate: date
+    //            Comments: comments
             }
         };
+        const salary = {
+            path: '/Salaries',
+            data: {
+                SapId: sapId,
+                EmployeeId: employeeId,
+                Amount: amount,
+                Waers: "EUR",
+                Comments: comments,
+                SalaryId: "0001"
+            }
+        };        
         console.log(employee);
         await utils.crud('create', new JSONModel(employee));
-        // }
-
+        await utils.crud('create', new JSONModel(salary));
 
     }
 
@@ -425,13 +436,11 @@ export default class NewEmployee extends BaseController {
 
         // Forzamos el tipo de retorno usando 'as IReadResult'
         const results = await utils.read(new JSONModel(object)) as unknown as IReadResult;
-        
-        let iCantidadRegistros: number = results.results ? results.results.length : 0;
-        iCantidadRegistros++;
-
-        let id = iCantidadRegistros.toString();
-        const employeeId: string = id.padStart(4, '0');
-
+        const valores = results.results.map(res => res.EmployeeId);
+        let valorMaximo = Math.max(...valores);   
+        valorMaximo++;
+        const employeeId: string = valorMaximo.toString().padStart(4, '0');
+        console.log(employeeId);
         return employeeId;
     }
 }
