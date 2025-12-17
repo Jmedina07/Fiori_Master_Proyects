@@ -16,15 +16,6 @@
       "toolsId": "9cca3540-d221-4215-8d9e-468fd41cd9d6"
     },
     "dataSources": {
-      "mainService": {
-        "uri": "/v2/northwind/northwind.svc/",
-        "type": "OData",
-        "settings": {
-          "annotations": [],
-          "localUri": "localService/mainService/metadata.xml",
-          "odataVersion": "2.0"
-        }
-      },
       "YSAPUI5_SRV_01": {
         "uri": "/sap/opu/odata/sap/YSAPUI5_SRV_01/",
         "type": "OData",
@@ -82,11 +73,6 @@
           "bundleName": "com.logaligroup.finalproject.i18n.i18n"
         }
       },
-      "northwind": {
-        "dataSource": "mainService",
-        "preload": true,
-        "settings": {}
-      },
       "zinvoices": {
         "dataSource": "YSAPUI5_SRV_01",
         "preload": true,
@@ -95,8 +81,8 @@
           "defaultBindingMode": "TwoWay",
           "defaultUpdateMethod": "PUT"
         }
-      },
-      "zinvoices2": {
+      },      
+      "zemployees": {
         "dataSource": "ZEMPLOYEES_SRV",
         "preload": true,
         "settings": {

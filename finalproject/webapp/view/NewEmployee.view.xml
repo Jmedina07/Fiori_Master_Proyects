@@ -5,6 +5,7 @@
 	xmlns:form="sap.ui.layout.form"
 	xmlns:layout="sap.ui.layout"
     xmlns:core="sap.ui.core"
+	xmlns:upload="sap.m.upload"
 	height="100%">
 	<NavContainer id="navContainer">
 		<pages>
@@ -125,6 +126,31 @@
 								layout="ColumnLayout">
 								<Label text="{i18n>lblnote}" required="false"/>
 								<TextArea rows="8" id="Note"/>						
+							</form:SimpleForm>
+							<form:SimpleForm >
+								<upload:UploadSet 
+									id="upload"
+									uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments/"
+									beforeUploadStarts="onBeforeUpload"
+									uploadCompleted="onUploadCompleted"
+									instantUpload="false"
+									>
+									<upload:toolbar>
+										<OverflowToolbar>
+											<Title text="Archivos Adjuntos"/>
+											<ToolbarSpacer/>
+											<Button
+												text="Subir Todos"
+												icon="sap-icon://upload"
+												press=""
+												type="Emphasized"/>
+										</OverflowToolbar>
+									</upload:toolbar>
+
+									<upload:items>
+									</upload:items>
+								</upload:UploadSet>
+
 							</form:SimpleForm>
 						</WizardStep>
 					</Wizard>

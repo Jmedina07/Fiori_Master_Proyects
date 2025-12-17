@@ -20,6 +20,10 @@ import Utils from "../utils/Utils";
 import DatePicker from "sap/m/DatePicker";
 import TextArea from "sap/m/TextArea";
 import Filter from "sap/ui/model/Filter";
+import UploadSet, { UploadSet$AfterItemRemovedEvent, UploadSet$BeforeUploadStartsEvent, UploadSet$UploadCompletedEvent } from "sap/m/upload/UploadSet";
+import UploadSetItem, { UploadSetItem$OpenPressedEvent } from "sap/m/upload/UploadSetItem";
+import ODataModel from "sap/ui/model/odata/v2/ODataModel";
+import Item from "sap/ui/core/Item";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -33,12 +37,16 @@ interface StepTwoData {
     name?: string;
     apellido?: string;
     dni?: string;
-    cfi?: string;
-    date?: string;
+    creationDate?: Date;
+    comment?: string;
+    sapId?: string;
+    employeeId?: string;
+    type?: string;
+    amount: string
 }
 interface ModelData {
     // Estas son las rutas de binding usadas en el XML
-    titleClickable: boolean;
+    //titleClickable: boolean;
     steptwo: StepTwoData;
 }
 type MessageBoxFunction = "confirm" | "warning";
@@ -59,11 +67,13 @@ export default class NewEmployee extends BaseController {
     private _oNavContainer!: NavContainer;
     private _oDynamicPage!: DynamicPage;
     private model!: JSONModel;
+    private screendata: ModelData;
+    private oUploadSet!: UploadSet;
 
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
-        
+
         const router = this.getRouter();
         router.getRoute("newEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
 
@@ -76,7 +86,11 @@ export default class NewEmployee extends BaseController {
             apellido: "",
             dni: null,
             cif: null,
-            date: null
+            creationDate: null,
+            comment: "",
+            sapId: "",
+            employeeId: "",
+            type: "",
             // Salario y Precio son Sliders, que se manejan mejor por ID o se inicializan aquí si están en el modelo
         },
         stepthree: {
@@ -95,7 +109,7 @@ export default class NewEmployee extends BaseController {
             Note: ""
         },
         selectedDeliveryMethod: "",
-        titleClickable: false // Propiedad de DynamicPage
+        //titleClickable: false // Propiedad de DynamicPage
     };
     private loadIncidences(): void {
 
@@ -369,57 +383,44 @@ export default class NewEmployee extends BaseController {
 
 
     public async saveEmployee(): Promise<void> {
-        const utils = new Utils(this);
-        const resourceBundle = (this.getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
-        const name = (this.byId("Name") as Input).getValue().toString();
-        const apellido = (this.byId("Apellido") as Input).getValue().toString();
-        let dni = "", amount = "";
 
-        var selectedKey = this.model.getProperty("/selectedOption").toString();
-        const option1 = resourceBundle.getText("tipoempleado1");
-        const option2 = resourceBundle.getText("tipoempleado2");
-        const option3 = resourceBundle.getText("tipoempleado3");
-        const type = ((selectedKey === option1) ? 1 : (selectedKey === option2) ? 2 : 3).toString();
-        //const dni1 = ( ( selectedKey === option2) ? (this.byId("Cif") as Input ).getValue() : (this.byId("Dni") as Input ).getValue()  ).toString();
-        if (selectedKey === option2) {
-            dni = (this.byId("Cif") as Input).getValue().toString();
-            amount = (this.byId("Precio") as Slider).getValue().toString();
-        } else {
-            dni = (this.byId("Dni") as Input).getValue().toString();
-            amount = (this.byId("Salario") as Slider).getValue().toString()
+
+        await this.getScreenData();
+        const data = this.screendata.steptwo;
+        if (!this.isObjectEmpty(data)) {
+            console.log(this.screendata.steptwo);
+
+
+            const utils = new Utils(this);
+            const employee = {
+                path: '/Users',
+                data: {
+                    SapId: data.sapId,
+                    EmployeeId: data.employeeId,
+                    Type: data.type,
+                    FirstName: data.name,
+                    LastName: data.apellido,
+                    Dni: data.dni,
+                    CreationDate: data.creationDate
+                    //            Comments: comments
+                }
+            };
+            const salary = {
+                path: '/Salaries',
+                data: {
+                    SapId: data.sapId,
+                    EmployeeId: data.employeeId,
+                    Amount: data.amount,
+                    Waers: "EUR",
+                    Comments: data.comment,
+                    SalaryId: "0001"
+                }
+            };
+            console.log(employee);
+            await utils.crud('create', new JSONModel(employee), new JSONModel(employee));
+            //await utils.crud('create', new JSONModel(salary));
+            this.onStartUpload();
         }
-        const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
-        //const note = this.model.getProperty("/stepthree/Note");
-        const comments = (this.byId("Note") as TextArea).getValue().toString();
-        const employeeId = (await this.getId()).toString();
-        const sapId = utils.getEmail()
-        const employee = {
-            path: '/Users',
-            data: {
-                SapId: sapId,
-                EmployeeId: employeeId,
-                Type: type,
-                FirstName: name,
-                LastName: apellido,
-                Dni: dni,
-                CreationDate: date
-    //            Comments: comments
-            }
-        };
-        const salary = {
-            path: '/Salaries',
-            data: {
-                SapId: sapId,
-                EmployeeId: employeeId,
-                Amount: amount,
-                Waers: "EUR",
-                Comments: comments,
-                SalaryId: "0001"
-            }
-        };        
-        console.log(employee);
-        await utils.crud('create', new JSONModel(employee));
-        await utils.crud('create', new JSONModel(salary));
 
     }
 
@@ -437,10 +438,98 @@ export default class NewEmployee extends BaseController {
         // Forzamos el tipo de retorno usando 'as IReadResult'
         const results = await utils.read(new JSONModel(object)) as unknown as IReadResult;
         const valores = results.results.map(res => res.EmployeeId);
-        let valorMaximo = Math.max(...valores);   
+        let valorMaximo = Math.max(...valores);
         valorMaximo++;
         const employeeId: string = valorMaximo.toString().padStart(4, '0');
         console.log(employeeId);
         return employeeId;
+    }
+    private async getScreenData(): Promise<void> {
+
+        const utils = new Utils(this);
+        const resourceBundle = (this.getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
+        const name = (this.byId("Name") as Input).getValue().toString();
+        const apellido = (this.byId("Apellido") as Input).getValue().toString();
+        let dni = "", amount = "";
+
+        var selectedKey = this.model.getProperty("/selectedOption").toString();
+        const option1 = resourceBundle.getText("tipoempleado1");
+        const option2 = resourceBundle.getText("tipoempleado2");
+        const option3 = resourceBundle.getText("tipoempleado3");
+        const type = ((selectedKey === option1) ? 1 : (selectedKey === option2) ? 2 : 3).toString();
+        if (selectedKey === option2) {
+            dni = (this.byId("Cif") as Input).getValue().toString();
+            amount = (this.byId("Precio") as Slider).getValue().toString();
+        } else {
+            dni = (this.byId("Dni") as Input).getValue().toString();
+            amount = (this.byId("Salario") as Slider).getValue().toString()
+        }
+        const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
+        //const note = this.model.getProperty("/stepthree/Note");
+        const comments = (this.byId("Note") as TextArea).getValue().toString();
+        const employeeId = (await this.getId()).toString();
+        const sapId = utils.getEmail()
+
+
+        const data = {
+            name: name,
+            apellido: apellido,
+            dni: dni,
+            creationDate: date,
+            comment: comments,
+            sapId: sapId,
+            employeeId: employeeId,
+            type: type,
+            amount: amount
+        } as StepTwoData;
+        this.screendata = {
+            steptwo: data
+        };
+        console.log(this.screendata);
+    }
+    private isObjectEmpty<T extends object>(obj: T): boolean {
+        // Comprueba si el array de las claves del objeto tiene longitud 0
+        return Object.keys(obj).length === 0;
+    }
+    public async onBeforeUpload(event: UploadSet$BeforeUploadStartsEvent): Promise<void> {
+
+        const item = event.getParameter("item") as UploadSetItem;
+        const model = this.getOwnerComponent()?.getModel("zemployees") as ODataModel;
+        const token = model.getSecurityToken();
+        const fileName = item.getFileName();
+        const mediaType = item.getMediaType();
+
+        //await this.getScreenData();
+        const data = this.screendata.steptwo;
+        console.log(data, "DAtos 2");
+        if (!this.isObjectEmpty(data)) {
+            console.log(this.screendata.steptwo);
+
+            const headerToken = new Item({
+                key: "x-csrf-token",
+                text: token
+            });
+
+            const headerSlug = new Item({
+                key: 'slug',
+                text: `${data.sapId};${data.employeeId};${fileName};${mediaType}`
+            });
+
+            item.addHeaderField(headerToken);
+            item.addHeaderField(headerSlug);
+        }
+    }
+    public onStartUpload(): void {
+        const uploadSet = this.byId("upload") as UploadSet;
+
+        if (uploadSet) {
+            // 2. Llamar al método upload()
+            // Esto iniciará el proceso de subida para todos los archivos que estén en estado "Pending"
+            uploadSet.upload();
+        }
+    }
+    public onUploadCompleted(event: UploadSet$UploadCompletedEvent): void {
+        const uploadSet = event.getSource();
+        uploadSet.getBinding("items")?.refresh();
     }
 }

@@ -19,7 +19,7 @@ export default class Utils {
 
     constructor(controller: Controller) {
         this.controller = controller;
-        this.model = (this.controller.getOwnerComponent() as UIComponent).getModel("zinvoices2") as ODataModel;
+        this.model = (this.controller.getOwnerComponent() as UIComponent).getModel("zemployees") as ODataModel;
         this.resourceBundle = ((this.controller.getOwnerComponent() as UIComponent).getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
     }
 
@@ -51,7 +51,8 @@ export default class Utils {
     }
 
     // action = create, read, update, delete
-    public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
+    //public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
+    public async crud(action: string, object1?: JSONModel, object2?: JSONModel): Promise<void | ODataListBinding> {
         console.log(action);
         const resourceBundle = this.resourceBundle;
 
@@ -62,7 +63,7 @@ export default class Utils {
                 onClose: async (response: string) => {
                     if (MessageBox.Action.OK == response) {
                         switch (action) {
-                            case 'create': resolve(await this.create(object)); break;
+                            case 'create': resolve(await this.create(object1)); resolve(await this.create(object2));break;
                             // case 'update': resolve(await this.update(object)); break;
                             // case 'delete': resolve(await this.delete(object)); break;
                         }
