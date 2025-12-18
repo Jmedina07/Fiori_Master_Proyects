@@ -149,7 +149,15 @@
           "pattern": "newEmployee",
           "name": "newEmployee",
           "target": ["Container", "NewEmployee"]
-        }
+        },
+        {
+          "name": "RouteDetails",
+          "pattern": "Employee({ID})",
+          "target": [
+            "TargetMaster",
+            "TargetDetails"
+          ]
+        }        
 
       ],
       "targets": {
@@ -160,8 +168,14 @@
           "parent": "TargetContainer",
           "controlId": "container-fcl",
           "controlAggregation": "beginColumnPages",
-          "name": "Master"
+          "name": "Employees"
         },
+        "TargetDetails": {
+          "parent": "TargetContainer",
+          "controlId": "container-fcl",
+          "controlAggregation": "midColumnPages",
+          "name": "Details"
+        },        
         "TargetDetail1": {
           "parent": "TargetContainer",
           "controlId": "container-fcl",

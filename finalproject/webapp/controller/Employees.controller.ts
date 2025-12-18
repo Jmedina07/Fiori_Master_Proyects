@@ -17,14 +17,16 @@ export default class Employees extends BaseController {
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
-        console.log("Entro a Employes");
-        const router = this.getRouter();
-        router.getRoute("employees")?.attachPatternMatched(this.onBindElement.bind(this));
+         this.detail();
+        //console.log("Entro a Employes");
+    //     const router = this.getRouter();
+    //     router.getRoute("employees")?.attachPatternMatched(this.onBindElement.bind(this));
     }
 
     private onBindElement(event: Route$PatternMatchedEvent): void {
 
         this.read();
+        this.detail();
 
     }
 
@@ -40,29 +42,26 @@ export default class Employees extends BaseController {
         };
 
         const employees = await utils.read(new JSONModel(filter));
-        console.log(employees);
-        //this.showResults(employees);
+        //console.log(employees);
+        this.showResults(employees);
 
         const salary = {
             path: '/Salaries',
             filters: [
-                new Filter("SapId", "EQ", utils.getEmail()),
-                new Filter("EmployeeId", "EQ", "0008")
+                new Filter("SapId", "EQ", utils.getEmail())
+                // new Filter("EmployeeId", "EQ", "0007")
             ]
         };
-        console.log(salary);
+        //console.log(salary);
         const Attachment = {
             path: '/Attachments',
             filters: [
-                new Filter("SapId", "EQ", utils.getEmail()),
-                new Filter("EmployeeId", "EQ", "0008")
+                 new Filter("SapId", "EQ", utils.getEmail())
+                // new Filter("EmployeeId", "EQ", "0006")
             ]
         };
-        
-        const Salaries = await utils.read(new JSONModel(salary));  
-        console.log(Salaries); 
-        // const Atachments = await utils.read(new JSONModel(Attachment)); 
-        // console.log(Atachments);      
+        // const Salaries = await utils.read(new JSONModel(salary));  
+        // const Atachments = await utils.read(new JSONModel(Attachment));     
     }
 
     public showResults(data: void | ODataListBinding): void {
@@ -70,6 +69,9 @@ export default class Employees extends BaseController {
         const oResultsModel = new JSONModel();
         oResultsModel.setData(results.results);
         this.getView()?.setModel(oResultsModel, "resultsModel");
+        const path = "zinvoices>/Salaries";
+        const data1 = oResultsModel.getProperty(path);
+        
 
     }
 
@@ -78,6 +80,17 @@ export default class Employees extends BaseController {
         const router = this.getRouter();
         router.navTo("master");
 
+    }
+    public detail():void{
+        // let item = event.getSource() as ObjectListItem;
+        // let bindingContext = item.getBindingContext("northwind") as Context;
+        // let id = bindingContext.getProperty("EmployeeID");
+        const model = this.getModel("view") as JSONModel;
+        model.setProperty("/layout", "TwoColumnsMidExpanded");
+        const router = this.getRouter();
+        router.navTo("RouteDetails", {
+            ID: 0
+        });
     }
 
 }

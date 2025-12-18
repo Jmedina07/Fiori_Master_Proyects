@@ -6,6 +6,7 @@ import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import MessageBox from "sap/m/MessageBox";
 import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
+import ResponsiveGridLayout from "sap/ui/layout/form/ResponsiveGridLayout";
 
 /**
  * @namespace com.logaligroup.finalproject.utils
@@ -53,7 +54,7 @@ export default class Utils {
     // action = create, read, update, delete
     //public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
     public async crud(action: string, object1?: JSONModel, object2?: JSONModel): Promise<void | ODataListBinding> {
-        console.log(action);
+        //console.log(action);
         const resourceBundle = this.resourceBundle;
 
         return new Promise((resolve, reject) => {
@@ -63,7 +64,7 @@ export default class Utils {
                 onClose: async (response: string) => {
                     if (MessageBox.Action.OK == response) {
                         switch (action) {
-                            case 'create': resolve(await this.create(object1)); resolve(await this.create(object2));break;
+                            case 'create': resolve(await this.create(object1)); resolve(await this.createdetail(object2));break;
                             // case 'update': resolve(await this.update(object)); break;
                             // case 'delete': resolve(await this.delete(object)); break;
                         }
@@ -77,22 +78,49 @@ export default class Utils {
 
         const model = this.model;
         const path = object?.getProperty("/path");
-        const body = object?.getProperty("/data");
+        const body = object?.getProperty("/data");  
         const resourceBundle = this.resourceBundle;
-        console.log(object);
+        //console.log(object);
         //console.log(body);
-        return new Promise((resolve, reject) => {
+        const result = new Promise((resolve, reject) => {
+            model.create(path, body, {
+                success: async () => {
+                    //MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                    resolve(await this.read(object));
+                    
+                },
+                error: () => {
+                    //MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    reject();
+                }
+            });
+        }) as Promise<void | ODataListBinding>;
+        //console.log("Resultado de insert", result)
+        return result;
+    }
+    private async createdetail(object?: JSONModel): Promise<void | ODataListBinding> {
+
+        const model = this.model;
+        const path = object?.getProperty("/path");
+        const body = object?.getProperty("/data");  
+        const resourceBundle = this.resourceBundle;
+        //console.log(object);
+        //console.log(body);
+        const result = new Promise((resolve, reject) => {
             model.create(path, body, {
                 success: async () => {
                     MessageBox.success(resourceBundle.getText("success") || 'no text defined');
                     resolve(await this.read(object));
+                    
                 },
                 error: () => {
-                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    //MessageBox.error(resourceBundle.getText("error") || 'no text defined');
                     reject();
                 }
             });
-        });
-    }
+        }) as Promise<void | ODataListBinding>;
+        //console.log("Resultado de insert", result)
+        return result;
+    }    
 
 }

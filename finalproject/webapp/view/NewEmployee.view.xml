@@ -28,7 +28,7 @@
 								type="Transparent"
 								press=".onClosePress"
 							/>
-						</f:navigationActions> 
+						</f:navigationActions>
 					</f:DynamicPageTitle>
 				</f:title>
 				<!-- DynamicPage Header -->
@@ -49,7 +49,7 @@
                                     justifyContent="Center"
                                     width="100%">
                                 <SegmentedButton
-                                    width="320px" id="butonselect" 
+                                    width="320px" id="butonselect"
                                     selectionChange="onSegmentedButtonChange"
 									selectedKey="{/selectedOption}"
 									>
@@ -69,8 +69,6 @@
                             activate="checksteptwo"
 							complete="steptwoComplete"
 							icon="sap-icon://money-bills">
-							<!-- <Text class="sapUiSmallMarginBottom"
-							      text="We accept all major credit cards. No extra cost will be charged when paying with a credit card. Bank transfer and Cash on delivery are only possible for inland deliveries. A service charge of 2.99 EUR will be charged for these types of deliveries. Be aware, that for Bank transfers, the shipping will start on the day after the payment is received."/> -->
 								<form:SimpleForm
 										editable="true"
 										layout="ResponsiveGridLayout">
@@ -78,14 +76,14 @@
 									<MessageStrip
 										text="{i18n>messageform1}"
 										type="Information"
-										showIcon="true" 
+										showIcon="true"
 										class="sapUiMediumMarginBottom">
-									</MessageStrip>      
+									</MessageStrip>
 
 									<Label text="{i18n>lblname}" required="true"/>
 									<Input  id="Name" liveChange="checksteptwo"
 											placeholder="{i18n>placename}" value="{/steptwo/name}" />
-                                            
+
 									<Label text="{i18n>lblapellido}" required="true"/>
 									<Input valueStateText="Enter digits"
 											id="Apellido"
@@ -112,7 +110,6 @@
 
 									<Label text="{i18n>lbldate}"/>
 									<DatePicker value="{/steptwo/date}" id="Date" valueFormat="yyyy-MM-dd" displayFormat="long" liveChange="checksteptwo"/>
-
 								</form:SimpleForm>
 
 						</WizardStep>
@@ -125,30 +122,22 @@
 								editable="true"
 								layout="ColumnLayout">
 								<Label text="{i18n>lblnote}" required="false"/>
-								<TextArea rows="8" id="Note"/>						
+								<TextArea rows="8" id="Note" value="{/steptwo/note}"/>
 							</form:SimpleForm>
 							<form:SimpleForm >
-								<upload:UploadSet 
+								<upload:UploadSet
 									id="upload"
 									uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments/"
 									beforeUploadStarts="onBeforeUpload"
 									uploadCompleted="onUploadCompleted"
 									instantUpload="false"
+									afterItemAdded="onFileAdded"
+									afterItemRemoved="onFileRemoved"
 									>
-									<upload:toolbar>
-										<OverflowToolbar>
-											<Title text="Archivos Adjuntos"/>
-											<ToolbarSpacer/>
-											<Button
-												text="Subir Todos"
-												icon="sap-icon://upload"
-												press=""
-												type="Emphasized"/>
-										</OverflowToolbar>
-									</upload:toolbar>
 
-									<upload:items>
-									</upload:items>
+									<!-- <upload:items>
+                        				<upload:UploadSetItem fileName="{form>name}" />
+									</upload:items> -->
 								</upload:UploadSet>
 
 							</form:SimpleForm>
@@ -190,84 +179,30 @@
 							<Text text="{/steptwo/dni}" id="txtdni"/>
 							<Label text="{i18n>lblcif}" id="lblcif"/>
 							<Text text="{/steptwo/cif}" id="txtcif"/>
-
-							<Label text="Expiration date"/>
-							<Text text="{/CreditCard/Expire}"/>
+							<Label text="{i18n>lbldate}"/>
+							<Text text="{/steptwo/date}"/>
 							<Link press="handleNavBackToTwo" text="Edit"/>
 						</form:content>
 					</form:SimpleForm>
 
 					<form:SimpleForm
-						visible="true"
-						title="3. Bank Transfer"
+						title="3. {i18n>wizardname3}"
 						editable="false"
 						layout="ResponsiveGridLayout">
 						<form:content>
-							<layout:Grid
-								defaultSpan="L6 M6 S10"
-								hSpacing="2">
-								<Label text="Beneficiary Name" design="Bold"/>
-								<Label text="Singapore Hardware e-Commerce LTD"/>
-								<Label text="Beneficiary Bank" design="Bold"/>
-								<Label text="CITY BANK, SINGAPORE BRANCH"/>
-								<Label text="Beneficiary Account Number" design="Bold"/>
-								<Label text="06110702027218"/>
-								<Label text="Bank Phone Number" design="Bold"/>
-								<Label text="+65-6224-2622"/>
-								<Label text="Bank Email Address" design="Bold"/>
-								<Label text="customerservice@citybank.com"/>
-								<Link press="handleNavBackToThree" text="Edit"></Link>
-							</layout:Grid>
+							<Label text="{i18n>lblnote}"/>
+							<TextArea rows="8" value="{/steptwo/note}" editable="false"/>
+							<Label text="{i18n>lblFiles}"/>
+							<Text text="{/steptwo/files}" id="files"/>
+							<List items="{path: 'form>/files'}">
+								<StandardListItem
+									title="{form>name}"
+									icon="sap-icon://document" />
+							</List>
+							<Link press="handleNavBackToThree" text="Edit"></Link>
 						</form:content>
 					</form:SimpleForm>
 
-					<form:SimpleForm
-						visible="{= ${/selectedPayment}==='Cash on Delivery' ? true : false}"
-						title="3. Cash on delivery"
-						editable="false"
-						layout="ResponsiveGridLayout">
-						<form:content>
-							<Label text="First Name"/>
-							<Text text="{/CashOnDelivery/FirstName}"/>
-							<Label text="Last Name"/>
-							<Text text="{/CashOnDelivery/LastName}"/>
-							<Label text="Phone number"/>
-							<Text text="{/CashOnDelivery/Phone Number}"/>
-							<Label text="Email address"/>
-							<Text text="{/CashOnDelivery/Email}"/>
-							<Link press="handleNavBackToCashOnDelivery" text="Edit"/>
-						</form:content>
-					</form:SimpleForm>
-
-					<form:SimpleForm
-						title="4. Billing Address"
-						editable="false"
-						layout="ResponsiveGridLayout">
-						<form:content>
-							<Label text="Address"/>
-							<Text text="{/BillingAddress/Address}"/>
-							<Label text="City"/>
-							<Text text="{/BillingAddress/City}"/>
-							<Label text="Zip Code"/>
-							<Text text="{/BillingAddress/ZipCode}"/>
-							<Label text="Country"/>
-							<Text text="{/BillingAddress/Country}"/>
-							<Label text="Note"/>
-							<Text text="{/BillingAddress/Note}"/>
-							<Link press="handleNavBackToBillingAddress" text="Edit"/>
-						</form:content>
-					</form:SimpleForm>
-
-					<form:SimpleForm
-						title="5. Delivery type"
-						editable="false"
-						layout="ResponsiveGridLayout">
-						<form:content>
-							<Label text="Chosen delivery type"/>
-							<Text text="{/selectedDeliveryMethod}"/>
-							<Link press="handleNavBackToDeliveryType" text="Edit"/>
-						</form:content>
-					</form:SimpleForm>
 				</content>
 				<footer>
 					<Bar>

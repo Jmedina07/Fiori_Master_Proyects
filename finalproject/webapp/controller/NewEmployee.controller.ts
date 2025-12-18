@@ -20,10 +20,11 @@ import Utils from "../utils/Utils";
 import DatePicker from "sap/m/DatePicker";
 import TextArea from "sap/m/TextArea";
 import Filter from "sap/ui/model/Filter";
-import UploadSet, { UploadSet$AfterItemRemovedEvent, UploadSet$BeforeUploadStartsEvent, UploadSet$UploadCompletedEvent } from "sap/m/upload/UploadSet";
+import UploadSet, { UploadSet$AfterItemRemovedEvent, UploadSet$BeforeUploadStartsEvent, UploadSet$UploadCompletedEvent, UploadSet$AfterItemAddedEvent } from "sap/m/upload/UploadSet";
 import UploadSetItem, { UploadSetItem$OpenPressedEvent } from "sap/m/upload/UploadSetItem";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import Item from "sap/ui/core/Item";
+import DataAnalyzer from "sap/sac/df/DataAnalyzer";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -76,7 +77,12 @@ export default class NewEmployee extends BaseController {
 
         const router = this.getRouter();
         router.getRoute("newEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
-
+        // Inicializamos el modelo con una lista vacía de archivos Prueba Lista de Archivos
+        const oData = {
+            files: [] as Array<{ name: string }>
+        };
+        const oModel = new JSONModel(oData);
+        this.getView()?.setModel(oModel, "form");
     }
     // Define la estructura inicial/vacía de tu modelo
     private initialModelData: any = {
@@ -122,7 +128,17 @@ export default class NewEmployee extends BaseController {
         // Usamos attachRequestCompleted para manejar la carga asíncrona de datos
         this.model.attachRequestCompleted({}, () => {
             const oData = this.model.getData() as ModelData;
-            oData.steptwo = {};
+            oData.steptwo = {
+                name: "",
+                apellido: "",
+                dni: "",
+                //creationDate: cle,
+                comment: "",
+                sapId: "",
+                employeeId: "",
+                type: "",
+                amount: ""
+            } as StepTwoData;
             this.model.setData(oData, true);
             //this.model.setProperty("/steptwo", "Step Two");
             //  this.model.setProperty("/steptwo", {});
@@ -161,7 +177,7 @@ export default class NewEmployee extends BaseController {
 
         // Opcionalmente, puedes inicializar los Sliders a sus valores por defecto si no están enlazados al modelo
         // const oSalarioSlider = this.byId("Salario") as Slider;
-        // oSalarioSlider.setValue(24000); 
+        // oSalarioSlider.setValue(24000);
         // const oPrecioSlider = this.byId("Precio") as Slider;
         // oPrecioSlider.setValue(400);
 
@@ -184,10 +200,32 @@ export default class NewEmployee extends BaseController {
             // Manejo de error si no se encuentra el Wizard o el primer paso
             console.error("No se encontró el Wizard o el primer paso.");
         }
+        // 2. Limpiar el UploadSet manualmente
+        const oUploadSet = this.byId("upload") as UploadSet;
+        if (oUploadSet) {
+            oUploadSet.removeAllItems();
+            oUploadSet.removeAllIncompleteItems();
+        }
+        const oInitialData = {
+            name: "",
+            apellido: "",
+            dni: "",
+            cif: "",
+            date: null,
+            salario: 24000, // Valor inicial del slider
+            precio: 400     // Valor inicial del slider
+        };
 
+        // 3. Actualizar la ruta del modelo
+        oModel.setProperty("/steptwo", oInitialData);
     }
     public completedHandler(): void {
-
+        const oModel = this.getView()?.getModel("form") as JSONModel;
+        let aFiles = oModel.getProperty("/files") as Array<{ name: string }>;
+        const iTotalRowCount: number = aFiles.length;
+        // 1. Obtener la referencia al control Title por su ID
+        const oTitle = this.byId("files") as Text;
+        oTitle.setText(`(${iTotalRowCount}) Ficheros`)
         this._oNavContainer.to(this.byId("wizardReviewPage") as Page);
     }
     public getPage(): DynamicPage {
@@ -388,7 +426,7 @@ export default class NewEmployee extends BaseController {
         await this.getScreenData();
         const data = this.screendata.steptwo;
         if (!this.isObjectEmpty(data)) {
-            console.log(this.screendata.steptwo);
+            //console.log(this.screendata.steptwo);
 
 
             const utils = new Utils(this);
@@ -409,6 +447,7 @@ export default class NewEmployee extends BaseController {
                 path: '/Salaries',
                 data: {
                     SapId: data.sapId,
+                    // EmployeeId: "0007",
                     EmployeeId: data.employeeId,
                     Amount: data.amount,
                     Waers: "EUR",
@@ -416,9 +455,9 @@ export default class NewEmployee extends BaseController {
                     SalaryId: "0001"
                 }
             };
-            console.log(employee);
-            await utils.crud('create', new JSONModel(employee), new JSONModel(employee));
-            //await utils.crud('create', new JSONModel(salary));
+            //console.log(employee);
+            await utils.crud('create', new JSONModel(employee), new JSONModel(salary));
+            // await utils.crud('createdetail', new JSONModel(salary));
             this.onStartUpload();
         }
 
@@ -531,5 +570,33 @@ export default class NewEmployee extends BaseController {
     public onUploadCompleted(event: UploadSet$UploadCompletedEvent): void {
         const uploadSet = event.getSource();
         uploadSet.getBinding("items")?.refresh();
+    }
+    /**
+    * Se dispara cuando el usuario agrega un archivo al UploadSet
+     */
+    public onFileAdded(oEvent: UploadSet$AfterItemAddedEvent): void {
+        const oItem = oEvent.getParameter("item") as UploadSetItem;
+        const oModel = this.getView()?.getModel("form") as JSONModel;
+        const aFiles = oModel.getProperty("/files");
+
+        // Agregamos el nombre del archivo al modelo
+        aFiles.push({
+            name: oItem.getFileName()
+        });
+
+        oModel.setProperty("/files", aFiles);
+    }
+    /**
+         * Se dispara cuando el usuario elimina un archivo del UploadSet
+         */
+    public onFileRemoved(oEvent: UploadSet$AfterItemRemovedEvent): void {
+        const oItem = oEvent.getParameter("item") as UploadSetItem;
+        const oModel = this.getView()?.getModel("form") as JSONModel;
+        let aFiles = oModel.getProperty("/files") as Array<{ name: string }>;
+
+        // Filtramos para eliminar el archivo de la lista de revisión
+        aFiles = aFiles.filter(file => file.name !== oItem.getFileName());
+
+        oModel.setProperty("/files", aFiles);
     }
 }
