@@ -76,7 +76,7 @@ export default class NewEmployee extends BaseController {
     public onInit(): void {
 
         const router = this.getRouter();
-        router.getRoute("newEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
+        router.getRoute("RouteNewEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
         // Inicializamos el modelo con una lista vacía de archivos Prueba Lista de Archivos
         const oData = {
             files: [] as Array<{ name: string }>
@@ -353,7 +353,9 @@ export default class NewEmployee extends BaseController {
     public onClosePress(): void {
 
         const router = this.getRouter();
-        router.navTo("master");
+        router.navTo("menu");
+        const model = this.getModel("view") as JSONModel;
+        model.setProperty("/layout", "OneColumn");
 
     }
 

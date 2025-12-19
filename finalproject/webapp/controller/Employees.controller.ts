@@ -17,16 +17,23 @@ export default class Employees extends BaseController {
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
-         this.detail();
+        //this.read();
+        //  this.detail();
         //console.log("Entro a Employes");
-    //     const router = this.getRouter();
-    //     router.getRoute("employees")?.attachPatternMatched(this.onBindElement.bind(this));
+        const router = this.getRouter();
+        router.getRoute("RouteEmployees")?.attachPatternMatched(this.onBindElement.bind(this));
     }
 
     private onBindElement(event: Route$PatternMatchedEvent): void {
 
         this.read();
-        this.detail();
+        // this.detail();
+        const model = this.getModel("view") as JSONModel;
+        model.setProperty("/layout", "TwoColumnsMidExpanded");
+        const router = this.getRouter();
+        router.navTo("RouteDetail",{
+            ID: "1"
+        });
 
     }
 
@@ -56,7 +63,7 @@ export default class Employees extends BaseController {
         const Attachment = {
             path: '/Attachments',
             filters: [
-                 new Filter("SapId", "EQ", utils.getEmail())
+                new Filter("SapId", "EQ", utils.getEmail())
                 // new Filter("EmployeeId", "EQ", "0006")
             ]
         };
@@ -69,28 +76,34 @@ export default class Employees extends BaseController {
         const oResultsModel = new JSONModel();
         oResultsModel.setData(results.results);
         this.getView()?.setModel(oResultsModel, "resultsModel");
-        const path = "zinvoices>/Salaries";
-        const data1 = oResultsModel.getProperty(path);
-        
+        // const path = "zinvoices>/Salaries";
+        // const data1 = oResultsModel.getProperty(path);
+
 
     }
 
     public onClosePress(): void {
 
+        // const router = this.getRouter();
+        // router.navTo("master");
+
+
         const router = this.getRouter();
-        router.navTo("master");
+        router.navTo("menu");
+        const model = this.getModel("view") as JSONModel;
+        model.setProperty("/layout", "OneColumn");
 
     }
-    public detail():void{
+    public detail(): void {
         // let item = event.getSource() as ObjectListItem;
         // let bindingContext = item.getBindingContext("northwind") as Context;
         // let id = bindingContext.getProperty("EmployeeID");
         const model = this.getModel("view") as JSONModel;
-        model.setProperty("/layout", "TwoColumnsMidExpanded");
+        // model.setProperty("/layout", "TwoColumnsMidExpanded");
         const router = this.getRouter();
-        router.navTo("RouteDetails", {
-            ID: 0
-        });
+        // router.navTo("RouteDetails", {
+        //     ID: 0
+        // });
     }
 
 }

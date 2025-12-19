@@ -81,7 +81,7 @@
           "defaultBindingMode": "TwoWay",
           "defaultUpdateMethod": "PUT"
         }
-      },      
+      },
       "zemployees": {
         "dataSource": "ZEMPLOYEES_SRV",
         "preload": true,
@@ -112,98 +112,57 @@
       },
       "routes": [
         {
-          "name": "RouteMaster",
+          "name": "menu",
           "pattern": "",
+          "target": "TargetMenu"
+        },
+        {
+          "pattern": "RouteEmployees",
+          "name": "RouteEmployees",
           "target": [
-            "TargetContainer",
-            "TargetMaster"
+            "TargetEmployees"
           ]
         },
         {
-          "pattern": "detail1", 
-          "name": "detalleProducto1",
+          "pattern": "RouteNewEmployee",
+          "name": "RouteNewEmployee",
           "target": [
             "TargetContainer",
-            "TargetDetail1"
-          ] 
+            "TargetNewEmployee"
+          ]
         },
         {
-          "pattern": "detail2",
-          "name": "detalleProducto2",
-          "target": [
-            "TargetContainer",
-            "TargetDetail2"
-          ] 
-        } ,
-        {
-          "pattern": "",
-          "name": "master",
-          "target": ["Container", "Master"]
-        },
-        {
-          "pattern": "employees",
-          "name": "employees",
-          "target": ["Container", "Employees"]
-        },
-        {
-          "pattern": "newEmployee",
-          "name": "newEmployee",
-          "target": ["Container", "NewEmployee"]
-        },
-        {
-          "name": "RouteDetails",
           "pattern": "Employee({ID})",
+          "name": "RouteDetail",
           "target": [
-            "TargetMaster",
-            "TargetDetails"
+            "TargetEmployees",
+            "TargetDetail"
           ]
-        }        
-
+        }     
       ],
       "targets": {
         "TargetContainer": {
           "name": "Container"
         },
-        "TargetMaster": {
-          "parent": "TargetContainer",
-          "controlId": "container-fcl",
-          "controlAggregation": "beginColumnPages",
-          "name": "Employees"
-        },
-        "TargetDetails": {
-          "parent": "TargetContainer",
-          "controlId": "container-fcl",
-          "controlAggregation": "midColumnPages",
-          "name": "Details"
-        },        
-        "TargetDetail1": {
-          "parent": "TargetContainer",
-          "controlId": "container-fcl",
-          "controlAggregation": "endColumnPages",
-          "name": "NewEmployee"
-        },
-        "TargetDetail2": {
-          "parent": "TargetContainer",
-          "controlId": "container-fcl",
-          "controlAggregation": "endColumnPages",
-          "name": "Employees"
-        },
-        "Container": {
-          "viewId": "Container",
-          "name": "Container"
-        },
-        "Master": {
-          "viewId": "Master",
-          "name": "Master"
-        },
-        "Employees": {
-          "viewId": "Employees",
-          "name": "Employees"
-        },
-        "NewEmployee": {
+        "TargetNewEmployee": {
           "viewId": "NewEmployee",
           "name": "NewEmployee"
-        }        
+        },
+        "TargetMenu": {
+          "name": "Menu"
+        },
+        "TargetEmployees": {
+          "parent": "TargetContainer",
+          "name": "Employees",
+          "controlId": "container-fcl",
+          "controlAggregation": "beginColumnPages"
+        },
+        "TargetDetail": {
+          "parent": "TargetContainer",
+          "name": "Detail",
+          "controlId": "container-fcl",
+          "controlAggregation": "midColumnPages"
+        }
       }
     },
     "rootView": {

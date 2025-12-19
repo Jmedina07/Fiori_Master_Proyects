@@ -1,0 +1,65 @@
+<mvc:View
+            controllerName="com.logaligroup.finalproject.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:uxap="sap.uxap"
+    xmlns:layout="sap.ui.layout">
+
+    <Page title="Detalle de Empleado">
+        <content>
+            <IllustratedMessage 
+                illustrationType="sapIllu-SelectOrders"
+                title="Seleccione un Empleado"
+                description="Por favor, elija un registro de la lista para ver sus detalles."
+                visible="{= !${/selectedEmployee} }" />
+
+            <uxap:ObjectPageLayout id="page"
+                visible="{= !!${/selectedEmployee} }">
+                
+                <uxap:headerTitle>
+                    <uxap:ObjectPageHeader 
+                        objectTitle="{FirstName} {LastName}"
+                        objectSubtitle="ID: {EmployeeID}">
+                    </uxap:ObjectPageHeader>
+                </uxap:headerTitle>
+
+                <uxap:sections >
+                    <uxap:ObjectPageSection title="Archivos Cargados" id="seccion1" >
+                        <uxap:subSections>
+                            <uxap:ObjectPageSubSection icon="sap-icon://attachment">
+                                <List items="{Attachments}">
+                                    <StandardListItem 
+                                        title="{FileName}" 
+                                        description="{FileSize}" 
+                                        icon="sap-icon://document" />
+                                </List>
+                            </uxap:ObjectPageSubSection>
+                        </uxap:subSections>
+                    </uxap:ObjectPageSection>
+
+                    <uxap:ObjectPageSection title="Historial de Salarios" id="seccion2">
+                        <uxap:subSections>
+                            <uxap:ObjectPageSubSection icon="sap-icon://money-bills">
+                                <Table items="{SalaryHistory}">
+                                    <columns>
+                                        <Column><Text text="Fecha" /></Column>
+                                        <Column><Text text="Monto" /></Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Text text="{Date}" />
+                                                <Text text="{Amount} {Currency}" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </uxap:ObjectPageSubSection>
+                        </uxap:subSections>
+                    </uxap:ObjectPageSection>
+                </uxap:sections>
+            </uxap:ObjectPageLayout>
+        </content>
+    </Page>
+
+</mvc:View>

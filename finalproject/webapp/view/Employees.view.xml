@@ -33,10 +33,7 @@
 
             <f:DynamicPageHeader>
                 <fb:FilterBar
-                            search="onFilterSearchPress"
-                            showClearOnFB="true"
-                            clear="onClearPress"
-                            filterContainerWidth="15rem"
+
                             >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
