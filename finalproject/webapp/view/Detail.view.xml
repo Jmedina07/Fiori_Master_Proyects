@@ -1,65 +1,80 @@
 <mvc:View
-            controllerName="com.logaligroup.finalproject.controller.Detail"
+    controllerName="com.logaligroup.finalproject.controller.Detail"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:uxap="sap.uxap"
-    xmlns:layout="sap.ui.layout">
+    xmlns:upload="sap.m.upload"
+    xmlns="sap.m">
 
-    <Page title="Detalle de Empleado">
+    <Page >
+        <ObjectHeader id="header"
+            title="{Name}"
+            backgroundDesign="Solid"
+            number="{
+                parts:[{path:'Price'},{path:'CurrencyCode'}],
+                type: 'sap.ui.model.type.Currency',
+                formatOptions: {showMeasure: false}
+            }"
+            numberUnit="{CurrencyCode}" >
+            <attributes>
+                <ObjectAttribute title="Weight" text="{WeightMeasure} {WeightUnit}" />
+                <ObjectAttribute title="Dimensions" text="{Width} x {Depth} X {Height} {DimUnit}" />
+            </attributes>
+            <statuses>
+                <ObjectStatus title="Status" text="In Stock" state="Success" />
+            </statuses>
+        </ObjectHeader>
         <content>
-            <IllustratedMessage 
+            <IllustratedMessage id="idMessage"
                 illustrationType="sapIllu-SelectOrders"
                 title="Seleccione un Empleado"
-                description="Por favor, elija un registro de la lista para ver sus detalles."
-                visible="{= !${/selectedEmployee} }" />
+                description="Por favor, elija un registro de la lista para ver el detalle."
+                visible="{= !${/selectedEmployee} }" />  
 
-            <uxap:ObjectPageLayout id="page"
-                visible="{= !!${/selectedEmployee} }">
-                
-                <uxap:headerTitle>
-                    <uxap:ObjectPageHeader 
-                        objectTitle="{FirstName} {LastName}"
-                        objectSubtitle="ID: {EmployeeID}">
-                    </uxap:ObjectPageHeader>
-                </uxap:headerTitle>
+        <IconTabBar 
+            id="idIconTabBar"
+            select=".onFilterSelect"
+            class="sapUiResponsiveContentPadding">
 
-                <uxap:sections >
-                    <uxap:ObjectPageSection title="Archivos Cargados" id="seccion1" >
-                        <uxap:subSections>
-                            <uxap:ObjectPageSubSection icon="sap-icon://attachment">
-                                <List items="{Attachments}">
-                                    <StandardListItem 
-                                        title="{FileName}" 
-                                        description="{FileSize}" 
-                                        icon="sap-icon://document" />
-                                </List>
-                            </uxap:ObjectPageSubSection>
-                        </uxap:subSections>
-                    </uxap:ObjectPageSection>
+            <items>
+                <IconTabFilter
+                    icon="sap-icon://attachment"
+                    iconColor="Default"
+                    design="Horizontal"
+                    count="{/ProductCollectionStats/Counts/Weight/Ok} of {/ProductCollectionStats/Counts/Total}"
+                    text="{i18n>lblFiles2}"
+                    key="Ok">
+                    <upload:UploadSet
+                        id="upload1"
+                        uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments/"
+                        beforeUploadStarts="onBeforeUpload"
+                        uploadCompleted="onUploadCompleted"
+                        instantUpload="false"
+                        afterItemAdded="onFileAdded"
+                        afterItemRemoved="onFileRemoved"
+                        >
+                    </upload:UploadSet>                    
+                </IconTabFilter>
+                    
+                <IconTabFilter
+                    icon="sap-icon://money-bills"
+                    iconColor="Default"
+                    design="Horizontal"
+                    count="{/ProductCollectionStats/Counts/Weight/Heavy} of {/ProductCollectionStats/Counts/Total}"
+                    text="{i18n>lblHistorial}"
+                    key="Heavy">
 
-                    <uxap:ObjectPageSection title="Historial de Salarios" id="seccion2">
-                        <uxap:subSections>
-                            <uxap:ObjectPageSubSection icon="sap-icon://money-bills">
-                                <Table items="{SalaryHistory}">
-                                    <columns>
-                                        <Column><Text text="Fecha" /></Column>
-                                        <Column><Text text="Monto" /></Column>
-                                    </columns>
-                                    <items>
-                                        <ColumnListItem>
-                                            <cells>
-                                                <Text text="{Date}" />
-                                                <Text text="{Amount} {Currency}" />
-                                            </cells>
-                                        </ColumnListItem>
-                                    </items>
-                                </Table>
-                            </uxap:ObjectPageSubSection>
-                        </uxap:subSections>
-                    </uxap:ObjectPageSection>
-                </uxap:sections>
-            </uxap:ObjectPageLayout>
+                    <Label text="Texto de prueba"/>
+
+                </IconTabFilter>
+            </items>
+            <content>
+            
+            </content>
+        </IconTabBar>
+
         </content>
+    
     </Page>
+
+
 
 </mvc:View>

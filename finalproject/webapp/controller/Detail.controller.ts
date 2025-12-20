@@ -1,8 +1,14 @@
 import { Route$PatternMatchedEvent } from "sap/ui/core/routing/Route";
 import BaseController from "./BaseController";
 import JSONModel from "sap/ui/model/json/JSONModel";
-import ObjectPageLayout from "sap/uxap/ObjectPageLayout";
-import ObjectPageSection from "sap/uxap/ObjectPageSection";
+import IllustratedMessage from "sap/m/IllustratedMessage";
+import Utils from "../utils/Utils";
+import View from "sap/ui/core/mvc/View";
+import IconTabBar from "sap/m/IconTabBar";
+import ObjectHeader from "sap/m/ObjectHeader";
+import Context from "sap/ui/model/odata/v2/Context";
+import Filter from "sap/ui/model/Filter";
+
 
 /**
  * @namespace com.logaligroup.finalproject.controller
@@ -21,40 +27,75 @@ export default class Detail extends BaseController {
         router.getRoute("RouteDetail")?.attachPatternMatched(this.onBindElement.bind(this));
     }
 
+    private loadIncidences(): void {
+        const model = new JSONModel([]);
+        this.setModel(model, "form");
+    }
+
     private onBindElement(event: Route$PatternMatchedEvent): void {
 
         let arg = event.getParameter("arguments") as any;
-        let sEmployeeId = arg.ID;
-        // const sEmployeeId = arguments.ID;
-        const oView = this.getView();
-
+        let id = arg.ID;
         // // 1. Enlazamos la ruta OData del empleado a la vista
-        const oSeccion1 = this.byId("seccion1") as ObjectPageSection;
-        const oSeccion2 = this.byId("seccion2") as ObjectPageSection;
-        const oPage = this.byId("page") as ObjectPageLayout;
-        
-        if( sEmployeeId > 0){
-            oPage.setVisible(true);
-            // oSeccion1.setVisible(true);
-            // oSeccion2.setVisible(true);
+        const oIconTabBar = this.byId("idIconTabBar") as IconTabBar;
+
+        const oMessage = this.byId("idMessage") as IllustratedMessage;
+        const oHeader = this.byId("header") as ObjectHeader;
+        this.loadIncidences();
+        if (id > 0) {
+            this.read(id);
+            oIconTabBar.setVisible(true);
+            oHeader.setVisible(true);
+            oMessage.setVisible(false);
+
         }
-        else{
-            oPage.setVisible(false);
-            // oSeccion1.setVisible(false);
-            // oSeccion2.setVisible(false);            
+        else {
+            oIconTabBar.setVisible(false);
+            oHeader.setVisible(false);
+            oMessage.setVisible(true);
+
         }
-        
-        // oView?.bindElement({
-        //     path: `/Employees('${sEmployeeId}')`,
+        // const view = this.getView() as View;
+
+        // view.bindElement({
+        //     path: `/Users(${id})`,
+        //     model: 'resultsModel',
         //     events: {
+        //         change: () => {
+        //             this.read();
+        //         },
+        //         dataRequested: () => {
+        //             view.setBusy(true)
+        //         },
         //         dataReceived: () => {
-        //             // 2. Al recibir datos, marcamos que hay un empleado seleccionado
-        //             (oView.getModel("view") as JSONModel).setProperty("/selectedEmployee", true);
+        //             view.setBusy(false)
         //         }
         //     }
         // });
-
     }
 
+    private async read(employeeId: string): Promise<void> {
+        const utils = new Utils(this);
+        const salary = {
+            path: '/Salaries',
+            filters: [
+                new Filter("SapId", "EQ", utils.getEmail()),
+                new Filter("EmployeeId", "EQ", employeeId)
+            ]
+        };
+        //console.log(salary);
+        const Attachment = {
+            path: '/Attachments',
+            filters: [
+                new Filter("SapId", "EQ", utils.getEmail()),
+                new Filter("EmployeeId", "EQ", employeeId)
+            ]
+        };
+        const Salaries = await utils.read(new JSONModel(salary));  
+        const Atachments = await utils.read(new JSONModel(Attachment));  
+
+        //console.log(results);
+
+    }
 
 }

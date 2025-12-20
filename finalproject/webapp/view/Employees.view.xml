@@ -8,48 +8,14 @@
 
     <f:DynamicPage >
 
-        <f:title>
-
-            <f:DynamicPageTitle>
-
-                <f:heading>
-
-                    <Title text="{i18n>appTitle}"/>
-                
-                </f:heading>
-                <f:navigationActions>
-                    <Button
-                        text="Regresar"
-                        icon="sap-icon://nav-back"
-                        type="Transparent"
-                        press=".onClosePress"
-                    />
-                </f:navigationActions>            
-            </f:DynamicPageTitle>
-        
-        </f:title>
-
         <f:header>
 
             <f:DynamicPageHeader>
-                <fb:FilterBar
-
-                            >
-                    <fb:filterGroupItems>
-                        <fb:FilterGroupItem
-                                        groupName="filters"
-                                        name="employee"
-                                        visibleInFilterBar="true">
-
-                            <fb:control>
-
-                                <Input placeholder="Buscar"/>
-                            
-                            </fb:control>
-                        
-                        </fb:FilterGroupItem>
-                    </fb:filterGroupItems>                            
-                </fb:FilterBar>                             
+                <HBox >
+                    <Button icon="sap-icon://nav-back" press=".onClosePress"></Button>
+                    <Input placeholder="Buscar" submit="onSearch"/>
+                </HBox>
+                          
             </f:DynamicPageHeader>
         
         </f:header>
@@ -58,12 +24,6 @@
 
             <Table  id="table"
                     items="{resultsModel>/}">
-
-                <headerToolbar>
-                    <Toolbar>
-                        <Title text="Employees"/>
-                    </Toolbar>
-                </headerToolbar>
 
                 <columns>
 

@@ -8,6 +8,11 @@ import Context from "sap/ui/model/odata/v2/Context";
 import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
 import Filter from "sap/ui/model/Filter";
 import UIComponent from "sap/ui/core/UIComponent";
+import { Input$SubmitEvent } from "sap/m/Input";
+import FilterOperator from "sap/ui/model/FilterOperator";
+import Table from "sap/m/Table";
+import ListBinding from "sap/ui/model/ListBinding";
+import ObjectListItem from "sap/m/ObjectListItem";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -31,8 +36,8 @@ export default class Employees extends BaseController {
         const model = this.getModel("view") as JSONModel;
         model.setProperty("/layout", "TwoColumnsMidExpanded");
         const router = this.getRouter();
-        router.navTo("RouteDetail",{
-            ID: "1"
+        router.navTo("RouteDetail", {
+            ID: "0"
         });
 
     }
@@ -52,21 +57,21 @@ export default class Employees extends BaseController {
         //console.log(employees);
         this.showResults(employees);
 
-        const salary = {
-            path: '/Salaries',
-            filters: [
-                new Filter("SapId", "EQ", utils.getEmail())
-                // new Filter("EmployeeId", "EQ", "0007")
-            ]
-        };
-        //console.log(salary);
-        const Attachment = {
-            path: '/Attachments',
-            filters: [
-                new Filter("SapId", "EQ", utils.getEmail())
-                // new Filter("EmployeeId", "EQ", "0006")
-            ]
-        };
+        // const salary = {
+        //     path: '/Salaries',
+        //     filters: [
+        //         new Filter("SapId", "EQ", utils.getEmail())
+        //         // new Filter("EmployeeId", "EQ", "0007")
+        //     ]
+        // };
+        // //console.log(salary);
+        // const Attachment = {
+        //     path: '/Attachments',
+        //     filters: [
+        //         new Filter("SapId", "EQ", utils.getEmail())
+        //         // new Filter("EmployeeId", "EQ", "0006")
+        //     ]
+        // };
         // const Salaries = await utils.read(new JSONModel(salary));  
         // const Atachments = await utils.read(new JSONModel(Attachment));     
     }
@@ -106,4 +111,46 @@ export default class Employees extends BaseController {
         // });
     }
 
+
+    public onSearch(oEvent: Input$SubmitEvent): void {
+        const sQuery = oEvent.getParameter("value") as string;
+
+        let filters = [];
+
+        if (sQuery) {
+            filters.push(
+                new Filter({
+                    filters:[
+                        new Filter("EmployeeId",FilterOperator.EQ,sQuery),
+                        new Filter({
+                            filters:[
+                                new Filter("FirstName","Contains",sQuery),
+                                new Filter("LastName",FilterOperator.Contains, sQuery)
+                            ],
+                            and: false
+                        })
+                    ],
+                    and: false
+                })
+            );
+        }
+
+        const table = this.byId("table") as Table;
+        const binding = table.getBinding("items") as ListBinding;
+        binding.filter(filters);
+
+    }
+
+      public onNavToDetails (event : Event) : void {
+        let item = event.getSource() as ObjectListItem;
+        let bindingContext = item.getBindingContext("resultsModel") as Context;
+        let id = bindingContext.getProperty("EmployeeId");
+        const model = this.getModel("view") as JSONModel;
+        model.setProperty("/layout","TwoColumnsMidExpanded");
+        const router = this.getRouter();
+        router.navTo("RouteDetail",{
+            ID:  id          //index
+        });
+    }  
+    
 }
