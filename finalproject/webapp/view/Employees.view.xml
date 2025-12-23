@@ -23,7 +23,7 @@
         <f:content>
 
             <Table  id="table"
-                    items="{resultsModel>/}">
+                    items="{zemployees>/}">
 
                 <columns>
 
@@ -51,14 +51,14 @@
 
                         <cells>
 
-                            <ObjectIdentifier title="{resultsModel>EmployeeId}" 
-                                                text="{resultsModel>LastName}, {resultsModel>FirstName}"/>
+                            <ObjectIdentifier title="{zemployees>EmployeeId}" 
+                                                text="{zemployees>LastName}, {zemployees>FirstName}"/>
 
-                            <Text text="{resultsModel>Type}"/>
-                            <Text text="{resultsModel>Dni}"/>
+                            <Text text="{zemployees>Type}"/>
+                            <Text text="{zemployees>Dni}"/>
                             <Text 
                                 text="{
-                                        path: 'resultsModel>CreationDate',
+                                        path: 'zemployees>CreationDate',
                                         type: 'sap.ui.model.type.Date'
                                     }"
                             />

@@ -4,9 +4,9 @@
     xmlns:upload="sap.m.upload"
     xmlns="sap.m">
 
-    <Page >
+    <Page title="{i18n>TitleViewDetail}">
         <ObjectHeader id="header"
-            title="{Name}"
+            title=""
             backgroundDesign="Solid"
             number="{
                 parts:[{path:'Price'},{path:'CurrencyCode'}],
@@ -15,7 +15,7 @@
             }"
             numberUnit="{CurrencyCode}" >
             <attributes>
-                <ObjectAttribute title="Weight" text="{WeightMeasure} {WeightUnit}" />
+                <ObjectAttribute title="Weight" text="{zemployees>Name}" />
                 <ObjectAttribute title="Dimensions" text="{Width} x {Depth} X {Height} {DimUnit}" />
             </attributes>
             <statuses>
@@ -47,9 +47,7 @@
                         uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments/"
                         beforeUploadStarts="onBeforeUpload"
                         uploadCompleted="onUploadCompleted"
-                        instantUpload="false"
-                        afterItemAdded="onFileAdded"
-                        afterItemRemoved="onFileRemoved"
+                        afterItemRemoved="onAfterRemoved"
                         >
                     </upload:UploadSet>                    
                 </IconTabFilter>

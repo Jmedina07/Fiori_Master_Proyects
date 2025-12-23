@@ -80,10 +80,12 @@ export default class Employees extends BaseController {
         let results = data as any;
         const oResultsModel = new JSONModel();
         oResultsModel.setData(results.results);
-        this.getView()?.setModel(oResultsModel, "resultsModel");
-        // const path = "zinvoices>/Salaries";
-        // const data1 = oResultsModel.getProperty(path);
+        this.getView()?.setModel(oResultsModel, "zemployees");
 
+
+        const object = results as any;
+        const form = this.getModel("form") as JSONModel;
+        form.setData(object.results);
 
     }
 
@@ -101,7 +103,7 @@ export default class Employees extends BaseController {
     }
     public detail(): void {
         // let item = event.getSource() as ObjectListItem;
-        // let bindingContext = item.getBindingContext("northwind") as Context;
+        // let bindingContext = item.getBindingContext("zemployees") as Context;
         // let id = bindingContext.getProperty("EmployeeID");
         const model = this.getModel("view") as JSONModel;
         // model.setProperty("/layout", "TwoColumnsMidExpanded");
@@ -143,7 +145,7 @@ export default class Employees extends BaseController {
 
       public onNavToDetails (event : Event) : void {
         let item = event.getSource() as ObjectListItem;
-        let bindingContext = item.getBindingContext("resultsModel") as Context;
+        let bindingContext = item.getBindingContext("zemployees") as Context;
         let id = bindingContext.getProperty("EmployeeId");
         const model = this.getModel("view") as JSONModel;
         model.setProperty("/layout","TwoColumnsMidExpanded");

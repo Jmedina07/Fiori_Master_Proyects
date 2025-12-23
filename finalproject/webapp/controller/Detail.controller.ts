@@ -8,6 +8,9 @@ import IconTabBar from "sap/m/IconTabBar";
 import ObjectHeader from "sap/m/ObjectHeader";
 import Context from "sap/ui/model/odata/v2/Context";
 import Filter from "sap/ui/model/Filter";
+import UploadSet, { UploadSet$AfterItemRemovedEvent } from "sap/m/upload/UploadSet";
+import UploadSetItem, { UploadSetItem$OpenPressedEvent } from "sap/m/upload/UploadSetItem";
+import File from "sap/ui/core/util/File"; // Asegúrate de importar esto
 
 
 /**
@@ -44,6 +47,7 @@ export default class Detail extends BaseController {
         this.loadIncidences();
         if (id > 0) {
             this.read(id);
+            this.searchFiles(id);
             oIconTabBar.setVisible(true);
             oHeader.setVisible(true);
             oMessage.setVisible(false);
@@ -55,14 +59,15 @@ export default class Detail extends BaseController {
             oMessage.setVisible(true);
 
         }
-        // const view = this.getView() as View;
+        const view = this.getView() as View;
 
         // view.bindElement({
-        //     path: `/Users(${id})`,
-        //     model: 'resultsModel',
+        //     path: `/Salaries(${id})`,
+        //     model: 'zemployees',
         //     events: {
         //         change: () => {
-        //             this.read();
+        //             //this.read();
+        //             this.searchFiles();
         //         },
         //         dataRequested: () => {
         //             view.setBusy(true)
@@ -75,27 +80,95 @@ export default class Detail extends BaseController {
     }
 
     private async read(employeeId: string): Promise<void> {
+        // private async read () : Promise<void | ODataListBinding> {   
+        const bindingContext = this.getView()?.getBindingContext("zemployees") as Context;
         const utils = new Utils(this);
         const salary = {
             path: '/Salaries',
             filters: [
-                new Filter("SapId", "EQ", utils.getEmail()),
-                new Filter("EmployeeId", "EQ", employeeId)
+                new Filter("SapId", "EQ", utils.getEmail())
+                // new Filter("EmployeeId", "EQ", employeeId)
             ]
         };
         //console.log(salary);
         const Attachment = {
             path: '/Attachments',
             filters: [
-                new Filter("SapId", "EQ", utils.getEmail()),
-                new Filter("EmployeeId", "EQ", employeeId)
+                new Filter("SapId", "EQ", utils.getEmail())
+                // new Filter("EmployeeId", "EQ", employeeId)
             ]
         };
-        const Salaries = await utils.read(new JSONModel(salary));  
-        const Atachments = await utils.read(new JSONModel(Attachment));  
+        const Salaries = await utils.read(new JSONModel(salary));
+        const Atachments = await utils.read(new JSONModel(Attachment));
 
-        //console.log(results);
+        console.log(Salaries);
 
+    }
+
+    private searchFiles(employeeId: string): void {
+        // private async read(employeeId: string): Promise<void> {
+        const utils = new Utils(this);
+        //const context = this.getView()?.getBindingContext("zemployees");
+        const sapId = utils.getEmail();
+        //const employeeId = context?.getProperty("EmployeeID");
+
+        const uploadSet = this.byId("upload1") as UploadSet;
+        uploadSet.bindAggregation("items", {
+            path: 'zemployees>/Attachments',
+            filters: [
+                new Filter("SapId", "EQ", sapId),
+                new Filter("EmployeeId", "EQ", employeeId)
+            ],
+            template: new UploadSetItem({
+                fileName: '{zemployees>DocName}',
+                mediaType: '{zemployees>MimeType}',
+                visibleEdit: false,
+                visibleRemove: true,
+                url: "hola",
+                openPressed: this.download.bind(this)
+            })
+        });
+    }
+
+    private async download(event: UploadSetItem$OpenPressedEvent): Promise<void> {
+        event.preventDefault();
+        const item = event.getSource() as UploadSetItem;
+        const context = item.getBindingContext("zemployees") as Context;
+        const path = context.getPath();
+        const DocName = context.getProperty("DocName") as string;
+        const media = item.getMediaType();
+        const url = `/sap/opu/odata/sap/ZEMPLOYEES_SRV${path}/$value`
+        // item.setUrl(url);
+        try {
+            // 2. Realizar la petición fetch para obtener los datos binarios
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Error al descargar el archivo");
+
+            const blob = await response.blob();
+
+            // 3. Usar la utilidad de SAPUI5 para guardar el archivo con el nombre correcto
+            // Los parámetros son: (blob, nombre, extensión, mimeType)
+            const nameOnly = DocName.substring(0, DocName.lastIndexOf("."));
+            let extension = DocName.substring(DocName.lastIndexOf(".") + 1);
+            extension = extension.substring(0,extension.lastIndexOf(";"));
+
+            File.save(blob as any, nameOnly, extension, "", undefined as any, undefined);
+
+        } catch (error) {
+            console.error("Error en la descarga:", error);
+            // Opcional: Mostrar un mensaje de error al usuario con MessageBox
+        }
+    }
+
+    public async onAfterRemoved(event: UploadSet$AfterItemRemovedEvent): Promise<void> {
+
+        const item = event.getParameter("item") as UploadSetItem;
+        const context = item.getBindingContext("zemployees") as Context;
+        const path = context.getPath();
+
+        const utils = new Utils(this);
+        await utils.crud('delete', new JSONModel({ path: path }));
+        item.getBinding("items")?.refresh();
     }
 
 }

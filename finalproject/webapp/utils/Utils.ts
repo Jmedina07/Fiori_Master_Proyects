@@ -66,7 +66,7 @@ export default class Utils {
                         switch (action) {
                             case 'create': resolve(await this.create(object1)); resolve(await this.createdetail(object2));break;
                             // case 'update': resolve(await this.update(object)); break;
-                            // case 'delete': resolve(await this.delete(object)); break;
+                            case 'delete': resolve(await this.delete(object1)); break;
                         }
                     }
                 }
@@ -121,6 +121,30 @@ export default class Utils {
         }) as Promise<void | ODataListBinding>;
         //console.log("Resultado de insert", result)
         return result;
+    }    
+
+    private async delete(object?: JSONModel): Promise<void | ODataListBinding> {
+
+        //const model = this.model;
+        const path = object?.getProperty("/path");
+        //const body = object?.getProperty("/data");
+        const resourceBundle = this.resourceBundle;
+
+        //console.log("Remove Utils");
+
+        return new Promise((resolve, reject) => {
+            this.model.remove(path, {
+                success: async () => {
+                    MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                    resolve(await this.read(object));
+                },
+                error: () => {
+                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    reject();
+                }
+            });
+        });
+
     }    
 
 }
