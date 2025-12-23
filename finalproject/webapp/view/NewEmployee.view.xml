@@ -51,6 +51,7 @@
                                 <SegmentedButton
                                     width="320px" id="butonselect"
                                     selectionChange="onSegmentedButtonChange"
+									validationSuccess="onValidation"
 									selectedKey="{/selectedOption}"
 									>
                                     <items>

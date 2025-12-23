@@ -88,7 +88,7 @@ export default class NewEmployee extends BaseController {
     private initialModelData: any = {
         selectedOption: "", // Para el SegmentedButton
         steptwo: {
-            name: "",
+            name: "Prueba",
             apellido: "",
             dni: null,
             cif: null,
@@ -284,6 +284,10 @@ export default class NewEmployee extends BaseController {
 
     }
 
+    public onValidation(): void {
+
+
+    }
     /**
          * Función genérica para manejar cambios en el modelo que podrían requerir
          * descartar el progreso del wizard si ya se ha avanzado.
@@ -305,6 +309,7 @@ export default class NewEmployee extends BaseController {
                         this._wizard.discardProgress(discardStep, false);
                         // Asegurar el tipado correcto para el historial
                         history[params.historyPath] = this.model.getProperty(params.modelPath) as any;
+                        this.loadIncidences();
                         this.frontcustomizing();
                     } else {
                         // Restablecer el valor anterior
@@ -314,6 +319,8 @@ export default class NewEmployee extends BaseController {
             });
         } else {
             // El usuario aún está en el paso, actualizar el historial sin MessageBox
+            this.loadIncidences();
+            this.frontcustomizing();
             history[params.historyPath] = this.model.getProperty(params.modelPath) as any;
         }
     }
@@ -381,6 +388,7 @@ export default class NewEmployee extends BaseController {
                     this._wizard.discardProgress(firstStep, false);
                     this._resetWizard();
                     this.handleNavBackToFirst();
+                    this.refreshScreen();
                 }
             }
         };
@@ -457,10 +465,11 @@ export default class NewEmployee extends BaseController {
                     SalaryId: "0001"
                 }
             };
-            //console.log(employee);
-            await utils.crud('create', new JSONModel(employee), new JSONModel(salary));
+            
+            // await utils.crud('create', new JSONModel(employee), new JSONModel(salary)); Descomentar
             // await utils.crud('createdetail', new JSONModel(salary));
-            this.onStartUpload();
+            // this.onStartUpload();   Descomentar
+            this.refreshScreen();
         }
 
     }
@@ -508,7 +517,8 @@ export default class NewEmployee extends BaseController {
         const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
         //const note = this.model.getProperty("/stepthree/Note");
         const comments = (this.byId("Note") as TextArea).getValue().toString();
-        const employeeId = (await this.getId()).toString();
+        const employeeId = "1";
+        // const employeeId = (await this.getId()).toString(); Descomentar
         const sapId = utils.getEmail()
 
 
@@ -600,5 +610,13 @@ export default class NewEmployee extends BaseController {
         aFiles = aFiles.filter(file => file.name !== oItem.getFileName());
 
         oModel.setProperty("/files", aFiles);
+    }
+
+    public refreshScreen(): void {
+        this.loadIncidences();
+        const firstStep = this._wizard.getSteps()[0];
+        this._wizard.discardProgress(firstStep, false);
+        this._resetWizard();
+        this.handleNavBackToFirst();
     }
 }
