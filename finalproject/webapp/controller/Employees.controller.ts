@@ -13,6 +13,7 @@ import FilterOperator from "sap/ui/model/FilterOperator";
 import Table from "sap/m/Table";
 import ListBinding from "sap/ui/model/ListBinding";
 import ObjectListItem from "sap/m/ObjectListItem";
+import Event from "sap/ui/base/Event";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -50,7 +51,11 @@ export default class Employees extends BaseController {
             path: '/Users',
             filters: [
                 new Filter("SapId", "EQ", utils.getEmail())
-            ]
+            ],
+            // IMPORTANTE: urlParameters es donde viaja el $expand
+            urlParameters: {
+                "$expand": "UserToAttachment"
+            }
         };
 
         const employees = await utils.read(new JSONModel(filter));
@@ -80,12 +85,14 @@ export default class Employees extends BaseController {
         let results = data as any;
         const oResultsModel = new JSONModel();
         oResultsModel.setData(results.results);
-        this.getView()?.setModel(oResultsModel, "zemployees");
+        //this.getView()?.setModel(oResultsModel, "zemployees"); /// Prueba
+        this.getOwnerComponent()?.setModel(oResultsModel, "mEmployees");
+
 
 
         const object = results as any;
-        const form = this.getModel("form") as JSONModel;
-        form.setData(object.results);
+        //const form = this.getModel("form") as JSONModel;
+        //form.setData(object.results);
 
     }
 
@@ -122,12 +129,12 @@ export default class Employees extends BaseController {
         if (sQuery) {
             filters.push(
                 new Filter({
-                    filters:[
-                        new Filter("EmployeeId",FilterOperator.EQ,sQuery),
+                    filters: [
+                        new Filter("EmployeeId", FilterOperator.EQ, sQuery),
                         new Filter({
-                            filters:[
-                                new Filter("FirstName","Contains",sQuery),
-                                new Filter("LastName",FilterOperator.Contains, sQuery)
+                            filters: [
+                                new Filter("FirstName", "Contains", sQuery),
+                                new Filter("LastName", FilterOperator.Contains, sQuery)
                             ],
                             and: false
                         })
@@ -143,16 +150,16 @@ export default class Employees extends BaseController {
 
     }
 
-      public onNavToDetails (event : Event) : void {
+    public onNavToDetails(event: Event): void {
         let item = event.getSource() as ObjectListItem;
-        let bindingContext = item.getBindingContext("zemployees") as Context;
+        let bindingContext = item.getBindingContext("mEmployees") as Context;
         let id = bindingContext.getProperty("EmployeeId");
         const model = this.getModel("view") as JSONModel;
-        model.setProperty("/layout","TwoColumnsMidExpanded");
+        model.setProperty("/layout", "TwoColumnsMidExpanded");
         const router = this.getRouter();
-        router.navTo("RouteDetail",{
-            ID:  id          //index
+        router.navTo("RouteDetail", {
+            ID: id          //index
         });
-    }  
-    
+    }
+
 }

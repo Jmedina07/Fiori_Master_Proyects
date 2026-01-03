@@ -32,6 +32,7 @@ export default class Utils {
         const model = this.model;
         let path = object?.getProperty("/path");
         const filters = object?.getProperty("/filters");
+        const urlParameters = model.getProperty("/urlParameters");
         const resourceBundle = this.resourceBundle;
 
         if (path && typeof path === 'string') {
@@ -40,6 +41,7 @@ export default class Utils {
         return new Promise((resolve, reject) => {
             model.read(path, {
                 filters: filters,
+                urlParameters: urlParameters,
                 success: (data: ODataListBinding) => {
                     resolve(data);
                 },
