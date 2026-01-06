@@ -444,7 +444,7 @@ export default class NewEmployee extends BaseController {
                 path: '/Users',
                 data: {
                     SapId: data.sapId,
-                    //EmployeeId: data.employeeId,  Descomentar
+                    EmployeeId: data.employeeId,  //Descomentar
                     Type: data.type,
                     FirstName: data.name,
                     LastName: data.apellido,
@@ -466,8 +466,8 @@ export default class NewEmployee extends BaseController {
                 }
             };
             
-            //await utils.crud('create', new JSONModel(employee), new JSONModel(salary)); Descomentar
-            await utils.crud('create', new JSONModel(employee)); 
+            await utils.crud('create', new JSONModel(employee), new JSONModel(salary)); //Descomentar
+            //await utils.crud('create', new JSONModel(employee)); 
             // await utils.crud('createdetail', new JSONModel(salary));
             this.onStartUpload();  
             this.refreshScreen();
@@ -530,7 +530,7 @@ export default class NewEmployee extends BaseController {
             creationDate: date,
             comment: comments,
             sapId: sapId,
-            //employeeId: employeeId,
+            employeeId: employeeId,
             type: type,
             amount: amount
         } as StepTwoData;

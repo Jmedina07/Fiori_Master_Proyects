@@ -13,7 +13,7 @@
             title="Seleccione un Empleado"
             description="Por favor, elija un registro de la lista para ver el detalle."
             visible="{= !${/selectedEmployee} }" />
-            <uxap:ObjectPageLayout id="ObjectPage">
+            <uxap:ObjectPageLayout id="ObjectPage" showFooter="true">
 
                     <uxap:headerTitle >
 
@@ -115,15 +115,13 @@
                                                         showFilterBar="false"
                                                         groupBy="HireDate"
                                                         growingThreshold="0"
-                                                        content="{mEmployees>/Salaries>/}"
+                                                        content="{mEmployees>/Salaries}"
                                                         filterTitle="Job Title"
                                                         sortOldestFirst="true">
                                                         <commons:content>
                                                             <commons:TimelineItem
-                                                                id="idTemplateItem"
                                                                 userNameClicked="onUserNameClick"
                                                                 select="onPressItems"
-                                                                title="{Amount}"
                                                                 userNameClickable="true"
 
                                                                 >
@@ -134,16 +132,24 @@
                                             </IconTabFilter>
                                         </items>
                                         <content>
-                                        
+          
+
+              
                                         </content>
                                     </IconTabBar>                           
                                 </uxap:ObjectPageSubSection>
                             </uxap:subSections>
+     
                         </uxap:ObjectPageSection>
 
-
+                    
                     </uxap:sections>
-
+                    <uxap:footer>
+                        <OverflowToolbar>
+                            <ToolbarSpacer /> <Button type="Emphasized" text="Dar de Baja" press="onDeleteEmployee" />
+                            <Button type="Transparent" text="Ascender" press="onAscender" />
+                        </OverflowToolbar>
+                    </uxap:footer>
             </uxap:ObjectPageLayout>
 
 

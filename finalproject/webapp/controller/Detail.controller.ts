@@ -16,12 +16,21 @@ import UIComponent from "sap/ui/core/UIComponent";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import Item from "sap/ui/core/Item";
 import ObjectPageLayout from "sap/uxap/ObjectPageLayout";
-
+import Timeline from "sap/suite/ui/commons/Timeline";
+import TimelineItem from "sap/suite/ui/commons/TimelineItem";
+import { Button$PressEvent } from "sap/m/Button";
+import Button from "sap/m/Button";
+import Popover from "sap/m/Popover";
+import Control from "sap/ui/core/Control";
+import Fragment from "sap/ui/core/Fragment";
+import Dialog from "sap/m/Dialog";
 
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
 export default class Detail extends BaseController {
+
+        private _pPopover: Promise<Popover>;
 
         /*eslint-disable @typescript-eslint/no-empty-function*/
         public onInit(): void {
@@ -48,7 +57,7 @@ export default class Detail extends BaseController {
                 else {
                         const model = (this.getOwnerComponent() as UIComponent).getModel("mEmployees") as JSONModel;
                         const data = model.getData(); // Esto es el array de resultados
-
+                        console.log(data);
                         // Buscamos el índice del empleado que coincida con el ID pasado por la ruta
                         const index = data.findIndex((emp: any) => emp.EmployeeId === id);
 
@@ -65,6 +74,7 @@ export default class Detail extends BaseController {
                                                 change: () => {
                                                         this.refresh_data(id);
                                                         this.searchFiles(id);
+                                                        this.readSalary(id);
                                                 },
                                                 dataRequested: () => {
                                                         view.setBusy(true)
@@ -74,53 +84,8 @@ export default class Detail extends BaseController {
                                                 }
                                         }
                                 });
-                                // (this.getView() as View).bindElement({
-                                //         path: sPath,
-                                //         model: "zemployees",
-                                //         events: {
-                                //                 change: () => {
-                                //                         this.read();
-                                //                 },
-                                //                 dataRequested: () => {
-                                //                         view.setBusy(true)
-                                //                 },
-                                //                 dataReceived: () => {
-                                //                         view.setBusy(false)
-                                //                 }
-                                //         }
-                                // });
 
                         }
-
-                        // let arg = event.getParameter("arguments") as any;            Lo comentado ya jalaba pero se lee nuevamente el dato de la Base de Datos
-                        // let id = arg.ID;
-                        // // // 1. Enlazamos la ruta OData del empleado a la vista
-                        // const oIconTabBar = this.byId("idIconTabBar") as IconTabBar;
-
-                        // const oMessage = this.byId("idMessage") as IllustratedMessage;
-                        // const oHeader = this.byId("header") as ObjectHeader;
-
-                        // if (id > 0) {
-                        //         const sPath = `/('${id}')`;
-
-                        //         ( this.getView() as View).bindElement({
-                        //                 path: sPath,
-                        //                 model: "zemployees"
-                        //         });
-                        //         this.refresh_data(id);
-                        //         oIconTabBar.setVisible(true);
-                        //         oHeader.setVisible(true);
-                        //         oMessage.setVisible(false);
-                        //         this.loadIncidences();
-
-                        // }
-                        // else {
-                        //         oIconTabBar.setVisible(false);
-                        //         oHeader.setVisible(false);
-                        //         oMessage.setVisible(true);
-
-                        // }
-                        // const view = this.getView() as View;
                 }
 
         }
@@ -154,46 +119,39 @@ export default class Detail extends BaseController {
                 }
         }
 
-        private async read(employeeId: string): Promise<void> {
-                // private async read () : Promise<void | ODataListBinding> {   
+        private async readSalary(employeeId: string): Promise<void> {
 
                 const utils = new Utils(this);
 
-                const employ = {
-                        path: '/Users',
+                const salary = {
+                        path: '/Salaries',
                         filters: [
                                 new Filter("SapId", "EQ", utils.getEmail()),
                                 new Filter("EmployeeId", "EQ", employeeId)
                         ]
                 };
+                const Salaries = await utils.read(new JSONModel(salary));
+                this.showSalaries(Salaries);
 
-                const demploy = await utils.read(new JSONModel(employ));
-                this.showResults(demploy);
-                // const salary = {
-                //         path: '/Salaries',
-                //         filters: [
-                //                 new Filter("SapId", "EQ", utils.getEmail()),
-                //                 new Filter("EmployeeId", "EQ", employeeId)
-                //         ]
-                // };
-                // const Salaries = await utils.read(new JSONModel(salary));
-
-                // console.log(Salaries);
 
         }
-        public showResults(data: void | ODataListBinding): void {
+        public showSalaries(data: void | ODataListBinding): void {
                 let results = data as any;
                 const oResultsModel = new JSONModel();
-                console.log(results.results[0].FirstName);
-                console.log(results.results[0]);
-                oResultsModel.setData(results.results[0]);
-                this.getView()?.setModel(oResultsModel, "zsalaries");  //Prueba para ver si no pierde el valor
-                //this.getOwnerComponent()?.setModel(oResultsModel, "zemployee");
-
-
                 const object = results as any;
-                const form = this.getModel("form") as JSONModel;
-                form.setData(object.results);
+                const oTimeline = this.getView()?.byId("idTimeline") as Timeline;
+                oTimeline.removeAllContent(); // Limpia el contenido previo
+                object.results.forEach((item: any) => {
+                        const oTimelineItem = new TimelineItem({
+                                title: item.Amount,
+                                userName: item.Waers,
+                                text: item.Comments,
+                                filterValue: item.SalaryId
+
+                        });
+
+                        oTimeline.addContent(oTimelineItem);
+                });
 
         }
         private async searchFiles(employeeId: string): Promise<void> {
@@ -308,6 +266,70 @@ export default class Detail extends BaseController {
         public onUploadCompleted(event: UploadSet$UploadCompletedEvent): void {
                 const uploadSet = event.getSource();
                 uploadSet.getBinding("items")?.refresh();
+        }
+
+        public async onDeleteEmployee(event: Button$PressEvent): Promise<void> {
+
+                const utils = new Utils(this);
+                const context = this.getView()?.getBindingContext("mEmployees");;
+                const sapId = utils.getEmail();
+                const employeeId = context?.getProperty("EmployeeId");
+
+                const object = {
+                        path: `/Users(EmployeeId='${employeeId}',SapId='${sapId}')`,
+                        filters: [
+                                new Filter("SapId", "EQ", utils.getEmail()),
+                                new Filter("EmployeeId", "EQ", employeeId)
+                        ]
+                }
+                const results = await utils.crud('delete', new JSONModel(object));
+                this.onNavToDetails();
+
+        }
+
+        public onNavToDetails(): void {
+
+                const model = this.getModel("view") as JSONModel;
+                model.setProperty("/layout", "TwoColumnsMidExpanded");
+                const router = this.getRouter();
+                router.navTo("RouteEmployees");
+
+        }
+        private dialog: Dialog;
+        public async onAscender(oEvent: Button$PressEvent): Promise<void> {
+                let view = this.getView() as View;
+
+                // if (!this.dialog) {
+                this.dialog ??= await Fragment.load({
+                        id: view.getId(),
+                        name: "com.logaligroup.finalproject.fragment.newSalary",
+                        controller: this
+                }) as Dialog;
+                // }
+                this.dialog.bindElement("form>/" + 1);
+                view.addDependent(this.dialog);
+                this.dialog.open();
+
+        }
+
+        public onCloseDialog(): void {
+                this.dialog.close();
+        }
+
+        public async onSaveDialog(event: Button$PressEvent): Promise<void> {
+
+                const oModel = ( this.getView() as View).getModel("form") as JSONModel;
+                const sValue = oModel.getProperty("/newSalaryValue");
+                console.log("Valor desde el modelo:", sValue);
+
+                // const oView = this.getView() as View;
+                // // Obtenemos el modelo por su nombre "form"
+                // const oModel = oView.getModel("form") as JSONModel;
+
+                // // Obtenemos todos los datos del modelo
+                // const oData = oModel.getData();
+
+                // console.log("Salario:", oData.Salario);
         }
 
 }

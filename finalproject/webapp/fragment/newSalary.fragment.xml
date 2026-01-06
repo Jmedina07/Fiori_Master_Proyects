@@ -1,0 +1,42 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core" >
+    <Dialog id="helloDialog" 
+        title="{i18n>lblFragmentTitle}" contentWidth="300px">
+        <content >
+            <VBox width="80%" class="sapUiSmallMargin">
+                <Label text="{i18n>lblFragmentSalary}" labelFor="idSalario" />
+                <Input id="idSalario" type="Number" value="{form>/newSalaryValue}"/>
+            </VBox>
+            <VBox width="80%" class="sapUiSmallMargin">
+                <Label text="{i18n>lblFragmentFecha}" labelFor="idDate" />
+                <DatePicker id="idDate" valueFormat="yyyy-MM-dd" displayFormat="long" dateValue="{form>CreationDate}" />
+            </VBox>        
+            <VBox width="80%" class="sapUiSmallMargin">
+                <Label text="{i18n>lblnote}" labelFor="idTexto" />
+                <TextArea id="idTexto" width="100%" value="{form>Comment}"/>
+            </VBox>             
+        </content>
+
+        <beginButton>
+            <Button 
+                type="Emphasized"
+                text="{i18n>buton4}"
+                tooltip="{i18n>buton4}"
+                press="onSaveDialog"
+                width="5rem"/> 
+        </beginButton>
+
+        <endButton>
+            <Button 
+                type="Reject"
+                text="{i18n>buton5}"
+                tooltip="{i18n>buton5}"
+                press="onCloseDialog"
+                width="5rem"/>        
+       
+        </endButton>
+    </Dialog>
+
+
+</core:FragmentDefinition>
