@@ -97,7 +97,7 @@ export default class Utils {
                 }
             });
         }) as Promise<void | ODataListBinding>;
-        //console.log("Resultado de insert", result)
+        console.log("Resultado de insert", result)
         return result;
     }
     private async createdetail(object?: JSONModel): Promise<void | ODataListBinding> {

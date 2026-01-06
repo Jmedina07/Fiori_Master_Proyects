@@ -1,70 +1,150 @@
 <mvc:View
     controllerName="com.logaligroup.finalproject.controller.Detail"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:upload="sap.m.upload"
-    xmlns="sap.m">
-
-    <Page title="{i18n>TitleViewDetail}">
-        <ObjectHeader id="header">
-            <attributes >
-                <ObjectAttribute text="{mEmployees>FirstName} {mEmployees>LastName}" />
-                <ObjectAttribute text="{mEmployees>Dni}" />
-            </attributes>
-            <statuses>
-                <ObjectStatus title="Status" text="{EmployeeId}" state="Success" />
-            </statuses>
-        </ObjectHeader>
-        <content>
+            xmlns="sap.m"
+            xmlns:uxap="sap.uxap"
+            xmlns:mvc="sap.ui.core.mvc"
+            xmlns:core="sap.ui.core"
+            xmlns:upload="sap.m.upload"
+            xmlns:commons="sap.suite.ui.commons"
+            core:require="{ MyFormmatter: 'com/logaligroup/finalproject/model/formatter' }"
+            >
             <IllustratedMessage id="idMessage"
-                illustrationType="sapIllu-SelectOrders"
-                title="Seleccione un Empleado"
-                description="Por favor, elija un registro de la lista para ver el detalle."
-                visible="{= !${/selectedEmployee} }" />  
+            illustrationType="sapIllu-SelectOrders"
+            title="Seleccione un Empleado"
+            description="Por favor, elija un registro de la lista para ver el detalle."
+            visible="{= !${/selectedEmployee} }" />
+            <uxap:ObjectPageLayout id="ObjectPage">
 
-        <IconTabBar 
-            id="idIconTabBar"
-            select=".onFilterSelect"
-            class="sapUiResponsiveContentPadding">
+                    <uxap:headerTitle >
 
-            <items>
-                <IconTabFilter
-                    icon="sap-icon://attachment"
-                    iconColor="Default"
-                    design="Horizontal"
-                    count="{/ProductCollectionStats/Counts/Weight/Ok} of {/ProductCollectionStats/Counts/Total}"
-                    text="{i18n>lblFiles2}"
-                    key="Ok">
-                    <upload:UploadSet
-                        id="upload1"
-                        uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments/"
-                        beforeUploadStarts="onBeforeUpload"
-                        uploadCompleted="onUploadCompleted"
-                        afterItemRemoved="onAfterRemoved"
-                        >
-                    </upload:UploadSet>                    
-                </IconTabFilter>
-                    
-                <IconTabFilter
-                    icon="sap-icon://money-bills"
-                    iconColor="Default"
-                    design="Horizontal"
-                    count="{/ProductCollectionStats/Counts/Weight/Heavy} of {/ProductCollectionStats/Counts/Total}"
-                    text="{i18n>lblHistorial}"
-                    key="Heavy">
+                        <uxap:ObjectPageDynamicHeaderTitle >
 
-                    <Label text="Texto de prueba"/>
+                            <uxap:content >
+                                <FlexBox alignItems="Center" justifyContent="Center" width="100%">
+                                    <Title text="{i18n>TitleViewDetail}" textAlign="Center" titleStyle="H3"/>
+                                </FlexBox>
+                             </uxap:content>                            
 
-                </IconTabFilter>
-            </items>
-            <content>
-            
-            </content>
-        </IconTabBar>
+                        
+                        </uxap:ObjectPageDynamicHeaderTitle>
 
-        </content>
-    
-    </Page>
+                    </uxap:headerTitle>
 
+                    <uxap:headerContent>
+
+                        <FlexBox justifyContent="SpaceBetween">
+
+                            <HBox>
+                                <core:Icon src="sap-icon://employee" size="2rem" 
+                                    class="sapUiSmallMarginEnd"/>
+                                <VBox>
+                                    <Text text="{mEmployees>FirstName} {mEmployees>LastName}"/>
+                                    <Text text="{mEmployees>Dni}"/>
+                                </VBox>                                
+                            </HBox>
+
+                        </FlexBox>
+                        <ToolbarSpacer width="100%" ></ToolbarSpacer>
+                        <FlexBox >
+                            <HBox width="100%" justifyContent="SpaceBetween">
+                                <HBox>
+                                    <VBox class="sapUiSmallMarginEnd">
+                                        <Label text="Fecha Incorporación:" class="boldElement" />
+                                        <Label text="Tipo:" class="boldElement" />
+                                    </VBox>
+                                    <VBox>
+                                        <Text text="{path: 'mEmployees>CreationDate', type: 'sap.ui.model.type.Date'}" class="boldElement" />
+                                        <Text  text="{
+                                                path:'mEmployees>Type',
+                                                formatter: 'MyFormmatter.typeText.bind($controller)'
+                                            }"
+                                            class="boldElement" />
+                                    </VBox>
+                                </HBox>
+
+                                <VBox>
+                                    <Label text="Comentario:" />
+                                    <Text text="{mEmployees>Salaries>Comments}" class="boldElement" />
+                                </VBox>
+                            </HBox>                              
+                                                                                                      
+                        </FlexBox>
+
+                    </uxap:headerContent>
+
+                    <uxap:sections>
+                        <uxap:ObjectPageSection>
+                            
+                            <uxap:subSections>
+
+                                <uxap:ObjectPageSubSection>
+
+                                    <IconTabBar 
+                                        id="idIconTabBar"
+                                        select=".onFilterSelect"
+                                        class="sapUiResponsiveContentPadding">
+
+                                        <items>
+                                            <IconTabFilter
+                                                icon="sap-icon://attachment"
+                                                iconColor="Default"
+                                                design="Horizontal"
+                                                count="{/ProductCollectionStats/Counts/Weight/Ok} of {/ProductCollectionStats/Counts/Total}"
+                                                text="{i18n>lblFiles2}"
+                                                key="Ok">
+                                                <upload:UploadSet
+                                                    id="upload1"
+                                                    uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments/"
+                                                    beforeUploadStarts="onBeforeUpload"
+                                                    uploadCompleted="onUploadCompleted"
+                                                    afterItemRemoved="onAfterRemoved"
+                                                    >
+                                                </upload:UploadSet>                    
+                                            </IconTabFilter>
+                                                
+                                            <IconTabFilter
+                                                icon="sap-icon://money-bills"
+                                                iconColor="Default"
+                                                design="Horizontal"
+                                                text="{i18n>lblHistorial}"
+                                                key="Heavy">
+
+                                                	<commons:Timeline
+                                                        id="idTimeline"
+                                                        enableDoubleSided="true"
+                                                        showFilterBar="false"
+                                                        groupBy="HireDate"
+                                                        growingThreshold="0"
+                                                        content="{mEmployees>/Salaries>/}"
+                                                        filterTitle="Job Title"
+                                                        sortOldestFirst="true">
+                                                        <commons:content>
+                                                            <commons:TimelineItem
+                                                                id="idTemplateItem"
+                                                                userNameClicked="onUserNameClick"
+                                                                select="onPressItems"
+                                                                title="{Amount}"
+                                                                userNameClickable="true"
+
+                                                                >
+                                                            </commons:TimelineItem>
+                                                        </commons:content>
+                                                    </commons:Timeline>
+
+                                            </IconTabFilter>
+                                        </items>
+                                        <content>
+                                        
+                                        </content>
+                                    </IconTabBar>                           
+                                </uxap:ObjectPageSubSection>
+                            </uxap:subSections>
+                        </uxap:ObjectPageSection>
+
+
+                    </uxap:sections>
+
+            </uxap:ObjectPageLayout>
 
 
 </mvc:View>

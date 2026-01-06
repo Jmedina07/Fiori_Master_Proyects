@@ -8,13 +8,14 @@ import IconTabBar from "sap/m/IconTabBar";
 import ObjectHeader from "sap/m/ObjectHeader";
 import Context from "sap/ui/model/odata/v2/Context";
 import Filter from "sap/ui/model/Filter";
-import UploadSet, { UploadSet$AfterItemRemovedEvent } from "sap/m/upload/UploadSet";
+import UploadSet, { UploadSet$AfterItemRemovedEvent, UploadSet$BeforeUploadStartsEvent, UploadSet$UploadCompletedEvent } from "sap/m/upload/UploadSet";
 import UploadSetItem, { UploadSetItem$OpenPressedEvent } from "sap/m/upload/UploadSetItem";
 import File from "sap/ui/core/util/File"; // Asegúrate de importar esto
 import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
 import UIComponent from "sap/ui/core/UIComponent";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
-import Integer from "sap/ui/model/type/Integer";
+import Item from "sap/ui/core/Item";
+import ObjectPageLayout from "sap/uxap/ObjectPageLayout";
 
 
 /**
@@ -128,23 +129,26 @@ export default class Detail extends BaseController {
 
                 let id = Number(employeeId);
                 // // 1. Enlazamos la ruta OData del empleado a la vista
-                const oIconTabBar = this.byId("idIconTabBar") as IconTabBar;
+                //const oIconTabBar = this.byId("idIconTabBar") as IconTabBar;
+                const oObjectPageLayout = this.byId("ObjectPage") as ObjectPageLayout;
 
                 const oMessage = this.byId("idMessage") as IllustratedMessage;
-                const oHeader = this.byId("header") as ObjectHeader;
+                //const oHeader = this.byId("header") as ObjectHeader;
 
                 if (id > 0) {
                         const sPath = `/('${id}')`;
 
-                        oIconTabBar.setVisible(true);
-                        oHeader.setVisible(true);
+                        // oIconTabBar.setVisible(true);
+                        // oHeader.setVisible(true);
                         oMessage.setVisible(false);
+                        oObjectPageLayout.setVisible(true);
                         //this.loadIncidences();
 
                 }
                 else {
-                        oIconTabBar.setVisible(false);
-                        oHeader.setVisible(false);
+                        // oIconTabBar.setVisible(false);
+                        // oHeader.setVisible(false);
+                        oObjectPageLayout.setVisible(false);
                         oMessage.setVisible(true);
 
                 }
@@ -183,7 +187,7 @@ export default class Detail extends BaseController {
                 console.log(results.results[0].FirstName);
                 console.log(results.results[0]);
                 oResultsModel.setData(results.results[0]);
-                this.getView()?.setModel(oResultsModel, "zemployee");  //Prueba para ver si no pierde el valor
+                this.getView()?.setModel(oResultsModel, "zsalaries");  //Prueba para ver si no pierde el valor
                 //this.getOwnerComponent()?.setModel(oResultsModel, "zemployee");
 
 
@@ -205,47 +209,6 @@ export default class Detail extends BaseController {
                 const sapId = utils.getEmail();
 
                 const uploadSet = this.byId("upload1") as UploadSet;
-
-
-
-                // // 1. Obtener el modelo OData (el que tiene la URL /sap/opu/odata/...)
-                // // Si no tiene nombre en el manifest, usa getModel() sin parámetros
-                // let oDataModel = (this.getOwnerComponent() as UIComponent).getModel() as ODataModel;
-                // if (!oDataModel) {
-                //         // Si sigue siendo undefined, probamos con el nombre técnico que suele usarse
-                //         oDataModel = this.getOwnerComponent()?.getModel("zemployees") as ODataModel;
-                // }
-                // // 2. Construir la ruta exacta hacia los adjuntos de ESTE empleado
-                // // La sintaxis debe ser igual a la que viste en el "uri" del log
-                // const sPath = `/Users(EmployeeId='${employeeId}',SapId='${sapId}')/UserToAttachment`;
-
-                // // 3. Hacer la lectura directa al servidor
-                // oDataModel.read(sPath, {
-                //         success: (oData: any) => {
-                //                 // oData.results contiene el array real de archivos
-                //                 const aFiles = oData.results || [];
-
-                //                 // 4. Crear un modelo JSON local solo para este control
-                //                 const oFilesModel = new JSONModel(aFiles);
-                //                 this.getView()?.setModel(oFilesModel, "archivosLocal");
-
-                //                 // 5. Vincular el UploadSet al nuevo modelo local
-                //                 uploadSet.bindAggregation("items", {
-                //                         path: "archivosLocal>/",
-                //                         template: new UploadSetItem({
-                //                                 fileName: "{archivosLocal>DocName}",
-                //                                 mediaType: "{archivosLocal>MimeType}",
-                //                                 visibleEdit: false,
-                //                                 visibleRemove: true
-                //                                 // URL para descargar el archivo físico
-                //                                 //url: oDataModel.sServiceUrl + sPath + `(DocName='{archivosLocal>DocName}')/$value`
-                //                         })
-                //                 });
-                //         },
-                //         error: (oError: any) => {
-                //                 console.error("Error al cargar adjuntos:", oError);
-                //         }
-                // });
 
 
                 uploadSet.bindAggregation("items", {
@@ -304,6 +267,47 @@ export default class Detail extends BaseController {
                 const utils = new Utils(this);
                 await utils.crud('delete', new JSONModel({ path: path }));
                 item.getBinding("items")?.refresh();
+        }
+
+        public onBeforeUpload(event: UploadSet$BeforeUploadStartsEvent): void {
+                const item = event.getParameter("item") as UploadSetItem;
+                const utils = new Utils(this);
+                const context = this.getView()?.getBindingContext("mEmployees");;
+                const model = this.getOwnerComponent()?.getModel("zemployees") as ODataModel;
+                const token = model.getSecurityToken();
+                const fileName = item.getFileName();
+                const mediaType = item.getMediaType();
+                //const orderId = context?.getProperty("OrderID");
+                const sapId = utils.getEmail();
+                const employeeId = context?.getProperty("EmployeeId");
+
+                // console.log({
+                //         fileName,
+                //         mediaType,
+                //         token,
+                //         orderId,
+                //         sapId,
+                //         employeeId
+                // });
+
+                const headerToken = new Item({
+                        key: "x-csrf-token",
+                        text: token
+                });
+
+                const headerSlug = new Item({
+                        key: 'slug',
+                        text: `${sapId};${employeeId};${fileName};${mediaType}`
+                });
+
+
+                item.addHeaderField(headerToken);
+                item.addHeaderField(headerSlug);
+        }
+
+        public onUploadCompleted(event: UploadSet$UploadCompletedEvent): void {
+                const uploadSet = event.getSource();
+                uploadSet.getBinding("items")?.refresh();
         }
 
 }
