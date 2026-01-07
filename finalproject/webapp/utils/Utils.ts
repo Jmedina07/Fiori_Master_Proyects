@@ -28,7 +28,7 @@ export default class Utils {
         return "joel@logaligroup.com";
     }
 
-    public async read(object?: JSONModel): Promise<void | ODataListBinding> {
+    public async read(object?: JSONModel): Promise<void | any> {
         const model = this.model;
         let path = object?.getProperty("/path");
         const filters = object?.getProperty("/filters");
@@ -45,9 +45,17 @@ export default class Utils {
                 success: (data: ODataListBinding) => {
                     resolve(data);
                 },
-                error: () => {
-                    reject();
-                    MessageBox.error(resourceBundle.getText("error") || 'no text defined Test');
+                // error: () => {
+                //     reject();
+                // }
+                error: (error: any) => {
+                    // El error 400 de SAP suele venir en error.responseText
+                    try {
+                        const oResponse = JSON.parse(error.responseText);
+                        reject(oResponse);
+                    } catch (e) {
+                        reject(error);
+                    }
                 }
             });
         });
@@ -55,7 +63,7 @@ export default class Utils {
 
     // action = create, read, update, delete
     //public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
-    public async crud(action: string, object1?: JSONModel, object2?: JSONModel): Promise<void | ODataListBinding> {
+    public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
         //console.log(action);
         const resourceBundle = this.resourceBundle;
 
@@ -66,9 +74,9 @@ export default class Utils {
                 onClose: async (response: string) => {
                     if (MessageBox.Action.OK == response) {
                         switch (action) {
-                            case 'create': resolve(await this.create(object1)); resolve(await this.createdetail(object2));break;
-                            // case 'update': resolve(await this.update(object)); break;
-                            case 'delete': resolve(await this.delete(object1)); break;
+                            case 'create': resolve(await this.create(object)); break;
+                            case 'createdetail': resolve(await this.createdetail(object)); break;
+                            case 'delete': resolve(await this.delete(object)); break;
                         }
                     }
                 }
@@ -80,7 +88,7 @@ export default class Utils {
 
         const model = this.model;
         const path = object?.getProperty("/path");
-        const body = object?.getProperty("/data");  
+        const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
         //console.log(object);
         //console.log(body);
@@ -89,7 +97,7 @@ export default class Utils {
                 success: async () => {
                     //MessageBox.success(resourceBundle.getText("success") || 'no text defined');
                     resolve(await this.read(object));
-                    
+
                 },
                 error: () => {
                     //MessageBox.error(resourceBundle.getText("error") || 'no text defined');
@@ -104,7 +112,7 @@ export default class Utils {
 
         const model = this.model;
         const path = object?.getProperty("/path");
-        const body = object?.getProperty("/data");  
+        const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
         //console.log(object);
         //console.log(body);
@@ -113,7 +121,7 @@ export default class Utils {
                 success: async () => {
                     MessageBox.success(resourceBundle.getText("success") || 'no text defined');
                     resolve(await this.read(object));
-                    
+
                 },
                 error: () => {
                     //MessageBox.error(resourceBundle.getText("error") || 'no text defined');
@@ -123,7 +131,7 @@ export default class Utils {
         }) as Promise<void | ODataListBinding>;
         //console.log("Resultado de insert", result)
         return result;
-    }    
+    }
 
     private async delete(object?: JSONModel): Promise<void | ODataListBinding> {
 
@@ -147,6 +155,6 @@ export default class Utils {
             });
         });
 
-    }    
+    }
 
 }

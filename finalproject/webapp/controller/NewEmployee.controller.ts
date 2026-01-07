@@ -25,6 +25,7 @@ import UploadSetItem, { UploadSetItem$OpenPressedEvent } from "sap/m/upload/Uplo
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import Item from "sap/ui/core/Item";
 import DataAnalyzer from "sap/sac/df/DataAnalyzer";
+import UIComponent from "sap/ui/core/UIComponent";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -74,6 +75,8 @@ export default class NewEmployee extends BaseController {
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
+
+
 
         const router = this.getRouter();
         router.getRoute("RouteNewEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
@@ -462,14 +465,15 @@ export default class NewEmployee extends BaseController {
                     Amount: data.amount,
                     Waers: "EUR",
                     Comments: data.comment,
+                    CreationDate: data.creationDate,
                     SalaryId: "0001"
                 }
             };
-            
-            await utils.crud('create', new JSONModel(employee), new JSONModel(salary)); //Descomentar
-            //await utils.crud('create', new JSONModel(employee)); 
-            // await utils.crud('createdetail', new JSONModel(salary));
-            this.onStartUpload();  
+            console.log("Salario", salary);
+            // await utils.crud('create', new JSONModel(employee), new JSONModel(salary)); //Descomentar
+            await utils.crud('create', new JSONModel(employee));
+            await utils.crud('createdetail', new JSONModel(salary));
+            this.onStartUpload();
             this.refreshScreen();
         }
 
@@ -478,7 +482,7 @@ export default class NewEmployee extends BaseController {
     private async getId(): Promise<string> {
 
         const utils = new Utils(this);
-
+        let employeeId: string ="";
         const object = {
             path: '/Users',
             filters: [
@@ -487,12 +491,30 @@ export default class NewEmployee extends BaseController {
         };
 
         // Forzamos el tipo de retorno usando 'as IReadResult'
-        const results = await utils.read(new JSONModel(object)) as unknown as IReadResult;
-        const valores = results.results.map(res => res.EmployeeId);
-        let valorMaximo = Math.max(...valores);
-        valorMaximo++;
-        const employeeId: string = valorMaximo.toString().padStart(4, '0');
-        console.log(employeeId);
+        try {
+            const results = await utils.read(new JSONModel(object)) as unknown as IReadResult;
+            const valores = results.results.map(res => res.EmployeeId);
+            let valorMaximo = Math.max(...valores);
+            valorMaximo++;
+            employeeId = valorMaximo.toString().padStart(4, '0');
+            console.log(employeeId);
+
+        } catch (oError) {
+            // Aquí capturamos el error 400 sin que la app se detenga
+            console.error("Error en la consulta:", oError);
+            employeeId = ("1").toString().padStart(4, '0');
+
+            // Extraemos el mensaje del backend (basado en tu log de error)
+
+
+        } 
+
+        // const results = await utils.read(new JSONModel(object)) as unknown as IReadResult;
+        // const valores = results.results.map(res => res.EmployeeId);
+        // let valorMaximo = Math.max(...valores);
+        // valorMaximo++;
+        // const employeeId: string = valorMaximo.toString().padStart(4, '0');
+        // console.log(employeeId);
         return employeeId;
     }
     private async getScreenData(): Promise<void> {
@@ -518,7 +540,7 @@ export default class NewEmployee extends BaseController {
         const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
         //const note = this.model.getProperty("/stepthree/Note");
         const comments = (this.byId("Note") as TextArea).getValue().toString();
-        // const employeeId = "1";
+        //const employeeId = "1";
         const employeeId = (await this.getId()).toString();
         const sapId = utils.getEmail()
 

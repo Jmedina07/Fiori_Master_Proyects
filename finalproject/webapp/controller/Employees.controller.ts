@@ -30,9 +30,9 @@ export default class Employees extends BaseController {
         router.getRoute("RouteEmployees")?.attachPatternMatched(this.onBindElement.bind(this));
     }
 
-    private onBindElement(event: Route$PatternMatchedEvent): void {
+    private async onBindElement(event: Route$PatternMatchedEvent): Promise<void> {
 
-        this.read();
+        await this.read();
         // this.detail();
         const model = this.getModel("view") as JSONModel;
         model.setProperty("/layout", "TwoColumnsMidExpanded");

@@ -6,15 +6,18 @@
         <content >
             <VBox width="80%" class="sapUiSmallMargin">
                 <Label text="{i18n>lblFragmentSalary}" labelFor="idSalario" />
-                <Input id="idSalario" type="Number" value="{form>/newSalaryValue}"/>
+                <Input id="idSalario" type="Number" value="{form>/newSalary}"
+                       required="true" change="onInputChange"/>
             </VBox>
             <VBox width="80%" class="sapUiSmallMargin">
                 <Label text="{i18n>lblFragmentFecha}" labelFor="idDate" />
-                <DatePicker id="idDate" valueFormat="yyyy-MM-dd" displayFormat="long" dateValue="{form>CreationDate}" />
+                <DatePicker id="idDate" displayFormat="long" dateValue="{form>/creationDate}"
+                            required="true" change="onDateChange"/>
             </VBox>        
             <VBox width="80%" class="sapUiSmallMargin">
                 <Label text="{i18n>lblnote}" labelFor="idTexto" />
-                <TextArea id="idTexto" width="100%" value="{form>Comment}"/>
+                <TextArea id="idTexto" width="100%" value="{form>/comment}"
+                          required="true" change="onTextChange"/>
             </VBox>             
         </content>
 

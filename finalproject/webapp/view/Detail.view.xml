@@ -113,11 +113,15 @@
                                                         id="idTimeline"
                                                         enableDoubleSided="true"
                                                         showFilterBar="false"
-                                                        groupBy="HireDate"
+
+
+                                                        groupByType="Year"
+                                                        groupBy="dateTime"
+                                                        textHeight="8"  
+
                                                         growingThreshold="0"
-                                                        content="{mEmployees>/Salaries}"
-                                                        filterTitle="Job Title"
-                                                        sortOldestFirst="true">
+
+                                                        sortOldestFirst="false">
                                                         <commons:content>
                                                             <commons:TimelineItem
                                                                 userNameClicked="onUserNameClick"

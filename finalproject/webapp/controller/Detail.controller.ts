@@ -24,6 +24,11 @@ import Popover from "sap/m/Popover";
 import Control from "sap/ui/core/Control";
 import Fragment from "sap/ui/core/Fragment";
 import Dialog from "sap/m/Dialog";
+import Input from "sap/m/Input";
+import ValueState from "sap/ui/core/ValueState";
+import MessageBox from "sap/m/MessageBox";
+import DatePicker from "sap/m/DatePicker";
+import TextArea from "sap/m/TextArea";
 
 /**
  * @namespace com.logaligroup.finalproject.controller
@@ -146,7 +151,9 @@ export default class Detail extends BaseController {
                                 title: item.Amount,
                                 userName: item.Waers,
                                 text: item.Comments,
-                                filterValue: item.SalaryId
+                                filterValue: item.SalaryId,
+                                dateTime: item.CreationDate,
+                                //filterValue:"2025"
 
                         });
 
@@ -274,12 +281,11 @@ export default class Detail extends BaseController {
                 const context = this.getView()?.getBindingContext("mEmployees");;
                 const sapId = utils.getEmail();
                 const employeeId = context?.getProperty("EmployeeId");
-
                 const object = {
                         path: `/Users(EmployeeId='${employeeId}',SapId='${sapId}')`,
                         filters: [
                                 new Filter("SapId", "EQ", utils.getEmail()),
-                                new Filter("EmployeeId", "EQ", employeeId)
+                               new Filter("EmployeeId", "EQ", employeeId)
                         ]
                 }
                 const results = await utils.crud('delete', new JSONModel(object));
@@ -297,18 +303,27 @@ export default class Detail extends BaseController {
         }
         private dialog: Dialog;
         public async onAscender(oEvent: Button$PressEvent): Promise<void> {
-                let view = this.getView() as View;
+                const view = this.getView() as View;
+                if (!this.dialog) {
+                        this.dialog = await Fragment.load({
+                                id: view.getId(),
+                                name: "com.logaligroup.finalproject.fragment.newSalary",
+                                controller: this
+                        }) as Dialog;
 
-                // if (!this.dialog) {
-                this.dialog ??= await Fragment.load({
-                        id: view.getId(),
-                        name: "com.logaligroup.finalproject.fragment.newSalary",
-                        controller: this
-                }) as Dialog;
-                // }
-                this.dialog.bindElement("form>/" + 1);
-                view.addDependent(this.dialog);
+                        // Agregar a la vista para que herede modelos y ciclo de vida
+                        view.addDependent(this.dialog);
+                }
+
+                // Asegúrate de que el modelo existe con datos iniciales si es necesario
+                const oModel = view.getModel("form") as JSONModel;
+                if (!oModel) {
+                        // Si no existe, créalo para evitar errores
+                        view.setModel(new JSONModel({ newSalaryValue: 0, CreationDate: new Date(), Comment: "" }), "form");
+                }
+
                 this.dialog.open();
+
 
         }
 
@@ -317,19 +332,97 @@ export default class Detail extends BaseController {
         }
 
         public async onSaveDialog(event: Button$PressEvent): Promise<void> {
+                const oModel = (this.getView() as View).getModel("form") as JSONModel;
+                const oData = oModel.getData();
+                if (this._validateForm(oData)) {
+                        // Si la validación pasa, procedemos con el guardado
 
-                const oModel = ( this.getView() as View).getModel("form") as JSONModel;
-                const sValue = oModel.getProperty("/newSalaryValue");
-                console.log("Valor desde el modelo:", sValue);
+                        const utils = new Utils(this);
+                        const context = this.getView()?.getBindingContext("mEmployees");;
+                        const sapId = utils.getEmail();
+                        const employeeId = context?.getProperty("EmployeeId");
+                        const salary = {
+                                path: '/Salaries',
+                                data: {
+                                        SapId: sapId,
+                                        // EmployeeId: "0007",
+                                        EmployeeId: employeeId,
+                                        Amount: oData.newSalary,
+                                        Waers: "EUR",
+                                        Comments: oData.comment,
+                                        CreationDate: oData.creationDate
+                                        //     SalaryId: "0001"
+                                }
+                        };
+                        // console.log("Nuevo Salario", salary);
+                        await utils.crud('createdetail', new JSONModel(salary));
+                        this.dialog.close();
+                        this.onNavToDetails();
+                } else {
+                        MessageBox.error("Por favor, complete los campos obligatorios.");
+                        //MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                }
 
-                // const oView = this.getView() as View;
-                // // Obtenemos el modelo por su nombre "form"
-                // const oModel = oView.getModel("form") as JSONModel;
+                //console.log("Todo el modelo:", oData);
 
-                // // Obtenemos todos los datos del modelo
-                // const oData = oModel.getData();
-
-                // console.log("Salario:", oData.Salario);
+                // const sValue = oModel.getProperty("/newSalaryValue");
+                // console.log("Valor específico:", sValue);
         }
 
+        private _validateForm(data: any): boolean {
+                // Obtenemos la referencia al input usando el ID que definimos en el fragment
+                // Recuerda que al usar Fragment.load con el ID de la vista, el ID es recuperable:
+                const oInputSalario = this.byId("idSalario") as Input;
+                const oDatePicker = this.byId("idDate") as DatePicker;
+                const oTextArea = this.byId("idTexto") as TextArea;
+                // const sValue = oInputSalario.getValue();
+                const sValue = data.newSalary;
+                let bValid = true;
+
+                // Validación: No vacío y mayor a cero
+                if (!data.newSalary || parseFloat(data.newSalary) <= 0) {
+                        oInputSalario.setValueState(ValueState.Error);
+                        oInputSalario.setValueStateText("El salario debe ser mayor a 0");
+                        bValid = false;
+                } else {
+                        oInputSalario.setValueState(ValueState.None);
+                }
+
+                if (!data.creationDate || parseFloat(data.creationDate) <= 0) {
+                        oDatePicker.setValueState(ValueState.Error);
+                        oDatePicker.setValueStateText("Ingresar Fecha");
+                        bValid = false;
+                } else {
+                        oDatePicker.setValueState(ValueState.None);
+                }
+
+                if (!data.comment || parseFloat(data.comment) <= 0) {
+                        oTextArea.setValueState(ValueState.Error);
+                        oTextArea.setValueStateText("Ingresar Comentario");
+                        bValid = false;
+                } else {
+                        oTextArea.setValueState(ValueState.None);
+                }
+                return bValid;
+        }
+
+        // Opcional: Limpiar el estado de error cuando el usuario escriba algo
+        public onInputChange(oEvent: any): void {
+                const oInput = oEvent.getSource() as Input;
+                if (oInput.getValue()) {
+                        oInput.setValueState(ValueState.None);
+                }
+        }
+        public onDateChange(oEvent: any): void {
+                const oDatePicker = oEvent.getSource() as DatePicker;
+                if (oDatePicker.getValue()) {
+                        oDatePicker.setValueState(ValueState.None);
+                }
+        }
+        public onTextChange(oEvent: any): void {
+                const oTextArea = oEvent.getSource() as TextArea;
+                if (oTextArea.getValue()) {
+                        oTextArea.setValueState(ValueState.None);
+                }
+        }
 }
