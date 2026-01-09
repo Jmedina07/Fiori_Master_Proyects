@@ -24,8 +24,7 @@ import UploadSet, { UploadSet$AfterItemRemovedEvent, UploadSet$BeforeUploadStart
 import UploadSetItem, { UploadSetItem$OpenPressedEvent } from "sap/m/upload/UploadSetItem";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import Item from "sap/ui/core/Item";
-import DataAnalyzer from "sap/sac/df/DataAnalyzer";
-import UIComponent from "sap/ui/core/UIComponent";
+
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -345,15 +344,35 @@ export default class NewEmployee extends BaseController {
 
     public checksteptwo(): void {
 
-        const oNameInput = this.byId("Name") as Input;
-        const oApellidoInput = this.byId("Apellido") as Input;
+        let vbal = true;
+        // const oNameInput = this.byId("Name") as Input;
+        // const oApellidoInput = this.byId("Apellido") as Input;
+        // const oCifInput = this.byId("Dni") as Input;
+        // const oDniInput = this.byId("Cif") as Input;
+        // const oDatePicker = this.byId("Date") as DatePicker;
 
         const steptwo = this.byId("steptwo") as WizardStep;
         // 2. Obtener el valor directamente del control
-        const name: string = oNameInput.getValue();
-        const apellido: string = oApellidoInput.getValue();
+        const name: string = ( this.byId("Name") as Input).getValue();
+        const apellido: string = ( this.byId("Apellido") as Input).getValue();
+        const cif: string = ( this.byId("Cif") as Input).getValue();
+        const dni: string = ( this.byId("Dni") as Input).getValue();
+         const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
         // console.log("Name;", name);
-        if (name.length > 3 && apellido.length > 5) {
+        if (name.length < 3 ) {
+            vbal = false;
+        }
+        else if (apellido.length < 5)
+        {
+            vbal = false;
+        }
+        else if (cif.length < 5 && dni.length < 5 ) {
+            vbal = false;
+        }
+        else if (date === null ) {
+            vbal = false;
+        }
+        if (vbal) {
             this._wizard.validateStep(steptwo);
         } else {
             this._wizard.invalidateStep(steptwo);
@@ -482,7 +501,7 @@ export default class NewEmployee extends BaseController {
     private async getId(): Promise<string> {
 
         const utils = new Utils(this);
-        let employeeId: string ="";
+        let employeeId: string = "";
         const object = {
             path: '/Users',
             filters: [
@@ -507,7 +526,7 @@ export default class NewEmployee extends BaseController {
             // Extraemos el mensaje del backend (basado en tu log de error)
 
 
-        } 
+        }
 
         // const results = await utils.read(new JSONModel(object)) as unknown as IReadResult;
         // const valores = results.results.map(res => res.EmployeeId);

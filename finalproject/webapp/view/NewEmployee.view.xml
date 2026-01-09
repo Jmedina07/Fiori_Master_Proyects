@@ -110,7 +110,7 @@
 									<Slider enableTickmarks="true" class="sapUiMediumMarginBottom" min="100" max="2000" value="400" id="Precio" />
 
 									<Label text="{i18n>lbldate}"/>
-									<DatePicker value="{/steptwo/date}" id="Date" valueFormat="yyyy-MM-dd" displayFormat="long" liveChange="checksteptwo"/>
+									<DatePicker value="{/steptwo/date}" id="Date" valueFormat="yyyy-MM-dd" displayFormat="long" liveChange="checksteptwo" required="true" afterValueHelpClose="checksteptwo"/>
 								</form:SimpleForm>
 
 						</WizardStep>

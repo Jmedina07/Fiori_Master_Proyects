@@ -44,9 +44,9 @@
 		<HBox alignItems="Center"> -->
             <Panel headerText="{i18n>titlepanel2}" width="auto" class="sapUiResponsiveMargin" >
 
-				<f:GridContainer id="grid2" borderReached=".onBorderReached">
+				<f:GridContainer id="grid" borderReached=".onBorderReached">
 					
-					<GenericTile header="" subheader="" press="onOrder"
+					<GenericTile header="" subheader="" press="onPedido"
 						headerImage="sap-icon://signature">
 						<layoutData>
 							<f:GridContainerItemLayoutData minRows="1" columns="2" />
