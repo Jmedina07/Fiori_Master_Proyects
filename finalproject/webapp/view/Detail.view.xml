@@ -108,8 +108,32 @@
                                                 design="Horizontal"
                                                 text="{i18n>lblHistorial}"
                                                 key="Heavy">
+                                                    <commons:Timeline 
+                                                        id="idTimeline" 
+                                                        enableDoubleSided="true"
+                                                        showFilterBar="false"
+                                                        content="{salaryModel>/}" 
+                                                        
+                                                        groupByType="Year"
+                                                        groupBy="CreationDate"
+                                                        textHeight="8"  
 
-                                                	<commons:Timeline
+                                                        growingThreshold="0"
+
+                                                        sortOldestFirst="false"                                                       
+                                                        
+                                                        >
+                                                        <commons:content>
+                                                            <commons:TimelineItem 
+                                                                dateTime="{salaryModel>CreationDate}"
+                                                                title="{salaryModel>Amount}"
+                                                                userName="{salaryModel>Waers}"
+                                                                text="{salaryModel>Comments}"
+                                                                filterValue="{salaryModel>SalaryId}"
+                                                                icon="sap-icon://money-bills" />
+                                                        </commons:content>
+                                                    </commons:Timeline>
+                                                	<!-- <commons:Timeline
                                                         id="idTimeline"
                                                         enableDoubleSided="true"
                                                         showFilterBar="false"
@@ -131,7 +155,7 @@
                                                                 >
                                                             </commons:TimelineItem>
                                                         </commons:content>
-                                                    </commons:Timeline>
+                                                    </commons:Timeline> -->
 
                                             </IconTabFilter>
                                         </items>
@@ -150,7 +174,7 @@
                     </uxap:sections>
                     <uxap:footer>
                         <OverflowToolbar>
-                            <ToolbarSpacer /> <Button type="Emphasized" text="Dar de Baja" press="onDeleteEmployee" />
+                            <ToolbarSpacer /> <Button type="Reject" text="Dar de Baja" press="onDeleteEmployee" />
                             <Button type="Transparent" text="Ascender" press="onAscender" />
                         </OverflowToolbar>
                     </uxap:footer>

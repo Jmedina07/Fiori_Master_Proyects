@@ -4,7 +4,7 @@ import JSONModel from "sap/ui/model/json/JSONModel";
 import Wizard from "sap/m/Wizard";
 import WizardStep from "sap/m/WizardStep";
 import NavContainer from "sap/m/NavContainer";
-import Page, { Page$NavButtonPressEvent } from "sap/m/Page";
+import Page from "sap/m/Page";
 import DynamicPage from "sap/f/DynamicPage";
 import Input from "sap/m/Input";
 import SegmentedButton, { SegmentedButton$SelectionChangeEvent } from "sap/m/SegmentedButton";
@@ -14,14 +14,13 @@ import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import Label from "sap/m/Label";
 import Text from "sap/m/Text";
-import MessageBox, { Action, Icon } from "sap/m/MessageBox";
-import ValueState from "sap/ui/core/ValueStateSupport";
+import MessageBox from "sap/m/MessageBox";
 import Utils from "../utils/Utils";
 import DatePicker from "sap/m/DatePicker";
 import TextArea from "sap/m/TextArea";
 import Filter from "sap/ui/model/Filter";
 import UploadSet, { UploadSet$AfterItemRemovedEvent, UploadSet$BeforeUploadStartsEvent, UploadSet$UploadCompletedEvent, UploadSet$AfterItemAddedEvent } from "sap/m/upload/UploadSet";
-import UploadSetItem, { UploadSetItem$OpenPressedEvent } from "sap/m/upload/UploadSetItem";
+import UploadSetItem from "sap/m/upload/UploadSetItem";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import Item from "sap/ui/core/Item";
 
@@ -57,7 +56,7 @@ interface History {
     prevDiffDeliverySelect: boolean | null;
 }
 // Variable de historial fuera de la clase para mantener el estado
-// El uso de 'var history' en el código original sugiere un estado global/estático.
+
 const history: History = {
     prevPaymentSelect: null,
     prevDiffDeliverySelect: null
@@ -117,7 +116,7 @@ export default class NewEmployee extends BaseController {
             Note: ""
         },
         selectedDeliveryMethod: "",
-        //titleClickable: false // Propiedad de DynamicPage
+
     };
     private loadIncidences(): void {
 
@@ -142,8 +141,6 @@ export default class NewEmployee extends BaseController {
                 amount: ""
             } as StepTwoData;
             this.model.setData(oData, true);
-            //this.model.setProperty("/steptwo", "Step Two");
-            //  this.model.setProperty("/steptwo", {});
 
         });
         // }, this);
@@ -177,12 +174,6 @@ export default class NewEmployee extends BaseController {
         // (Esto limpiará todos los campos de entrada, botones de segmento, etc. que estén enlazados al modelo)
         oModel.setData(this.initialModelData);
 
-        // Opcionalmente, puedes inicializar los Sliders a sus valores por defecto si no están enlazados al modelo
-        // const oSalarioSlider = this.byId("Salario") as Slider;
-        // oSalarioSlider.setValue(24000);
-        // const oPrecioSlider = this.byId("Precio") as Slider;
-        // oPrecioSlider.setValue(400);
-
         // 2. Volver al primer paso del Wizard
         const oFirstStep = this.byId("ContentsStep") as WizardStep;
         if (oWizard && oFirstStep) {
@@ -196,8 +187,6 @@ export default class NewEmployee extends BaseController {
                 oNavContainer.to(oDynamicPage.getId());
             }
 
-            // Opcional: Mostrar un mensaje
-            //MessageToast.show("Formulario y Wizard reiniciados.");
         } else {
             // Manejo de error si no se encuentra el Wizard o el primer paso
             console.error("No se encontró el Wizard o el primer paso.");
@@ -345,31 +334,24 @@ export default class NewEmployee extends BaseController {
     public checksteptwo(): void {
 
         let vbal = true;
-        // const oNameInput = this.byId("Name") as Input;
-        // const oApellidoInput = this.byId("Apellido") as Input;
-        // const oCifInput = this.byId("Dni") as Input;
-        // const oDniInput = this.byId("Cif") as Input;
-        // const oDatePicker = this.byId("Date") as DatePicker;
-
         const steptwo = this.byId("steptwo") as WizardStep;
         // 2. Obtener el valor directamente del control
-        const name: string = ( this.byId("Name") as Input).getValue();
-        const apellido: string = ( this.byId("Apellido") as Input).getValue();
-        const cif: string = ( this.byId("Cif") as Input).getValue();
-        const dni: string = ( this.byId("Dni") as Input).getValue();
-         const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
+        const name: string = (this.byId("Name") as Input).getValue();
+        const apellido: string = (this.byId("Apellido") as Input).getValue();
+        const cif: string = (this.byId("Cif") as Input).getValue();
+        const dni: string = (this.byId("Dni") as Input).getValue();
+        const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
         // console.log("Name;", name);
-        if (name.length < 3 ) {
+        if (name.length < 3) {
             vbal = false;
         }
-        else if (apellido.length < 5)
-        {
+        else if (apellido.length < 5) {
             vbal = false;
         }
-        else if (cif.length < 5 && dni.length < 5 ) {
+        else if (cif.length < 5 && dni.length < 5) {
             vbal = false;
         }
-        else if (date === null ) {
+        else if (date === null) {
             vbal = false;
         }
         if (vbal) {
@@ -424,7 +406,6 @@ export default class NewEmployee extends BaseController {
                 MessageBox.warning(sMessage, oActionConfig);
                 break;
             default:
-                // Esto no debería suceder gracias al tipado de MessageBoxFunction
                 MessageBox.show(sMessage, oActionConfig);
                 break;
         }
@@ -452,46 +433,82 @@ export default class NewEmployee extends BaseController {
     }
 
 
+    // public async saveEmployee(): Promise<void> {
+
+
+    //     await this.getScreenData();
+    //     const data = this.screendata.steptwo;
+    //     if (!this.isObjectEmpty(data)) {
+
+    //         const utils = new Utils(this);
+    //         const sEmpId = data.employeeId?.toString().substring(0, 4);
+    //         const oDate = new Date(); // O la fecha que desees
+    //         const employee = {
+    //             path: '/Users',
+    //             data: {
+    //                 SapId: data.sapId,
+    //                 EmployeeId: sEmpId,  //Descomentar
+    //                 Type: data.type,
+    //                 FirstName: data.name,
+    //                 LastName: data.apellido,
+    //                 Dni: data.dni,
+    //                 CreationDate: oDate
+    //                 // Aquí usamos el nombre de la Navigation Property definida en el metadata
+    //             },
+    //             ToSalary:
+    //             {
+    //                 SapId: data.sapId,
+    //                 EmployeeId: sEmpId,
+    //                 Amount: data.amount.toString(), // OData suele pedir importes como string
+    //                 Waers: "EUR",
+    //                 Comments: data.comment,
+    //                 CreationDate: oDate,
+    //                 SalaryId: "0001"
+    //             }
+
+    //         };
+    //         await utils.crud('createUser', new JSONModel(employee));
+    //         this.onStartUpload();
+    //         this.refreshScreen();
+    //     }
+
+    // }
     public async saveEmployee(): Promise<void> {
 
 
         await this.getScreenData();
         const data = this.screendata.steptwo;
         if (!this.isObjectEmpty(data)) {
-            //console.log(this.screendata.steptwo);
-
 
             const utils = new Utils(this);
+            const sEmpId = data.employeeId?.toString().substring(0, 4);
+            const oDate = new Date(); // O la fecha que desees
             const employee = {
                 path: '/Users',
                 data: {
                     SapId: data.sapId,
-                    EmployeeId: data.employeeId,  //Descomentar
+                    EmployeeId: sEmpId,  //Descomentar
                     Type: data.type,
                     FirstName: data.name,
                     LastName: data.apellido,
                     Dni: data.dni,
-                    CreationDate: data.creationDate
-                    //            Comments: comments
+                    CreationDate: oDate,
+                    UserToSalary:
+                        [
+                            {
+                                SapId: data.sapId,
+                                EmployeeId: sEmpId,
+                                Amount: data.amount.toString(), // OData suele pedir importes como string
+                                Waers: "EUR",
+                                Comments: data.comment,
+                                CreationDate: oDate,
+                                SalaryId: "0001"
+                            }
+                        ]
                 }
+
             };
-            const salary = {
-                path: '/Salaries',
-                data: {
-                    SapId: data.sapId,
-                    // EmployeeId: "0007",
-                    EmployeeId: data.employeeId,
-                    Amount: data.amount,
-                    Waers: "EUR",
-                    Comments: data.comment,
-                    CreationDate: data.creationDate,
-                    SalaryId: "0001"
-                }
-            };
-            console.log("Salario", salary);
-            // await utils.crud('create', new JSONModel(employee), new JSONModel(salary)); //Descomentar
             await utils.crud('create', new JSONModel(employee));
-            await utils.crud('createdetail', new JSONModel(salary));
             this.onStartUpload();
             this.refreshScreen();
         }
@@ -516,7 +533,6 @@ export default class NewEmployee extends BaseController {
             let valorMaximo = Math.max(...valores);
             valorMaximo++;
             employeeId = valorMaximo.toString().padStart(4, '0');
-            console.log(employeeId);
 
         } catch (oError) {
             // Aquí capturamos el error 400 sin que la app se detenga
@@ -528,14 +544,9 @@ export default class NewEmployee extends BaseController {
 
         }
 
-        // const results = await utils.read(new JSONModel(object)) as unknown as IReadResult;
-        // const valores = results.results.map(res => res.EmployeeId);
-        // let valorMaximo = Math.max(...valores);
-        // valorMaximo++;
-        // const employeeId: string = valorMaximo.toString().padStart(4, '0');
-        // console.log(employeeId);
         return employeeId;
     }
+
     private async getScreenData(): Promise<void> {
 
         const utils = new Utils(this);
@@ -578,7 +589,7 @@ export default class NewEmployee extends BaseController {
         this.screendata = {
             steptwo: data
         };
-        console.log(this.screendata);
+
     }
     private isObjectEmpty<T extends object>(obj: T): boolean {
         // Comprueba si el array de las claves del objeto tiene longitud 0
@@ -591,12 +602,9 @@ export default class NewEmployee extends BaseController {
         const token = model.getSecurityToken();
         const fileName = item.getFileName();
         const mediaType = item.getMediaType();
-
-        //await this.getScreenData();
         const data = this.screendata.steptwo;
-        console.log(data, "DAtos 2");
+
         if (!this.isObjectEmpty(data)) {
-            console.log(this.screendata.steptwo);
 
             const headerToken = new Item({
                 key: "x-csrf-token",

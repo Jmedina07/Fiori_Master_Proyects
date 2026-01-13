@@ -16,15 +16,6 @@
       "toolsId": "9cca3540-d221-4215-8d9e-468fd41cd9d6"
     },
     "dataSources": {
-      "YSAPUI5_SRV_01": {
-        "uri": "/sap/opu/odata/sap/YSAPUI5_SRV_01/",
-        "type": "OData",
-        "settings": {
-          "annotations": [],
-          "localUri": "localService/YSAPUI5_SRV_01/metadata.xml",
-          "odataVersion": "2.0"
-        }
-      },
       "ZEMPLOYEES_SRV": {
         "uri": "/sap/opu/odata/sap/ZEMPLOYEES_SRV/",
         "type": "OData",
@@ -71,15 +62,6 @@
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
           "bundleName": "com.logaligroup.finalproject.i18n.i18n"
-        }
-      },
-      "zinvoices": {
-        "dataSource": "YSAPUI5_SRV_01",
-        "preload": true,
-        "settings": {
-          "useBatch": false,
-          "defaultBindingMode": "TwoWay",
-          "defaultUpdateMethod": "PUT"
         }
       },
       "zemployees": {

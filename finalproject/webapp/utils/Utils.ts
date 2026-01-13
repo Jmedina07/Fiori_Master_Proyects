@@ -75,13 +75,56 @@ export default class Utils {
                     if (MessageBox.Action.OK == response) {
                         switch (action) {
                             case 'create': resolve(await this.create(object)); break;
-                            case 'createdetail': resolve(await this.createdetail(object)); break;
+                            case 'createUser': resolve(await this.createUser(object)); break;
+                            case 'createSalary': resolve(await this.create(object)); break;
                             case 'delete': resolve(await this.delete(object)); break;
+                            //case 'deepInsert': resolve(await.deepcreate(object)); break;
                         }
                     }
                 }
             });
         });
+    }
+    private async createUser(object?: JSONModel): Promise<void | ODataListBinding> {
+        // 1. Definimos un ID de grupo para el Batch y un ID de Changeset
+        const sGroupId = "userCreationGroup";
+        const sChangeSetId = "allOrNothing";
+        const model = this.model;
+        const path = object?.getProperty("/path");
+        const user = object?.getProperty("/data");
+        const salary = object?.getProperty("/ToSalary");
+        const resourceBundle = this.resourceBundle;
+        //console.log(object);
+        //console.log(body);
+        // 4. Creamos las entidades ASOCIÁNDOLAS al mismo ChangeSet
+        // El changeSetId es la clave para que SAP los trate como una sola transacción
+        model.create("/Users", user, {
+            groupId: sGroupId,
+            changeSetId: sChangeSetId
+        });
+
+        model.create("/Salaries", salary, {
+            groupId: sGroupId,
+            changeSetId: sChangeSetId
+        });
+
+        // 5. Enviamos el batch al servidor
+        const result = new Promise((resolve, reject) => {
+            model.submitChanges({
+                groupId: sGroupId,
+               success: async () => {
+                    //MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                    resolve(await this.read(object));
+
+                },
+                error: () => {
+                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    reject();
+                }
+            })
+            }) as Promise<void | ODataListBinding>;
+        console.log("Resultado de insert", result)
+        return result;
     }
 
     private async create(object?: JSONModel): Promise<void | ODataListBinding> {
@@ -90,17 +133,18 @@ export default class Utils {
         const path = object?.getProperty("/path");
         const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
-        //console.log(object);
-        //console.log(body);
+        console.log(object);
+        console.log(body);
         const result = new Promise((resolve, reject) => {
             model.create(path, body, {
                 success: async () => {
-                    //MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                    MessageBox.success(resourceBundle.getText("success") || 'no text defined');
                     resolve(await this.read(object));
 
                 },
-                error: () => {
-                    //MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                error: (oError: any) => {
+                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+                    console.error("Error detallado:", oError);
                     reject();
                 }
             });
@@ -114,8 +158,6 @@ export default class Utils {
         const path = object?.getProperty("/path");
         const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
-        //console.log(object);
-        //console.log(body);
         const result = new Promise((resolve, reject) => {
             model.create(path, body, {
                 success: async () => {
