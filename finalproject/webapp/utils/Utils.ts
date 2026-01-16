@@ -27,43 +27,78 @@ export default class Utils {
     public getEmail(): string {
         return "joel@logaligroup.com";
     }
-
-    public async read(object?: JSONModel): Promise<void | any> {
+    public async read(object?: JSONModel): Promise<any> {
         const model = this.model;
         let path = object?.getProperty("/path");
         const filters = object?.getProperty("/filters");
-        const urlParameters = model.getProperty("/urlParameters");
-        const resourceBundle = this.resourceBundle;
+        const urlParameters = object?.getProperty("/urlParameters"); // Nota: corregido de model a object si aplica
 
         if (path && typeof path === 'string') {
             path = path.split('(')[0];
         }
+
         return new Promise((resolve, reject) => {
             model.read(path, {
                 filters: filters,
                 urlParameters: urlParameters,
-                success: (data: ODataListBinding) => {
+                success: (data: any) => {
+                    // Si data.results existe, es una colección. Si no, es un objeto único.
                     resolve(data);
                 },
-                // error: () => {
-                //     reject();
-                // }
                 error: (error: any) => {
-                    // El error 400 de SAP suele venir en error.responseText
-                    try {
-                        const oResponse = JSON.parse(error.responseText);
-                        reject(oResponse);
-                    } catch (e) {
-                        reject(error);
+                    // 1. Verificar si es un error de "No encontrado" (404)
+                    if (error.statusCode === "404" || error.statusText === "Not Found") {
+                        console.warn("No se encontraron registros para la ruta:", path);
+                        resolve(null); // Resolvemos con null para que el programa continúe
+                    } else {
+                        // 2. Si es otro tipo de error (500, 403, etc.), sí lanzamos reject
+                        try {
+                            const oResponse = JSON.parse(error.responseText);
+                            reject(oResponse);
+                        } catch (e) {
+                            reject(error);
+                        }
                     }
                 }
             });
         });
     }
+    // public async read(object?: JSONModel): Promise<void | any> {
+    //     const model = this.model;
+    //     let path = object?.getProperty("/path");
+    //     const filters = object?.getProperty("/filters");
+    //     const urlParameters = model.getProperty("/urlParameters");
+    //     const resourceBundle = this.resourceBundle;
+
+    //     if (path && typeof path === 'string') {
+    //         path = path.split('(')[0];
+    //     }
+    //     return new Promise((resolve, reject) => {
+    //         model.read(path, {
+    //             filters: filters,
+    //             urlParameters: urlParameters,
+    //             success: (data: ODataListBinding) => {
+    //                 resolve(data);
+    //             },
+    //             // error: () => {
+    //             //     reject();
+    //             // }
+    //             error: (error: any) => {
+    //                 // El error 400 de SAP suele venir en error.responseText
+    //                 try {
+    //                     const oResponse = JSON.parse(error.responseText);
+    //                     reject(oResponse);
+    //                 } catch (e) {
+    //                     reject(error);
+    //                 }
+    //             }
+    //         });
+    //     });
+    // }
 
     // action = create, read, update, delete
     //public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
-    public async crud(action: string, object?: JSONModel): Promise<void | ODataListBinding> {
+    public async crud(action: string, object?: JSONModel): Promise<any> {
         //console.log(action);
         const resourceBundle = this.resourceBundle;
 
@@ -112,7 +147,7 @@ export default class Utils {
         const result = new Promise((resolve, reject) => {
             model.submitChanges({
                 groupId: sGroupId,
-               success: async () => {
+                success: async () => {
                     //MessageBox.success(resourceBundle.getText("success") || 'no text defined');
                     resolve(await this.read(object));
 
@@ -122,24 +157,26 @@ export default class Utils {
                     reject();
                 }
             })
-            }) as Promise<void | ODataListBinding>;
+        }) as Promise<void | ODataListBinding>;
         console.log("Resultado de insert", result)
         return result;
     }
 
-    private async create(object?: JSONModel): Promise<void | ODataListBinding> {
-
+    // private async create(object?: JSONModel): Promise<void | ODataListBinding> {
+    private async create(object?: JSONModel): Promise<any> {
         const model = this.model;
         const path = object?.getProperty("/path");
         const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
-        console.log(object);
-        console.log(body);
-        const result = new Promise((resolve, reject) => {
+    
+        return new Promise((resolve, reject) => {
             model.create(path, body, {
-                success: async () => {
+                // success: async () => {
+                //     MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+                //     resolve(await this.read(object));
+                success: async (oData: any) => { // oData contiene la respuesta del backend
                     MessageBox.success(resourceBundle.getText("success") || 'no text defined');
-                    resolve(await this.read(object));
+                    resolve(oData);
 
                 },
                 error: (oError: any) => {
@@ -148,9 +185,9 @@ export default class Utils {
                     reject();
                 }
             });
-        }) as Promise<void | ODataListBinding>;
-        console.log("Resultado de insert", result)
-        return result;
+        });
+        // console.log("Resultado de insert", result)
+        // return result;
     }
     private async createdetail(object?: JSONModel): Promise<void | ODataListBinding> {
 
@@ -175,28 +212,56 @@ export default class Utils {
         return result;
     }
 
-    private async delete(object?: JSONModel): Promise<void | ODataListBinding> {
-
-        //const model = this.model;
+    private delete(object?: JSONModel): Promise<void> {
         const path = object?.getProperty("/path");
-        //const body = object?.getProperty("/data");
         const resourceBundle = this.resourceBundle;
-
-        //console.log("Remove Utils");
 
         return new Promise((resolve, reject) => {
             this.model.remove(path, {
-                success: async () => {
-                    MessageBox.success(resourceBundle.getText("success") || 'no text defined');
-                    resolve(await this.read(object));
+                success: () => {
+                    MessageBox.success(resourceBundle.getText("success") || 'Registro eliminado', {
+                        onClose: async () => {
+                            // Es mejor refrescar después de que el usuario cierre el mensaje
+                            try {
+                                // if (object) {
+                                //     await this.read(object);
+                                // }
+                                resolve(); // Ahora sí, el flujo continúa
+                            } catch (err) {
+                                reject(err);
+                            }
+                        }
+                    });
                 },
-                error: () => {
-                    MessageBox.error(resourceBundle.getText("error") || 'no text defined');
-                    reject();
+                error: (error: any) => {
+                    MessageBox.error(resourceBundle.getText("error") || 'Error al eliminar');
+                    reject(error);
                 }
             });
         });
-
     }
+    // private async delete(object?: JSONModel): Promise<void | ODataListBinding> {
+
+    //     //const model = this.model;
+    //     const path = object?.getProperty("/path");
+    //     //const body = object?.getProperty("/data");
+    //     const resourceBundle = this.resourceBundle;
+
+    //     //console.log("Remove Utils");
+
+    //     return new Promise((resolve, reject) => {
+    //         this.model.remove(path, {
+    //             success: async () => {
+    //                 MessageBox.success(resourceBundle.getText("success") || 'no text defined');
+    //                 resolve(await this.read(object));
+    //             },
+    //             error: () => {
+    //                 MessageBox.error(resourceBundle.getText("error") || 'no text defined');
+    //                 reject();
+    //             }
+    //         });
+    //     });
+
+    // }
 
 }

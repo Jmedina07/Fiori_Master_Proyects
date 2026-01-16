@@ -23,6 +23,7 @@ import UploadSet, { UploadSet$AfterItemRemovedEvent, UploadSet$BeforeUploadStart
 import UploadSetItem from "sap/m/upload/UploadSetItem";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import Item from "sap/ui/core/Item";
+import View from "sap/ui/core/mvc/View";
 
 /**
  * @namespace com.logaligroup.finalproject.controller
@@ -44,6 +45,25 @@ interface StepTwoData {
     type?: string;
     amount: string
 }
+// interface EmployeeData {
+//     SapId: string;
+//     Type: string;
+//     FirstName: string;
+//     LastName: string;
+//     Dni: string;
+//     CreationDate?: Date | null;
+//     // ... otros campos
+//     // UserToSalary:
+//     // {
+//     //     SapId: string;
+//     //     Amount: string;
+//     //     Waers: string;
+//     //     Comments: string;
+//     //     CreationDate: Date;
+//     // }[];
+//     UserToSalary: any[];
+//     // UserToAttachment: any[];
+// }
 interface ModelData {
     // Estas son las rutas de binding usadas en el XML
     //titleClickable: boolean;
@@ -69,27 +89,31 @@ export default class NewEmployee extends BaseController {
     private model!: JSONModel;
     private screendata: ModelData;
     private oUploadSet!: UploadSet;
+    // private _oEmployee: { path: string, data: EmployeeData };
 
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
 
-
-
         const router = this.getRouter();
         router.getRoute("RouteNewEmployee")?.attachPatternMatched(this.onBindElement.bind(this));
-        // Inicializamos el modelo con una lista vacía de archivos Prueba Lista de Archivos
-        const oData = {
-            files: [] as Array<{ name: string }>
-        };
-        const oModel = new JSONModel(oData);
-        this.getView()?.setModel(oModel, "form");
+
+        // 1. Modelo para archivos
+        const oData = { files: [] as Array<{ name: string }> };
+        const oFormModel = new JSONModel(oData);
+        this.getView()?.setModel(oFormModel, "form");
+
+        // 2. CORRECCIÓN: Asignar a la propiedad de la clase this.model
+        this.model = new JSONModel(Object.assign({}, this.initialModelData));
+        this.getView()?.setModel(this.model); // Modelo por defecto
+
     }
     // Define la estructura inicial/vacía de tu modelo
     private initialModelData: any = {
+
         selectedOption: "", // Para el SegmentedButton
         steptwo: {
-            name: "Prueba",
+            name: "",
             apellido: "",
             dni: null,
             cif: null,
@@ -107,109 +131,162 @@ export default class NewEmployee extends BaseController {
         // como /CreditCard, /CashOnDelivery, /BillingAddress, etc. si las usas.
 
         // Propiedades de ejemplo para el modelo
-        selectedPayment: "",
-        BillingAddress: {
-            Address: "",
-            City: "",
-            ZipCode: "",
-            Country: "",
-            Note: ""
-        },
-        selectedDeliveryMethod: "",
+        // selectedPayment: "",
+        // BillingAddress: {
+        //     Address: "",
+        //     City: "",
+        //     ZipCode: "",
+        //     Country: "",
+        //     Note: ""
+        // },
+        // selectedDeliveryMethod: "",
 
     };
     private loadIncidences(): void {
-
+        // Buscamos el control
         const oWizard = this.byId("employeeWizard") as Wizard;
+
+        // Asignamos a la propiedad privada de la clase
+        if (oWizard) {
+            this._wizard = oWizard;
+        } else {
+            console.error("No se pudo encontrar el Wizard 'employeeWizard'");
+            return;
+        }
+
         this._oNavContainer = this.byId("navContainer") as NavContainer;
         this._oDynamicPage = this.getPage();
 
-        this.model = new JSONModel();
-
-        // Usamos attachRequestCompleted para manejar la carga asíncrona de datos
-        this.model.attachRequestCompleted({}, () => {
-            const oData = this.model.getData() as ModelData;
-            oData.steptwo = {
-                name: "",
-                apellido: "",
-                dni: "",
-                //creationDate: cle,
-                comment: "",
-                sapId: "",
-                employeeId: "",
-                type: "",
-                amount: ""
-            } as StepTwoData;
-            this.model.setData(oData, true);
-
-        });
-        // }, this);
-        //this.model.updateBindings();
-        // Cargar datos (asume que los paths son correctos en un proyecto real)
-        this.model.loadData(sap.ui.require.toUrl("sap/ui/demo/mock/products.json"));
-        this.getView()?.setModel(this.model);
-        // Realiza una verificación de tipo para asegurar que es un Wizard (buena práctica de TS)
-        if (oWizard instanceof Wizard) {
-            this._wizard = oWizard;
-        } else {
-            // Manejo de error si el ID es incorrecto o el control no es un Wizard
-            console.error("Control con ID 'wizard' no encontrado o no es un sap.m.Wizard.");
-            // O lanza un error: throw new Error("Wizard no encontrado.");
+        // Asegurar que el modelo esté vinculado
+        if (!this.model) {
+            this.model = this.getView()?.getModel() as JSONModel;
         }
-        const buton = this.byId("savebuton") as Button;
-        buton.setVisible(false);
 
+        const oSaveBtn = this.byId("savebuton") as Button;
+        if (oSaveBtn) oSaveBtn.setVisible(false);
     }
     /**
          * Reinicia el Wizard al primer paso y limpia los datos.
          */
     private _resetWizard(): void {
-
         const oWizard = this.byId("employeeWizard") as Wizard;
-        //const oModel = this.getView().getModel() as JSONModel;
 
-        const oModel = this.model = new JSONModel();
+        // 1. Limpiar los datos del modelo principal sin destruirlo
+        // 1. Limpiar modelo principal
 
-        // 1. Reiniciar el modelo de datos a su estado inicial
-        // (Esto limpiará todos los campos de entrada, botones de segmento, etc. que estén enlazados al modelo)
-        oModel.setData(this.initialModelData);
+        if (this.model) {
+            // Opción A: Crear un objeto totalmente nuevo basado en la estructura inicial
+            // Esto rompe cualquier referencia a datos anteriores
+            const oEmptyData = JSON.parse(JSON.stringify(this.initialModelData));
 
-        // 2. Volver al primer paso del Wizard
-        const oFirstStep = this.byId("ContentsStep") as WizardStep;
-        if (oWizard && oFirstStep) {
-            // Ir al primer paso
-            oWizard.discardProgress(oFirstStep, false);
+            // Opción B: Forzar manualmente los campos clave a vacío si la estructura falla
+            oEmptyData.selectedOption = "";
+            oEmptyData.steptwo.name = "";
+            oEmptyData.steptwo.apellido = "";
+            oEmptyData.steptwo.dni = null;
+            oEmptyData.steptwo.cif = null;
+            oEmptyData.steptwo.creationDate = null;
+            oEmptyData.steptwo.comment = "";
 
-            // Opcional: Reiniciar la navegación al primer Page
-            const oNavContainer = this.byId("navContainer") as NavContainer;
-            const oDynamicPage = this.byId("dynamicPage") as DynamicPage;
-            if (oNavContainer && oDynamicPage) {
-                oNavContainer.to(oDynamicPage.getId());
-            }
-
-        } else {
-            // Manejo de error si no se encuentra el Wizard o el primer paso
-            console.error("No se encontró el Wizard o el primer paso.");
+            this.model.setData(oEmptyData);
+            this.model.updateBindings(true); // <--- Vital para que la UI se entere
         }
-        // 2. Limpiar el UploadSet manualmente
+
+        // 2. Limpiar el modelo de archivos (form)
+        const oFormModel = this.getView()?.getModel("form") as JSONModel;
+        if (oFormModel) {
+            oFormModel.setProperty("/files", []);
+        }
+
         const oUploadSet = this.byId("upload") as UploadSet;
         if (oUploadSet) {
-            oUploadSet.removeAllItems();
+            // Eliminar items cargados
+            const aItems = oUploadSet.getItems();
+            aItems.forEach((oItem: any) => {
+                oUploadSet.removeItem(oItem);
+                oItem.destroy();
+            });
+            // B. IMPORTANTE: Eliminar items que están pendientes de subir (la cola visual)
+            const aIncompleteItems = oUploadSet.getIncompleteItems() || [];
+            aIncompleteItems.forEach((oItem: any) => {
+                oUploadSet.removeItem(oItem);
+                oItem.destroy();
+            });
+            // Limpiar el input oculto del navegador
+            const oUploader = oUploadSet.getDefaultFileUploader();
+            if (oUploader) {
+                oUploader.clear();
+            }
+
+            // Limpiar items incompletos
             oUploadSet.removeAllIncompleteItems();
         }
-        const oInitialData = {
-            name: "",
-            apellido: "",
-            dni: "",
-            cif: "",
-            date: null,
-            salario: 24000, // Valor inicial del slider
-            precio: 400     // Valor inicial del slider
-        };
 
-        // 3. Actualizar la ruta del modelo
-        oModel.setProperty("/steptwo", oInitialData);
+        // 4. Resetear el Wizard al paso 1
+        const oFirstStep = this.byId("ContentsStep") as WizardStep;
+        if (oWizard && oFirstStep) {
+            oWizard.discardProgress(oFirstStep, false);
+            oWizard.goToStep(oFirstStep, false);
+        }
     }
+    // private _resetWizard(): void {
+
+    //     const oWizard = this.byId("employeeWizard") as Wizard;
+    //     //const oModel = this.getView().getModel() as JSONModel;
+
+    //     const oModel = this.model = new JSONModel();
+
+    //     // 1. Reiniciar el modelo de datos a su estado inicial
+    //     // (Esto limpiará todos los campos de entrada, botones de segmento, etc. que estén enlazados al modelo)
+    //     oModel.setData(this.initialModelData);
+
+    //     // 2. Volver al primer paso del Wizard
+    //     const oFirstStep = this.byId("ContentsStep") as WizardStep;
+    //     if (oWizard && oFirstStep) {
+    //         // Ir al primer paso
+    //         oWizard.discardProgress(oFirstStep, false);
+
+    //         // Opcional: Reiniciar la navegación al primer Page
+    //         const oNavContainer = this.byId("navContainer") as NavContainer;
+    //         const oDynamicPage = this.byId("dynamicPage") as DynamicPage;
+    //         if (oNavContainer && oDynamicPage) {
+    //             oNavContainer.to(oDynamicPage.getId());
+    //         }
+
+    //     } else {
+    //         // Manejo de error si no se encuentra el Wizard o el primer paso
+    //         console.error("No se encontró el Wizard o el primer paso.");
+    //     }
+    //     // 2. Limpiar el UploadSet manualmente
+    //     const oUploadSet = this.byId("upload") as UploadSet;
+    //     if (oUploadSet) {
+    //         const oform = this.getView()?.getModel("form") as JSONModel;
+
+    //         if (oform) {
+    //             // Asignar un array vacío a la propiedad específica
+    //             oform.setProperty("/files", []);
+    //         }
+
+    //         oUploadSet.removeAllItems();
+    //         oUploadSet.removeAllIncompleteItems();
+    //         const oUploader = oUploadSet.getDefaultFileUploader();
+    //         if (oUploader) {
+    //             oUploader.clear();
+    //         }
+    //     }
+    //     const oInitialData = {
+    //         name: "",
+    //         apellido: "",
+    //         dni: "",
+    //         cif: "",
+    //         date: null,
+    //         salario: 24000, // Valor inicial del slider
+    //         precio: 400     // Valor inicial del slider
+    //     };
+
+    //     // 3. Actualizar la ruta del modelo
+    //     oModel.setProperty("/steptwo", oInitialData);
+    // }
     public completedHandler(): void {
         const oModel = this.getView()?.getModel("form") as JSONModel;
         let aFiles = oModel.getProperty("/files") as Array<{ name: string }>;
@@ -260,7 +337,7 @@ export default class NewEmployee extends BaseController {
 
     }
     private onBindElement(event: Route$PatternMatchedEvent): void {
-
+        this._resetWizard();
         this.loadIncidences();
         this.frontcustomizing();
 
@@ -268,6 +345,15 @@ export default class NewEmployee extends BaseController {
     public onSegmentedButtonChange(oEvent: SegmentedButton$SelectionChangeEvent): void {
         this.setDiscardableProperty({
             message: "Are you sure you want to change the Employee type ? This will discard your progress.",
+            discardStepId: "ContentsStep",
+            modelPath: "/selectedOption",
+            historyPath: "prevPaymentSelect"
+        });
+
+    }
+    public onchange(): void {
+        this.setDiscardableProperty({
+            message: "",
             discardStepId: "ContentsStep",
             modelPath: "/selectedOption",
             historyPath: "prevPaymentSelect"
@@ -332,28 +418,37 @@ export default class NewEmployee extends BaseController {
     }
 
     public checksteptwo(): void {
+        // SEGURIDAD: Si _wizard es undefined, intentamos recuperarlo de nuevo
+        if (!this._wizard) {
+            this._wizard = this.byId("employeeWizard") as Wizard;
+        }
+
+        // Si después de intentar recuperarlo sigue fallando, salimos de la función
+        if (!this._wizard) {
+            return;
+        }
 
         let vbal = true;
         const steptwo = this.byId("steptwo") as WizardStep;
-        // 2. Obtener el valor directamente del control
+
         const name: string = (this.byId("Name") as Input).getValue();
         const apellido: string = (this.byId("Apellido") as Input).getValue();
         const cif: string = (this.byId("Cif") as Input).getValue();
         const dni: string = (this.byId("Dni") as Input).getValue();
         const date: Date | null = (this.byId("Date") as DatePicker).getDateValue();
-        // console.log("Name;", name);
+
+        // Lógica de validación
         if (name.length < 3) {
             vbal = false;
-        }
-        else if (apellido.length < 5) {
+        } else if (apellido.length < 5) {
+            vbal = false;
+        } else if (cif.length < 5 && dni.length < 5) {
+            vbal = false;
+        } else if (date === null) {
             vbal = false;
         }
-        else if (cif.length < 5 && dni.length < 5) {
-            vbal = false;
-        }
-        else if (date === null) {
-            vbal = false;
-        }
+
+        // Ahora es seguro llamar a los métodos
         if (vbal) {
             this._wizard.validateStep(steptwo);
         } else {
@@ -433,46 +528,6 @@ export default class NewEmployee extends BaseController {
     }
 
 
-    // public async saveEmployee(): Promise<void> {
-
-
-    //     await this.getScreenData();
-    //     const data = this.screendata.steptwo;
-    //     if (!this.isObjectEmpty(data)) {
-
-    //         const utils = new Utils(this);
-    //         const sEmpId = data.employeeId?.toString().substring(0, 4);
-    //         const oDate = new Date(); // O la fecha que desees
-    //         const employee = {
-    //             path: '/Users',
-    //             data: {
-    //                 SapId: data.sapId,
-    //                 EmployeeId: sEmpId,  //Descomentar
-    //                 Type: data.type,
-    //                 FirstName: data.name,
-    //                 LastName: data.apellido,
-    //                 Dni: data.dni,
-    //                 CreationDate: oDate
-    //                 // Aquí usamos el nombre de la Navigation Property definida en el metadata
-    //             },
-    //             ToSalary:
-    //             {
-    //                 SapId: data.sapId,
-    //                 EmployeeId: sEmpId,
-    //                 Amount: data.amount.toString(), // OData suele pedir importes como string
-    //                 Waers: "EUR",
-    //                 Comments: data.comment,
-    //                 CreationDate: oDate,
-    //                 SalaryId: "0001"
-    //             }
-
-    //         };
-    //         await utils.crud('createUser', new JSONModel(employee));
-    //         this.onStartUpload();
-    //         this.refreshScreen();
-    //     }
-
-    // }
     public async saveEmployee(): Promise<void> {
 
 
@@ -482,38 +537,120 @@ export default class NewEmployee extends BaseController {
 
             const utils = new Utils(this);
             const sEmpId = data.employeeId?.toString().substring(0, 4);
-            const oDate = new Date(); // O la fecha que desees
+            //const oDate = new Date(); // O la fecha que desees
             const employee = {
                 path: '/Users',
                 data: {
                     SapId: data.sapId,
-                    EmployeeId: sEmpId,  //Descomentar
+                    // EmployeeId: sEmpId,  //Descomentar
                     Type: data.type,
                     FirstName: data.name,
                     LastName: data.apellido,
                     Dni: data.dni,
-                    CreationDate: oDate,
-                    UserToSalary:
+                    CreationDate: data.creationDate,
+                    Comments: data.comment,
+                    UserToSalary: 
                         [
                             {
                                 SapId: data.sapId,
-                                EmployeeId: sEmpId,
+                                // EmployeeId: sEmpId,
                                 Amount: data.amount.toString(), // OData suele pedir importes como string
                                 Waers: "EUR",
                                 Comments: data.comment,
-                                CreationDate: oDate,
-                                SalaryId: "0001"
+                                CreationDate: data.creationDate
+                                // SalaryId: "0001"
                             }
                         ]
+                    // Aquí usamos el nombre de la Navigation Property definida en el metadata
                 }
 
+
             };
-            await utils.crud('create', new JSONModel(employee));
+            // await utils.crud('createUser', new JSONModel(employee));
+            const result = await utils.crud('create', new JSONModel(employee));
+            this.screendata.steptwo.employeeId = result.EmployeeId;
+            const dataprev = this.initialModelData;
             this.onStartUpload();
             this.refreshScreen();
+
         }
 
     }
+    // public async saveEmployee(): Promise<void> {
+
+    //     const oFormData = this.getView()?.getModel("form") as JSONModel;
+    //     await this.getScreenData();
+    //     const data = this.screendata.steptwo;
+    //     if (!this.isObjectEmpty(data)) {
+
+    //         const utils = new Utils(this);
+    //         const sEmpId = data.employeeId?.toString().substring(0, 4);
+    //         const oDate = new Date(); // O la fecha que desees
+    //         // Dentro de tu función de guardado:
+    //         this._oEmployee.data = {
+    //             SapId: data.sapId,
+    //             Type: data.type,
+    //             FirstName: data.name,
+    //             LastName: data.apellido,
+    //             Dni: data.dni,
+    //             CreationDate: oDate,
+    //             UserToSalary: []
+    //             // UserToAttachment: []
+    //             // UserToAttachment: oFormData.getProperty("/attachments")
+    //         } as EmployeeData;
+    //         this._oEmployee.data.UserToSalary.push({
+    //             SapId: data.sapId,
+    //             Amount: data.amount.toString(),
+    //             Waers: "EUR",
+    //             Comments: data.comment,
+    //             CreationDate: oDate
+    //         });
+    //         // const files = oFormData.getProperty("/files");
+    //         // this._oEmployee.data.UserToAttachment.push(oFormData.getProperty("/files"));
+
+    //         const result = await utils.crud('create', new JSONModel(this._oEmployee));
+    //         this.screendata.steptwo.employeeId = result.EmployeeId;
+    //         console.log("resultado", result);
+    //         // const employee = {
+    //         //     path: '/Users',
+    //         //     data: {
+    //         //         SapId: data.sapId,
+    //         //         //EmployeeId: sEmpId,  //Descomentar
+    //         //         Type: data.type,
+    //         //         FirstName: data.name,
+    //         //         LastName: data.apellido,
+    //         //         Dni: data.dni,
+    //         //         CreationDate: oDate,
+    //         //         UserToSalary:
+    //         //             [
+    //         //                 {
+    //         //                     SapId: data.sapId,
+    //         //                     //EmployeeId: sEmpId,
+    //         //                     Amount: data.amount.toString(), // OData suele pedir importes como string
+    //         //                     Waers: "EUR",
+    //         //                     Comments: data.comment,
+    //         //                     CreationDate: oDate
+    //         //                     // SalaryId: "0001"
+    //         //                 }
+    //         //             ],
+    //         //         UserToAttachment: [
+    //         //             {
+    //         //                 SapId: data.sapId,
+    //         //                 EmployeeId: "",
+    //         //                 DocName: "",
+    //         //                 MimeType: ""
+    //         //             }
+
+    //         //         ]
+    //         //     }
+
+    //         // };            
+    //         //await utils.crud('create', new JSONModel(employee));
+    //         this.onStartUpload();
+    //         this.refreshScreen();
+    //     }
+
+    // }
 
     private async getId(): Promise<string> {
 
@@ -550,6 +687,10 @@ export default class NewEmployee extends BaseController {
     private async getScreenData(): Promise<void> {
 
         const utils = new Utils(this);
+        const sapId = utils.getEmail();
+
+
+        const model = this.initialModelData;
         const resourceBundle = (this.getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle;
         const name = (this.byId("Name") as Input).getValue().toString();
         const apellido = (this.byId("Apellido") as Input).getValue().toString();
@@ -571,8 +712,7 @@ export default class NewEmployee extends BaseController {
         //const note = this.model.getProperty("/stepthree/Note");
         const comments = (this.byId("Note") as TextArea).getValue().toString();
         //const employeeId = "1";
-        const employeeId = (await this.getId()).toString();
-        const sapId = utils.getEmail()
+        //const employeeId = (await this.getId()).toString();
 
 
         const data = {
@@ -582,7 +722,7 @@ export default class NewEmployee extends BaseController {
             creationDate: date,
             comment: comments,
             sapId: sapId,
-            employeeId: employeeId,
+            //employeeId: employeeId,
             type: type,
             amount: amount
         } as StepTwoData;
@@ -596,6 +736,7 @@ export default class NewEmployee extends BaseController {
         return Object.keys(obj).length === 0;
     }
     public async onBeforeUpload(event: UploadSet$BeforeUploadStartsEvent): Promise<void> {
+
 
         const item = event.getParameter("item") as UploadSetItem;
         const model = this.getOwnerComponent()?.getModel("zemployees") as ODataModel;
@@ -634,8 +775,8 @@ export default class NewEmployee extends BaseController {
         uploadSet.getBinding("items")?.refresh();
     }
     /**
-    * Se dispara cuando el usuario agrega un archivo al UploadSet
-     */
+        * Se dispara cuando el usuario agrega un archivo al UploadSet
+             */
     public onFileAdded(oEvent: UploadSet$AfterItemAddedEvent): void {
         const oItem = oEvent.getParameter("item") as UploadSetItem;
         const oModel = this.getView()?.getModel("form") as JSONModel;
@@ -647,10 +788,12 @@ export default class NewEmployee extends BaseController {
         });
 
         oModel.setProperty("/files", aFiles);
+
     }
     /**
          * Se dispara cuando el usuario elimina un archivo del UploadSet
          */
+
     public onFileRemoved(oEvent: UploadSet$AfterItemRemovedEvent): void {
         const oItem = oEvent.getParameter("item") as UploadSetItem;
         const oModel = this.getView()?.getModel("form") as JSONModel;
@@ -662,11 +805,30 @@ export default class NewEmployee extends BaseController {
         oModel.setProperty("/files", aFiles);
     }
 
+    // public refreshScreen(): void {
+    //     this.loadIncidences();
+    //     const firstStep = this._wizard.getSteps()[0];
+    //     this._wizard.discardProgress(firstStep, false);
+    //     this._resetWizard();
+    //     this.handleNavBackToFirst();
+    //     this.onchange();
+    // }
     public refreshScreen(): void {
-        this.loadIncidences();
-        const firstStep = this._wizard.getSteps()[0];
-        this._wizard.discardProgress(firstStep, false);
+        // 1. Volvemos a la página principal donde está el Wizard 
+        // (Esto es vital porque si estás en wizardReviewPage no verás los cambios)
+        this._oNavContainer.to(this._oDynamicPage);
+
+        // 2. Ejecutamos la limpieza profunda
+        const dataprev2 = this.initialModelData;
         this._resetWizard();
-        this.handleNavBackToFirst();
+        this.loadIncidences();
+        this.frontcustomizing();
+
+        // 3. Ocultar el botón de guardado (que se activó al final del Wizard anterior)
+        const oSaveBtn = this.byId("savebuton") as Button;
+        if (oSaveBtn) {
+            oSaveBtn.setVisible(false);
+        }
     }
+
 }

@@ -12,6 +12,7 @@ import Table from "sap/m/Table";
 import ListBinding from "sap/ui/model/ListBinding";
 import ObjectListItem from "sap/m/ObjectListItem";
 import Event from "sap/ui/base/Event";
+import View from "sap/ui/core/mvc/View";
 /**
  * @namespace com.logaligroup.finalproject.controller
  */
@@ -35,6 +36,7 @@ export default class Employees extends BaseController {
             ID: "0"
         });
 
+
     }
 
     private async read(): Promise<void> {
@@ -50,17 +52,44 @@ export default class Employees extends BaseController {
                 "$expand": "UserToAttachment"
             }
         };
+        try {
+            const employees = await utils.read(new JSONModel(filter));
+            this.showResults(employees);
+        } catch (error) {
+            this.showResults();
+        }
 
-        const employees = await utils.read(new JSONModel(filter));
-        this.showResults(employees);  
+
     }
 
-    public showResults(data: void | ODataListBinding): void {
+    public showResults(data?: void | ODataListBinding): void {
         let results = data as any;
-        const oResultsModel = new JSONModel();
-        oResultsModel.setData(results.results);
+        // 1. Validamos si hay datos. Si no hay, inicializamos con un arreglo vacío.
+        const resultsArray = (results && results.results) ? results.results : [];
+
+        // 2. Creamos o actualizamos el modelo
+        const oResultsModel = new JSONModel(resultsArray);
+
+
+        //const oResultsModel = new JSONModel();
+        //oResultsModel.setData(results.results);
         this.getOwnerComponent()?.setModel(oResultsModel, "mEmployees");
-        const object = results as any;
+
+        // --- SECCIÓN DE LIMPIEZA DE BINDING ---
+        const view = this.getView() as View;
+
+        if (resultsArray.length === 0) {
+            // A. Si no hay datos, quitamos el enlace de la vista con cualquier registro previo
+            view.unbindElement("mEmployees");
+
+            // B. Si el ID del empleado está en un campo específico (ej. un Input), 
+            // a veces es necesario resetear el valor manualmente si no se limpia solo:
+            // this.byId("idInputEmpleado").setValue(""); 
+        }
+
+        // 4. OPCIONAL: Forzar el refresco si la UI no se entera
+        oResultsModel.updateBindings(true);
+
 
     }
 
@@ -76,7 +105,7 @@ export default class Employees extends BaseController {
 
         const model = this.getModel("view") as JSONModel;
         const router = this.getRouter();
- 
+
     }
 
 

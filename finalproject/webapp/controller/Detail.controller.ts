@@ -128,7 +128,7 @@ export default class Detail extends BaseController {
 
         }
         // public showSalaries(data: void | ODataListBinding): void {
-        public showSalaries(data: any ): void {
+        public showSalaries(data?: any ): void {
                 const oTimeline = this.getView()?.byId("idTimeline") as Timeline;
                 console.log(data.results)
                 // 1. Creamos un modelo JSON con los resultados
@@ -273,7 +273,7 @@ export default class Detail extends BaseController {
                                 new Filter("EmployeeId", "EQ", employeeId)
                         ]
                 }
-                const results = await utils.crud('delete', new JSONModel(object));
+                await utils.crud('delete', new JSONModel(object));
                 this.onNavToDetails();
 
         }
@@ -313,6 +313,8 @@ export default class Detail extends BaseController {
         }
 
         public onCloseDialog(): void {
+                const oModel = (this.getView() as View).getModel("form") as JSONModel;
+                oModel.setData([]);
                 this.dialog.close();
         }
 
@@ -336,8 +338,11 @@ export default class Detail extends BaseController {
                                 }
                         };
                         await utils.crud('create', new JSONModel(salary));
+                        oModel.setData([]);                        
                         this.dialog.close();
-                        this.onNavToDetails();
+                        this.readSalary(employeeId);
+                        //this.onNavToDetails();
+
                 } else {
                         MessageBox.error("Por favor, complete los campos obligatorios.");
                 }

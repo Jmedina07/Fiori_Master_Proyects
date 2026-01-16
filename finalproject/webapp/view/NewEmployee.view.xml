@@ -208,8 +208,8 @@
 				<footer>
 					<Bar>
 						<contentRight>
-							<Button text="{i18n>buton4}" press="saveEmployee" id="Save"/>
-							<Button text="{i18n>buton5}" press="handleWizardCancel"/>
+							<Button text="{i18n>buton4}" press="saveEmployee" id="Save" type="Accept"/>
+							<Button text="{i18n>buton5}" press="handleWizardCancel" type="Reject"/>
 						</contentRight>
 					</Bar>
 				</footer>

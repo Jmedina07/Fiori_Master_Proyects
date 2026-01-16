@@ -64,7 +64,7 @@
 
                                 <VBox>
                                     <Label text="Comentario:" />
-                                    <Text text="{mEmployees>Salaries>Comments}" class="boldElement" />
+                                    <Text text="{mEmployees>Comments}" class="boldElement" />
                                 </VBox>
                             </HBox>                              
                                                                                                       
