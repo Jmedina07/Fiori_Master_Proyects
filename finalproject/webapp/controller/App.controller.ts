@@ -17,8 +17,8 @@ export default class App extends BaseController {
 
     private loadEmployees(): void {
         const model = new JSONModel();  //Modelos
-        model.loadData("../model/Employees.json");
-        this.setModel(model, "employees");
+        // model.loadData("../model/Employees.json");
+        // this.setModel(model, "employees");
     }
 
     private loadCountries(): void {

@@ -27,7 +27,7 @@
 						</TileContent>					
 					</GenericTile>
 
-					<GenericTile header="" subheader="" press="onviewEmployee" url="https://9b3a5cb2trial-dev-c25c385-2-approuter.cfapps.us10-001.hana.ondemand.com" id="linkFirmarPedido"
+					<GenericTile header="" subheader="" press="onviewEmployee" 
 						headerImage="sap-icon://employee-lookup">
 						<layoutData>
 							<f:GridContainerItemLayoutData minRows="2" columns="2" />
@@ -46,7 +46,7 @@
 
 				<f:GridContainer id="grid" borderReached=".onBorderReached">
 					
-					<GenericTile header="" subheader="" press="onPedido"
+					<GenericTile header="" subheader="" press="onPressFirmarPedido" url="https://9b3a5cb2trial-dev-c25c385-2-approuter.cfapps.us10-001.hana.ondemand.com" id="linkFirmarPedido"
 						headerImage="sap-icon://signature">
 						<layoutData>
 							<f:GridContainerItemLayoutData minRows="1" columns="2" />

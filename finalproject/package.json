@@ -13,6 +13,7 @@
     "@sap-ux/eslint-plugin-fiori-tools": "^0.4.0",
     "@sap/ux-ui5-tooling": "1",
     "@sapui5/types": "~1.136.0",
+    "@types/jquery": "^3.5.33",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@ui5/cli": "^4.0.33",
@@ -38,5 +39,8 @@
     "unit-test": "fiori run --open \"test/unit/unitTests.qunit.html\"",
     "build:cf": "ui5 build preload --clean-dest --config ui5-deploy.yaml --include-task=generateCachebusterInfo"
   },
-  "sapuxLayer": "CUSTOMER_BASE"
+  "sapuxLayer": "CUSTOMER_BASE",
+  "dependencies": {
+    "jquery": "^4.0.0"
+  }
 }

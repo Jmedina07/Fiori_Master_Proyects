@@ -82,25 +82,25 @@
 									</MessageStrip>
 
 									<Label text="{i18n>lblname}" required="true"/>
-									<Input  id="Name" liveChange="checksteptwo"
+									<Input  id="Name" change="checksteptwo"
 											placeholder="{i18n>placename}" value="{/steptwo/name}" />
 
 									<Label text="{i18n>lblapellido}" required="true"/>
 									<Input valueStateText="Enter digits"
 											id="Apellido"
-											liveChange="checksteptwo" placeholder="{i18n>placeapellido}"
+											change="checksteptwo" placeholder="{i18n>placeapellido}"
 											value="{/steptwo/apellido}"/>
 
 									<Label text="{i18n>lbldni}" required="true"/>
 									<Input valueStateText="Enter digits"
-											id="Dni" type="Number"
-											liveChange="checksteptwo" placeholder="{i18n>placedni}"
-											value="{/steptwo/dni}"/>
+											id="Dni" type="Text"
+											placeholder="{i18n>placedni}"
+											value="{/steptwo/dni}" change="checksteptwo"/>
 
 									<Label text="{i18n>lblcif}" required="true"/>
 									<Input valueStateText="Enter digits"
 											id="Cif" type="Number"
-											liveChange="checksteptwo" placeholder="{i18n>placecif}"
+											change="checksteptwo" placeholder="{i18n>placecif}"
 											value="{/steptwo/cif}"/>
 
 									<Label text="{i18n>lblsalario}" required="true"/>

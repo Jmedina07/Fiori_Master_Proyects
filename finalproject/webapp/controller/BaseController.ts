@@ -36,17 +36,12 @@ export default class BaseController extends Controller {
         if (sPreviousHash !== undefined) {
             history.go(-1);
         } else {
-    // Paso 2a: Cambiar el layout a OneColumn (solo Master visible)
-            // Necesitas la instancia del FCL. 
-            // ASUMO que el FCL tiene el ID "container-fcl" y es el padre de las vistas.
             const fcl = this.getView()?.getParent()?.getParent() as FlexibleColumnLayout;
 
             if (fcl && fcl.isA("sap.f.FlexibleColumnLayout")) {
                 fcl.setLayout("OneColumn"); 
             }
             
-            // Paso 2b: Navegar a la ruta Master
-            // Usamos el nombre de tu ruta: "RouteMaster"
             this.getRouter().navTo("RouteMaster", {}, true);
         }
     }

@@ -9,7 +9,6 @@ import Filter from "sap/ui/model/Filter";
 import UploadSet, { UploadSet$AfterItemRemovedEvent, UploadSet$BeforeUploadStartsEvent, UploadSet$UploadCompletedEvent } from "sap/m/upload/UploadSet";
 import UploadSetItem, { UploadSetItem$OpenPressedEvent } from "sap/m/upload/UploadSetItem";
 import File from "sap/ui/core/util/File";
-import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
 import UIComponent from "sap/ui/core/UIComponent";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import Item from "sap/ui/core/Item";
@@ -21,7 +20,7 @@ import Popover from "sap/m/Popover";
 import Fragment from "sap/ui/core/Fragment";
 import Dialog from "sap/m/Dialog";
 import Input from "sap/m/Input";
-import ValueState from "sap/ui/core/ValueState";
+import { ValueState } from "sap/ui/core/library";
 import MessageBox from "sap/m/MessageBox";
 import DatePicker from "sap/m/DatePicker";
 import TextArea from "sap/m/TextArea";
@@ -32,11 +31,10 @@ import TextArea from "sap/m/TextArea";
 export default class Detail extends BaseController {
 
         private _pPopover: Promise<Popover>;
-
+        private dialog: Dialog;
         /*eslint-disable @typescript-eslint/no-empty-function*/
         public onInit(): void {
 
-                // Inicializamos un modelo local para controlar el estado de selección
                 const oViewModel = new JSONModel({
                         selectedEmployee: false
                 });
@@ -46,23 +44,26 @@ export default class Detail extends BaseController {
         }
 
         private loadIncidences(): void {
+
                 const model = new JSONModel([]);
                 this.setModel(model, "form");
+
         }
 
         private onBindElement(event: Route$PatternMatchedEvent): void {
+
                 const id = (event.getParameter("arguments") as any).ID;
                 if (id == 0) {
                         this.refresh_data(id);
                 }
                 else {
+
                         const model = (this.getOwnerComponent() as UIComponent).getModel("mEmployees") as JSONModel;
                         const data = model.getData(); // Esto es el array de resultados
-                        // Buscamos el índice del empleado que coincida con el ID pasado por la ruta
                         const index = data.findIndex((emp: any) => emp.EmployeeId === id);
 
                         if (index !== -1) {
-                                // Creamos el path hacia el elemento específico: /0, /1, etc.
+
                                 const sPath = `/${index}`;
 
                                 const view = this.getView() as View;
@@ -88,6 +89,7 @@ export default class Detail extends BaseController {
                         }
                 }
 
+
         }
 
         private async refresh_data(employeeId?: string): Promise<void> {
@@ -107,6 +109,7 @@ export default class Detail extends BaseController {
                         oMessage.setVisible(true);
 
                 }
+
         }
 
         private async readSalary(employeeId: string): Promise<void> {
@@ -121,22 +124,16 @@ export default class Detail extends BaseController {
                         ]
                 };
                 const Salaries = await utils.read(new JSONModel(salary));
-                // console.log("Busqueda Salario", salary);
-                // console.log("Salario", Salaries);
                 this.showSalaries(Salaries);
 
-
         }
-        // public showSalaries(data: void | ODataListBinding): void {
+
         public showSalaries(data?: any ): void {
+
                 const oTimeline = this.getView()?.byId("idTimeline") as Timeline;
-                console.log(data.results)
-                // 1. Creamos un modelo JSON con los resultados
                 const aSalaries = data?.results || [];
                 const oJSONModel = new JSONModel({ salaries: aSalaries });
                 this.getView()?.setModel(oJSONModel, "timelineModel");
-
-                // 2. Definimos el template una sola vez (si no lo tienes en el XML)
                 const oItemTemplate = new TimelineItem({
                         title: "{timelineModel>Amount}",
                         userName: "{timelineModel>Waers}",
@@ -145,30 +142,13 @@ export default class Detail extends BaseController {
                         dateTime: "{timelineModel>CreationDate}"
                 });
 
-                // 3. Vinculamos la agregación. UI5 limpiará y creará todo automáticamente.
                 oTimeline.bindAggregation("content", {
                         path: "timelineModel>/salaries",
                         template: oItemTemplate
                 });
-                // let results = data as any;
-                // const oResultsModel = new JSONModel();
-                // const object = results as any;
-                // const oTimeline = this.getView()?.byId("idTimeline") as Timeline;
-                // oTimeline.removeAllContent(); // Limpia el contenido previo
-                // object.results.forEach((item: any) => {
-                //         const oTimelineItem = new TimelineItem({
-                //                 title: item.Amount,
-                //                 userName: item.Waers,
-                //                 text: item.Comments,
-                //                 filterValue: item.SalaryId,
-                //                 dateTime: item.CreationDate
-
-                //         });
-
-                //         oTimeline.addContent(oTimelineItem);
-                // });
 
         }
+
         private async searchFiles(employeeId: string): Promise<void> {
 
                 const utils = new Utils(this);
@@ -192,9 +172,11 @@ export default class Detail extends BaseController {
                                 openPressed: this.download.bind(this)
                         })
                 });
+
         }
 
         private async download(event: UploadSetItem$OpenPressedEvent): Promise<void> {
+
                 event.preventDefault();
                 const item = event.getSource() as UploadSetItem;
                 const context = item.getBindingContext("zemployees") as Context;
@@ -216,6 +198,7 @@ export default class Detail extends BaseController {
                 } catch (error) {
                         console.error("Error en la descarga:", error);
                 }
+
         }
 
         public async onAfterRemoved(event: UploadSet$AfterItemRemovedEvent): Promise<void> {
@@ -230,6 +213,7 @@ export default class Detail extends BaseController {
         }
 
         public onBeforeUpload(event: UploadSet$BeforeUploadStartsEvent): void {
+
                 const item = event.getParameter("item") as UploadSetItem;
                 const utils = new Utils(this);
                 const context = this.getView()?.getBindingContext("mEmployees");;
@@ -253,11 +237,14 @@ export default class Detail extends BaseController {
 
                 item.addHeaderField(headerToken);
                 item.addHeaderField(headerSlug);
+
         }
 
         public onUploadCompleted(event: UploadSet$UploadCompletedEvent): void {
+
                 const uploadSet = event.getSource();
                 uploadSet.getBinding("items")?.refresh();
+
         }
 
         public async onDeleteEmployee(event: Button$PressEvent): Promise<void> {
@@ -286,8 +273,9 @@ export default class Detail extends BaseController {
                 router.navTo("RouteEmployees");
 
         }
-        private dialog: Dialog;
+
         public async onAscender(oEvent: Button$PressEvent): Promise<void> {
+
                 const view = this.getView() as View;
                 if (!this.dialog) {
                         this.dialog = await Fragment.load({
@@ -296,14 +284,11 @@ export default class Detail extends BaseController {
                                 controller: this
                         }) as Dialog;
 
-                        // Agregar a la vista para que herede modelos y ciclo de vida
                         view.addDependent(this.dialog);
                 }
 
-                // Asegúrate de que el modelo existe con datos iniciales si es necesario
                 const oModel = view.getModel("form") as JSONModel;
                 if (!oModel) {
-                        // Si no existe, créalo para evitar errores
                         view.setModel(new JSONModel({ newSalaryValue: 0, CreationDate: new Date(), Comment: "" }), "form");
                 }
 
@@ -313,12 +298,15 @@ export default class Detail extends BaseController {
         }
 
         public onCloseDialog(): void {
+
                 const oModel = (this.getView() as View).getModel("form") as JSONModel;
                 oModel.setData([]);
                 this.dialog.close();
+
         }
 
         public async onSaveDialog(event: Button$PressEvent): Promise<void> {
+
                 const oModel = (this.getView() as View).getModel("form") as JSONModel;
                 const oData = oModel.getData();
                 if (this._validateForm(oData)) {
@@ -341,7 +329,6 @@ export default class Detail extends BaseController {
                         oModel.setData([]);                        
                         this.dialog.close();
                         this.readSalary(employeeId);
-                        //this.onNavToDetails();
 
                 } else {
                         MessageBox.error("Por favor, complete los campos obligatorios.");
@@ -350,6 +337,7 @@ export default class Detail extends BaseController {
         }
 
         private _validateForm(data: any): boolean {
+
                 const oInputSalario = this.byId("idSalario") as Input;
                 const oDatePicker = this.byId("idDate") as DatePicker;
                 const oTextArea = this.byId("idTexto") as TextArea;
@@ -379,24 +367,33 @@ export default class Detail extends BaseController {
                         oTextArea.setValueState(ValueState.None);
                 }
                 return bValid;
+
         }
 
         public onInputChange(oEvent: any): void {
+
                 const oInput = oEvent.getSource() as Input;
                 if (oInput.getValue()) {
                         oInput.setValueState(ValueState.None);
                 }
+
         }
+
         public onDateChange(oEvent: any): void {
+
                 const oDatePicker = oEvent.getSource() as DatePicker;
                 if (oDatePicker.getValue()) {
                         oDatePicker.setValueState(ValueState.None);
                 }
+
         }
+
         public onTextChange(oEvent: any): void {
+
                 const oTextArea = oEvent.getSource() as TextArea;
                 if (oTextArea.getValue()) {
                         oTextArea.setValueState(ValueState.None);
                 }
         }
+
 }
