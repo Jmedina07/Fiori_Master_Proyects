@@ -133,29 +133,6 @@
                                                                 icon="sap-icon://money-bills" />
                                                         </commons:content>
                                                     </commons:Timeline>
-                                                	<!-- <commons:Timeline
-                                                        id="idTimeline"
-                                                        enableDoubleSided="true"
-                                                        showFilterBar="false"
-
-
-                                                        groupByType="Year"
-                                                        groupBy="dateTime"
-                                                        textHeight="8"  
-
-                                                        growingThreshold="0"
-
-                                                        sortOldestFirst="false">
-                                                        <commons:content>
-                                                            <commons:TimelineItem
-                                                                userNameClicked="onUserNameClick"
-                                                                select="onPressItems"
-                                                                userNameClickable="true"
-
-                                                                >
-                                                            </commons:TimelineItem>
-                                                        </commons:content>
-                                                    </commons:Timeline> -->
 
                                             </IconTabFilter>
                                         </items>

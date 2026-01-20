@@ -10,9 +10,9 @@ export default {
         const resourceBundle = resourceModel.getResourceBundle() as ResourceBundle;
 
         switch (status) {
-            case '1': return resourceBundle.getText("tipoempleado1"); //New
-            case '2': return resourceBundle.getText("tipoempleado2"); //New
-            case '3': return resourceBundle.getText("tipoempleado3"); //New
+            case '1': return resourceBundle.getText("tipoempleado1"); 
+            case '2': return resourceBundle.getText("tipoempleado2");
+            case '3': return resourceBundle.getText("tipoempleado3");
             default: return status;
         }
 

@@ -266,7 +266,7 @@ export default class Detail extends BaseController {
         }
 
         public onNavToDetails(): void {
-
+                
                 const model = this.getModel("view") as JSONModel;
                 model.setProperty("/layout", "TwoColumnsMidExpanded");
                 const router = this.getRouter();

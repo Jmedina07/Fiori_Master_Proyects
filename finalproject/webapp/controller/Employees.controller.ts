@@ -80,7 +80,6 @@ export default class Employees extends BaseController {
     }
 
     public onClosePress(): void {
-
         const router = this.getRouter();
         router.navTo("menu");
         const model = this.getModel("view") as JSONModel;

@@ -346,10 +346,11 @@ export default class NewEmployee extends BaseController {
 
     public onClosePress(): void {
 
-        const router = this.getRouter();
-        router.navTo("menu");
-        const model = this.getModel("view") as JSONModel;
-        model.setProperty("/layout", "OneColumn");
+        this.onNavToBack();
+        // const router = this.getRouter();
+        // router.navTo("menu");
+        // const model = this.getModel("view") as JSONModel;
+        // model.setProperty("/layout", "OneColumn");
 
     }
 

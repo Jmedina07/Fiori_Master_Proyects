@@ -31,18 +31,10 @@
                         <Label text="{i18n>ID}"/>
                     </Column>
 
-                    <!-- <Column>
-                        <Label text="{i18n>type}"/>
-                    </Column> -->
-
                     <Column>
                         <Label text="{i18n>dni}"/>
                     </Column>
 
-                    <!-- <Column>
-                        <Label text="{i18n>date}"/>
-                    </Column> -->
-                
                 </columns>
 
                 <items>
@@ -54,14 +46,7 @@
                             <ObjectIdentifier title="{mEmployees>EmployeeId}" 
                                                 text="{mEmployees>LastName}, {mEmployees>FirstName}"/>
 
-                            <!-- <Text text="{mEmployees>Type}"/> -->
                             <Text text="{mEmployees>Dni}"/>
-                            <!-- <Text 
-                                text="{
-                                        path: 'mEmployees>CreationDate',
-                                        type: 'sap.ui.model.type.Date'
-                                    }"
-                            /> -->
                         
                         </cells>
                     

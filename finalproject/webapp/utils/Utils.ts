@@ -23,7 +23,7 @@ export default class Utils {
     }
 
     public getEmail(): string {
-        return "joel@logaligroup.com";
+        return "jomeez0307@gmail.com";
     }
     public async read(object?: JSONModel): Promise<any> {
         const model = this.model;

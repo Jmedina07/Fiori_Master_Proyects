@@ -15,7 +15,6 @@
 				stickySubheaderProvider="ShoppingCartWizard"
 				class="sapUiNoContentPadding"
 				showFooter="true">
-				<!-- DynamicPage Title -->
 				<f:title>
 					<f:DynamicPageTitle>
 						<f:heading>
@@ -31,7 +30,6 @@
 						</f:navigationActions>
 					</f:DynamicPageTitle>
 				</f:title>
-				<!-- DynamicPage Header -->
 				<f:content>
 					<Wizard id="employeeWizard"
 					        class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
@@ -133,19 +131,15 @@
 									uploadCompleted="onUploadCompleted"
 									instantUpload="false"
 									afterItemAdded="onFileAdded"
-									afterItemRemoved="onFileRemoved"
-									>
+									afterItemRemoved="onFileRemoved" >
 
-									<!-- <upload:items>
-                        				<upload:UploadSetItem fileName="{form>name}" />
-									</upload:items> -->
 								</upload:UploadSet>
 
 							</form:SimpleForm>
 						</WizardStep>
 					</Wizard>
 				</f:content>
-				<!-- DynamicPage Footer -->
+				
 				<f:footer>
 					<OverflowToolbar>
 						<ToolbarSpacer/>

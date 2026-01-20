@@ -42,7 +42,7 @@ export default class BaseController extends Controller {
                 fcl.setLayout("OneColumn"); 
             }
             
-            this.getRouter().navTo("RouteMaster", {}, true);
+            this.getRouter().navTo("menu", {}, true);
         }
     }
 

@@ -7,11 +7,6 @@
 	displayBlock="true"
 	height="100%">
 
-	<!-- <ScrollContainer
-		height="100%"
-		width="100%"
-		vertical="true"> -->
-		<!-- <HBox alignItems="Center"> -->
             <Panel headerText="{i18n>titlepanel1}" width="auto" class="sapUiResponsiveMargin">
 				<layoutData>
 					<FlexItemData baseSize="100%" />
@@ -40,8 +35,6 @@
 
             </Panel>
 
-        <!-- </HBox>
-		<HBox alignItems="Center"> -->
             <Panel headerText="{i18n>titlepanel2}" width="auto" class="sapUiResponsiveMargin" >
 
 				<f:GridContainer id="grid" borderReached=".onBorderReached">
@@ -56,6 +49,5 @@
 					</GenericTile>
                 </f:GridContainer>   
 			</Panel>		
-		<!-- </HBox> -->
-    <!-- </ScrollContainer> -->
+
 </mvc:View>
