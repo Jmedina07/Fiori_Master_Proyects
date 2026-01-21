@@ -3,9 +3,19 @@
 specVersion: "3.1"
 metadata:
   name: com.logaligroup.employees
+framework:
+  name: SAPUI5
+  version: "1.120.0"
+  libraries:
+    - name: sap.m
+    - name: sap.f
+    - name: sap.ui.core
+    - name: sap.ui.comp
 type: application
 builder:
   customTasks:
+    - name: ui5-tooling-modules-task
+      afterTask: replaceVersion
     - name: ui5-tooling-transpile-task
       afterTask: replaceVersion
       configuration:

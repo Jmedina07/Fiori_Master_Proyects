@@ -69,35 +69,53 @@ export default class Main extends BaseController {
         this.aStatusFilters = [];
         this.inputfilter(oInput);
         this.countryFilter(oMultiInput);
-        this.statusFilter(oMultiComboBox);
+        // this.statusFilter(oMultiComboBox);
         this.applyAllFilters();
     }
 
+    // private inputfilter(input: Input): void {
+
+    //     const sEmployee = input.getValue();
+    //     if (sEmployee) {
+    //         // Create a single OR filter for ProductName and ShipperName
+    //         const oSearchFilter =
+    //             new Filter({
+    //                 filters: [
+    //                     // new Filter("EmployeeID", FilterOperator.EQ, sEmployee),
+    //                     new Filter({
+    //                         filters: [
+    //                             new Filter("FistName", FilterOperator.Contains, sEmployee),
+    //                             new Filter("LastName", FilterOperator.Contains, sEmployee)
+    //                         ],
+    //                         and: false
+    //                     })
+
+    //                 ],
+    //                 and: false // Use OR logic for the search query
+    //             });
+    //         this.aSearchFilters.push(oSearchFilter);
+    //     }
+
+    // }
     private inputfilter(input: Input): void {
+        const sValue = input.getValue();
+        if (sValue) {
+            // Creamos un grupo OR para buscar por ID o por Nombre/Apellido
+            // const oIdFilter = new Filter("EmployeeID", FilterOperator.EQ, sValue);
+            const oNameFilter = new Filter({
+                filters: [
+                    new Filter("FirstName", FilterOperator.Contains, sValue), // Corregido "FistName"
+                    new Filter("LastName", FilterOperator.Contains, sValue)
+                ],
+                and: false
+            });
 
-        const sEmployee = input.getValue();
-        if (sEmployee) {
-            // Create a single OR filter for ProductName and ShipperName
-            const oSearchFilter =
-                new Filter({
-                    filters: [
-                        new Filter("EmployeeID", FilterOperator.EQ, sEmployee),
-                        new Filter({
-                            filters: [
-                                new Filter("FistName", FilterOperator.Contains, sEmployee),
-                                new Filter("LastName", FilterOperator.Contains, sEmployee)
-                            ],
-                            and: false
-                        })
-
-                    ],
-                    and: false // Use OR logic for the search query
-                });
-            this.aSearchFilters.push(oSearchFilter);
+            this.aSearchFilters.push(new Filter({
+                filters: [oNameFilter],
+                and: false // Buscamos si coincide con el ID O con los nombres
+            }));
         }
-
     }
-
     private countryFilter(oMultiInput: MultiInput): void {
 
         // 2. Obtener la lista de tokens

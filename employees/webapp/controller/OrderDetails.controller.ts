@@ -185,7 +185,7 @@ export default class OrderDetails extends BaseController {
         const context = item.getBindingContext("zinvoices") as Context;
         const path = context.getPath();
         // /sap/opu/odata/sap/YSAPUI5_SRV_01/FilesSet(AttId='0668',OrderId='010258',SapId='c25c385%40logaligroup.com',EmployeeId='0001')/$value
-        const url = `/sap/opu/odata/sap/YSAPUI5_SRV_01${path}/$value`
+        const url = `/comlogaligroupemployees/sap/opu/odata/sap/YSAPUI5_SRV_01${path}/$value`
         item.setUrl(url);
     }
 

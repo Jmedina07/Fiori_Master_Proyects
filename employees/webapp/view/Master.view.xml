@@ -82,7 +82,7 @@
                         <fb:FilterGroupItem groupName="filterStatus"
                                         name="Status"
                                         label="{i18n>labelStatus}"
-                                        visibleInFilterBar="true">
+                                        visibleInFilterBar="false">
                             <fb:control>
                                 <MultiComboBox id="idcmbStatus"
 
